@@ -4,16 +4,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="GoalVision - Pronostici calcistici basati su statistiche e algoritmi.">
+  <meta name="description" content="JustPredix - Pronostici calcistici basati su statistiche e algoritmi.">
   <title>JustPredix | Pronostici Calcio</title>
+
   <style>
     * { box-sizing: border-box; }
+
     body {
       margin: 0;
       font-family: Arial, sans-serif;
       background: #0b1220;
       color: #f5f7fb;
     }
+
     header {
       padding: 22px 7%;
       display: flex;
@@ -22,12 +25,37 @@
       background: #111c2e;
       border-bottom: 1px solid #26344b;
     }
-    .logo { font-size: 27px; font-weight: bold; color: #45df9a; }
-    nav a { color: white; text-decoration: none; margin-left: 20px; }
-    .hero { text-align: center; padding: 65px 20px 45px; }
-    .hero h1 { font-size: clamp(32px, 6vw, 52px); margin-bottom: 12px; }
+
+    .logo img {
+      width: 85px;
+      height: 85px;
+      object-fit: contain;
+      display: block;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin-left: 20px;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 65px 20px 45px;
+    }
+
+    .hero h1 {
+      font-size: clamp(32px, 6vw, 52px);
+      margin-bottom: 12px;
+    }
+
     .hero h1 span { color: #45df9a; }
-    .hero p { color: #aab7ca; font-size: 17px; }
+
+    .hero p {
+      color: #aab7ca;
+      font-size: 17px;
+    }
+
     .button {
       display: inline-block;
       background: #45df9a;
@@ -38,24 +66,50 @@
       font-weight: bold;
       margin-top: 15px;
     }
-    main { width: 86%; max-width: 1100px; margin: auto; }
+
+    main {
+      width: 86%;
+      max-width: 1100px;
+      margin: auto;
+    }
+
     h2 { margin-top: 35px; }
+
     .cards {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
       gap: 18px;
       margin: 22px 0 40px;
     }
+
     .card {
       background: #142238;
       border: 1px solid #293b55;
       border-radius: 13px;
       padding: 20px;
     }
-    .league { color: #45df9a; font-size: 13px; }
-    .match { font-size: 19px; font-weight: bold; margin: 15px 0; }
-    .prediction { color: #45df9a; font-weight: bold; }
-    .confidence { color: #aab7ca; font-size: 14px; }
+
+    .league {
+      color: #45df9a;
+      font-size: 13px;
+    }
+
+    .match {
+      font-size: 19px;
+      font-weight: bold;
+      margin: 15px 0;
+    }
+
+    .prediction {
+      color: #45df9a;
+      font-weight: bold;
+    }
+
+    .confidence {
+      color: #aab7ca;
+      font-size: 14px;
+    }
+
     .notice {
       background: #18283c;
       padding: 18px;
@@ -64,7 +118,12 @@
       line-height: 1.6;
       margin-bottom: 35px;
     }
-    .premium { text-align: center; padding: 30px 15px; }
+
+    .premium {
+      text-align: center;
+      padding: 30px 15px;
+    }
+
     footer {
       text-align: center;
       padding: 25px;
@@ -72,22 +131,27 @@
       color: #8796aa;
       margin-top: 35px;
     }
+
     @media(max-width:600px) {
-      header { flex-direction: column; gap: 15px; }
-      nav a { margin: 0 7px; font-size: 14px; }
+      header {
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      nav a {
+        margin: 0 7px;
+        font-size: 14px;
+      }
     }
-  style.logo img {
-  width: 85px;
-  height: 85px;
-  object-fit: contain;
-  display: block;
-}
+  </style>
 </head>
+
 <body>
   <header>
     <div class="logo">
-  <img src="logo.png" alt="JustPredix">
-</div>
+      <img src="logo.png" alt="JustPredix">
+    </div>
+
     <nav>
       <a href="#pronostici">Pronostici</a>
       <a href="#metodo">Metodo</a>
@@ -104,7 +168,10 @@
   <main>
     <section id="pronostici">
       <h2>Pronostici in evidenza</h2>
-      <p style="color:#aab7ca">Esempi dimostrativi: non sono previsioni aggiornate né consigli di scommessa.</p>
+      <p style="color:#aab7ca">
+        Esempi dimostrativi: non sono previsioni aggiornate né consigli di scommessa.
+      </p>
+
       <div class="cards">
         <article class="card">
           <div class="league">ESEMPIO · SERIE A</div>
@@ -112,12 +179,14 @@
           <p class="prediction">Previsione: 1X</p>
           <p class="confidence">Probabilità dimostrativa: 72%</p>
         </article>
+
         <article class="card">
           <div class="league">ESEMPIO · PREMIER LEAGUE</div>
           <div class="match">Squadra C – Squadra D</div>
           <p class="prediction">Previsione: Over 1.5</p>
           <p class="confidence">Probabilità dimostrativa: 68%</p>
         </article>
+
         <article class="card">
           <div class="league">ESEMPIO · LIGA</div>
           <div class="match">Squadra E – Squadra F</div>
@@ -128,7 +197,7 @@
     </section>
 
     <section id="metodo">
-      <h2>Come funziona GoalVision</h2>
+      <h2>Come funziona JustPredix</h2>
       <div class="notice">
         Il progetto utilizzerà dati calcistici, statistiche delle squadre,
         risultati precedenti e algoritmi per elaborare probabilità.
@@ -138,14 +207,14 @@
     </section>
 
     <section id="premium" class="premium">
-      <h2>GoalVision Premium</h2>
+      <h2>JustPredix Premium</h2>
       <p>In futuro: analisi approfondite, statistiche aggiuntive e contenuti esclusivi.</p>
-      <a class="button" href="mailto:info@goalvision.example">Scopri Premium</a>
+      <a class="button" href="#premium">Scopri Premium</a>
     </section>
   </main>
 
   <footer>
-    © 2026 GoalVision · Progetto in fase di sviluppo
+    © 2026 JustPredix · Progetto in fase di sviluppo
   </footer>
 </body>
 </html>
