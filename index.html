@@ -315,6 +315,31 @@ footer {
 <footer>
   © 2026 JustPredix · Football Analytics
 </footer>
+<script>
+const API_URL = "https://justpredix-api.sidritkadija.workers.dev";
 
+async function caricaPartite() {
+  try {
+    const oggi = new Date().toISOString().slice(0, 10);
+
+    const risposta = await fetch(
+      `${API_URL}/fixtures?date=${oggi}`
+    );
+
+    if (!risposta.ok) {
+      throw new Error("Errore nel caricamento delle partite");
+    }
+
+    const dati = await risposta.json();
+
+    console.log("Partite ricevute:", dati.response);
+
+  } catch (errore) {
+    console.error("Errore:", errore);
+  }
+}
+
+caricaPartite();
+</script>
 </body>
 </html>
