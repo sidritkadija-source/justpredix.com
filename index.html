@@ -2,219 +2,319 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="JustPredix - Pronostici calcistici basati su statistiche e algoritmi.">
-  <title>JustPredix | Pronostici Calcio</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JustPredix | Football Analytics</title>
+<meta name="description" content="JustPredix: statistiche, analisi e pronostici calcistici.">
 
-  <style>
-    * { box-sizing: border-box; }
+<style>
+* { box-sizing: border-box; }
 
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #0b1220;
-      color: #f5f7fb;
-    }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #080f1e;
+  color: #fff;
+}
 
-    header {
-      padding: 22px 7%;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: #111c2e;
-      border-bottom: 1px solid #26344b;
-    }
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 7%;
+  background: #101b30;
+  border-bottom: 1px solid #263957;
+}
 
-    .logo img {
-      width: 85px;
-      height: 85px;
-      object-fit: contain;
-      display: block;
-    }
+.logo img {
+  width: 75px;
+  height: 75px;
+  object-fit: contain;
+}
 
-    nav a {
-      color: white;
-      text-decoration: none;
-      margin-left: 20px;
-    }
+nav a {
+  color: #dce6f5;
+  text-decoration: none;
+  margin-left: 22px;
+  font-size: 14px;
+}
 
-    .hero {
-      text-align: center;
-      padding: 65px 20px 45px;
-    }
+nav a:hover { color: #42a5ff; }
 
-    .hero h1 {
-      font-size: clamp(32px, 6vw, 52px);
-      margin-bottom: 12px;
-    }
+.hero {
+  text-align: center;
+  padding: 75px 20px;
+  background: linear-gradient(135deg, #101d35, #0b1428);
+}
 
-    .hero h1 span { color: #45df9a; }
+.hero h1 {
+  font-size: clamp(34px, 6vw, 58px);
+  margin: 0 0 18px;
+}
 
-    .hero p {
-      color: #aab7ca;
-      font-size: 17px;
-    }
+.hero h1 span { color: #42a5ff; }
 
-    .button {
-      display: inline-block;
-      background: #45df9a;
-      color: #07140e;
-      padding: 13px 23px;
-      border-radius: 8px;
-      text-decoration: none;
-      font-weight: bold;
-      margin-top: 15px;
-    }
+.hero p {
+  color: #aabbd3;
+  font-size: 17px;
+  line-height: 1.6;
+}
 
-    main {
-      width: 86%;
-      max-width: 1100px;
-      margin: auto;
-    }
+.button {
+  display: inline-block;
+  background: #238cf0;
+  color: white;
+  padding: 14px 25px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: bold;
+  margin-top: 20px;
+}
 
-    h2 { margin-top: 35px; }
+main {
+  width: 88%;
+  max-width: 1150px;
+  margin: auto;
+}
 
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-      gap: 18px;
-      margin: 22px 0 40px;
-    }
+.section-title {
+  margin-top: 45px;
+  margin-bottom: 20px;
+  font-size: 25px;
+}
 
-    .card {
-      background: #142238;
-      border: 1px solid #293b55;
-      border-radius: 13px;
-      padding: 20px;
-    }
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 15px;
+  margin-top: -25px;
+}
 
-    .league {
-      color: #45df9a;
-      font-size: 13px;
-    }
+.stat {
+  background: #14233c;
+  border: 1px solid #263957;
+  border-radius: 12px;
+  padding: 22px;
+  text-align: center;
+}
 
-    .match {
-      font-size: 19px;
-      font-weight: bold;
-      margin: 15px 0;
-    }
+.stat strong {
+  display: block;
+  font-size: 27px;
+  color: #42a5ff;
+  margin-bottom: 8px;
+}
 
-    .prediction {
-      color: #45df9a;
-      font-weight: bold;
-    }
+.stat span {
+  color: #aabbd3;
+  font-size: 13px;
+}
 
-    .confidence {
-      color: #aab7ca;
-      font-size: 14px;
-    }
+.matches {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 18px;
+}
 
-    .notice {
-      background: #18283c;
-      padding: 18px;
-      border-radius: 10px;
-      color: #bdc9d9;
-      line-height: 1.6;
-      margin-bottom: 35px;
-    }
+.match-card {
+  background: #14233c;
+  border: 1px solid #263957;
+  border-radius: 13px;
+  padding: 22px;
+}
 
-    .premium {
-      text-align: center;
-      padding: 30px 15px;
-    }
+.league {
+  color: #42a5ff;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
 
-    footer {
-      text-align: center;
-      padding: 25px;
-      background: #111c2e;
-      color: #8796aa;
-      margin-top: 35px;
-    }
+.teams {
+  font-size: 19px;
+  font-weight: bold;
+  margin: 22px 0;
+}
 
-    @media(max-width:600px) {
-      header {
-        flex-direction: column;
-        gap: 15px;
-      }
+.prediction {
+  border-top: 1px solid #30415c;
+  padding-top: 15px;
+  color: #42a5ff;
+  font-weight: bold;
+}
 
-      nav a {
-        margin: 0 7px;
-        font-size: 14px;
-      }
-    }
-  </style>
+.probability {
+  color: #aabbd3;
+  font-size: 13px;
+}
+
+.leagues {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.league-item {
+  background: #14233c;
+  border: 1px solid #263957;
+  border-radius: 8px;
+  padding: 15px 20px;
+  color: #dce6f5;
+}
+
+.premium {
+  background: linear-gradient(135deg, #142c4b, #10213c);
+  border: 1px solid #31547c;
+  border-radius: 15px;
+  text-align: center;
+  padding: 40px 20px;
+  margin: 50px 0;
+}
+
+.premium h2 { color: #42a5ff; }
+
+.premium p {
+  color: #bdcce0;
+  line-height: 1.6;
+}
+
+.notice {
+  color: #8295b0;
+  font-size: 12px;
+  line-height: 1.6;
+  margin: 25px 0;
+}
+
+footer {
+  background: #101b30;
+  text-align: center;
+  padding: 30px;
+  color: #8295b0;
+  font-size: 13px;
+  margin-top: 50px;
+}
+
+@media(max-width: 650px) {
+  header {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  nav a {
+    margin: 0 7px;
+    font-size: 12px;
+  }
+
+  .hero { padding: 55px 18px; }
+  main { width: 92%; }
+}
+</style>
 </head>
 
 <body>
-  <header>
-    <div class="logo">
-      <img src="Logo.png" alt="JustPredix">
-    </div>
 
-    <nav>
-      <a href="#pronostici">Pronostici</a>
-      <a href="#metodo">Metodo</a>
-      <a href="#premium">Premium</a>
-    </nav>
-  </header>
+<header>
+  <div class="logo">
+    <img src="Logo.png" alt="JustPredix">
+  </div>
 
-  <section class="hero">
-    <h1>Il calcio, visto attraverso <span>i dati.</span></h1>
-    <p>Analisi statistiche e previsioni per i campionati di tutto il mondo.</p>
-    <a class="button" href="#pronostici">Scopri i pronostici</a>
-  </section>
+  <nav>
+    <a href="#">Home</a>
+    <a href="#partite">Partite</a>
+    <a href="#campionati">Campionati</a>
+    <a href="#premium">Premium</a>
+  </nav>
+</header>
 
-  <main>
-    <section id="pronostici">
-      <h2>Pronostici in evidenza</h2>
-      <p style="color:#aab7ca">
-        Esempi dimostrativi: non sono previsioni aggiornate né consigli di scommessa.
-      </p>
+<section class="hero">
+  <h1>Football <span>Analytics.</span></h1>
+  <p>
+    Il calcio analizzato attraverso i dati.<br>
+    Statistiche, probabilità e pronostici in un'unica piattaforma.
+  </p>
+  <a href="#partite" class="button">Esplora le analisi</a>
+</section>
 
-      <div class="cards">
-        <article class="card">
-          <div class="league">ESEMPIO · SERIE A</div>
-          <div class="match">Squadra A – Squadra B</div>
-          <p class="prediction">Previsione: 1X</p>
-          <p class="confidence">Probabilità dimostrativa: 72%</p>
-        </article>
+<main>
 
-        <article class="card">
-          <div class="league">ESEMPIO · PREMIER LEAGUE</div>
-          <div class="match">Squadra C – Squadra D</div>
-          <p class="prediction">Previsione: Over 1.5</p>
-          <p class="confidence">Probabilità dimostrativa: 68%</p>
-        </article>
+<section class="stats">
+  <div class="stat">
+    <strong>5</strong>
+    <span>Campionati da seguire</span>
+  </div>
+  <div class="stat">
+    <strong>1X2</strong>
+    <span>Mercati di previsione</span>
+  </div>
+  <div class="stat">
+    <strong>24/7</strong>
+    <span>Progetto online</span>
+  </div>
+</section>
 
-        <article class="card">
-          <div class="league">ESEMPIO · LIGA</div>
-          <div class="match">Squadra E – Squadra F</div>
-          <p class="prediction">Previsione: Goal</p>
-          <p class="confidence">Probabilità dimostrativa: 65%</p>
-        </article>
-      </div>
-    </section>
+<section id="partite">
+  <h2 class="section-title">Partite in evidenza</h2>
 
-    <section id="metodo">
-      <h2>Come funziona JustPredix</h2>
-      <div class="notice">
-        Il progetto utilizzerà dati calcistici, statistiche delle squadre,
-        risultati precedenti e algoritmi per elaborare probabilità.
-        Le percentuali mostrate in questa prima versione sono solo esempi.
-        Le previsioni reali richiederanno una fonte dati e un sistema di analisi.
-      </div>
-    </section>
+  <div class="matches">
 
-    <section id="premium" class="premium">
-      <h2>JustPredix Premium</h2>
-      <p>In futuro: analisi approfondite, statistiche aggiuntive e contenuti esclusivi.</p>
-      <a class="button" href="#premium">Scopri Premium</a>
-    </section>
-  </main>
+    <article class="match-card">
+      <div class="league">ESEMPIO · SERIE A</div>
+      <div class="teams">Inter - Milan</div>
+      <div class="prediction">Pronostico: 1X</div>
+      <p class="probability">Probabilità dimostrativa: 72%</p>
+    </article>
 
-  <footer>
-    © 2026 JustPredix · Progetto in fase di sviluppo
-  </footer>
+    <article class="match-card">
+      <div class="league">ESEMPIO · PREMIER LEAGUE</div>
+      <div class="teams">Arsenal - Chelsea</div>
+      <div class="prediction">Pronostico: Over 1.5</div>
+      <p class="probability">Probabilità dimostrativa: 68%</p>
+    </article>
+
+    <article class="match-card">
+      <div class="league">ESEMPIO · LA LIGA</div>
+      <div class="teams">Real Madrid - Barcelona</div>
+      <div class="prediction">Pronostico: Goal</div>
+      <p class="probability">Probabilità dimostrativa: 65%</p>
+    </article>
+
+  </div>
+</section>
+
+<section id="campionati">
+  <h2 class="section-title">Campionati</h2>
+
+  <div class="leagues">
+    <div class="league-item">🇮🇹 Serie A</div>
+    <div class="league-item">🏴 Premier League</div>
+    <div class="league-item">🇪🇸 La Liga</div>
+    <div class="league-item">🇩🇪 Bundesliga</div>
+    <div class="league-item">🇫🇷 Ligue 1</div>
+  </div>
+</section>
+
+<section id="premium" class="premium">
+  <h2>JustPredix Premium</h2>
+  <p>
+    Analisi approfondite, statistiche avanzate
+    e contenuti esclusivi.
+  </p>
+  <a href="mailto:info@justpredix.com" class="button">
+    Scopri Premium
+  </a>
+</section>
+
+<p class="notice">
+  Le partite e le percentuali presenti sono esempi dimostrativi,
+  non dati aggiornati né previsioni reali. JustPredix è in fase
+  di sviluppo.
+</p>
+
+</main>
+
+<footer>
+  © 2026 JustPredix · Football Analytics
+</footer>
+
 </body>
 </html>
