@@ -316,23 +316,43 @@ footer {
   © 2026 JustPredix · Football Analytics
 </footer>
 <script>
+<script>
 const API_URL = "https://justpredix-api.sidritkadija.workers.dev";
+const CACHE_TIME = 5 * 60 * 1000;
 
 async function caricaPartite() {
+  const oggi = new Date().toLocaleDateString("en-CA");
+  const cacheKey = "justpredix_partite_" + oggi;
+
   try {
-    const oggi = "2026-10-30";
+    const salvati = localStorage.getItem(cacheKey);
+
+    if (salvati) {
+      const cache = JSON.parse(salvati);
+
+      if (Date.now() - cache.time < CACHE_TIME) {
+        console.log("Partite dalla memoria:", cache.data);
+        return;
+      }
+    }
 
     const risposta = await fetch(
       `${API_URL}/fixtures?date=${oggi}`
     );
 
-    if (!risposta.ok) {
-      throw new Error("Errore nel caricamento delle partite");
-    }
-
     const dati = await risposta.json();
 
-    console.log("Risposta completa:", dati);
+    if (dati.errors && Object.keys(dati.errors).length > 0) {
+      console.error("Errore API:", dati.errors);
+      return;
+    }
+
+    localStorage.setItem(cacheKey, JSON.stringify({
+      time: Date.now(),
+      data: dati.response
+    }));
+
+    console.log("Partite ricevute:", dati.response);
 
   } catch (errore) {
     console.error("Errore:", errore);
