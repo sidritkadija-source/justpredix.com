@@ -346,6 +346,8 @@ async function caricaClassifica(leagueId) {
 }
   
 function mostraPartite(partite) {
+console.log("Partite ricevute:", partite.length);
+  
   const contenitore = document.getElementById("matches");
 
   if (!contenitore) return;
