@@ -344,7 +344,27 @@ async function caricaClassifica(leagueId) {
 
   return dati;
 }
-  
+ const SQUADRE_PRIORITARIE = {
+  135: [
+    "Inter", "Milan", "Juventus", "Roma", "Lazio"
+  ],
+  39: [
+    "Manchester City", "Manchester United",
+    "Liverpool", "Arsenal", "Chelsea",
+    "Newcastle", "Aston Villa"
+  ],
+  61: [
+    "Lyon", "Marseille", "Monaco", "Paris Saint Germain"
+  ],
+  78: [
+    "Bayern Munich", "Borussia Dortmund",
+    "RB Leipzig", "Bayer Leverkusen"
+  ],
+  140: [
+    "Real Madrid", "Barcelona",
+    "Atletico Madrid", "Sevilla"
+  ]
+}; 
 async function mostraPartite(partite) {
   console.log("Partite ricevute:", partite.length);
 
@@ -393,42 +413,65 @@ async function mostraPartite(partite) {
     console.error("Errore nel caricamento classifiche:", errore);
   }
 
-  const punteggioSquadra = (nome, classifica) => {
-    const squadra = classifica.find(riga =>
-      riga.team?.name?.toLowerCase() === nome.toLowerCase()
-    );
+  const punteggioSquadra = (nome, classifica, leagueId) => {
+  const nomeNormalizzato = nome
+    .toLowerCase()
+    .trim();
 
-    if (!squadra) return 0;
+  const prioritarie = SQUADRE_PRIORITARIE[leagueId] || [];
 
+  const squadraPrioritaria = prioritarie.some(s =>
+    s.toLowerCase() === nomeNormalizzato
+  );
+
+  let punteggio = squadraPrioritaria ? 5 : 0;
+
+  const squadra = classifica.find(riga =>
+    riga.team?.name?.toLowerCase().trim() === nomeNormalizzato
+  );
+
+  if (squadra) {
     const posizione = Number(squadra.league_rank);
 
-    if (posizione <= 5) return 3;
-    if (posizione <= 8) return 2;
+    if (posizione >= 1 && posizione <= 5) {
+      punteggio += 3;
+    } else if (posizione >= 6 && posizione <= 8) {
+      punteggio += 2;
+    }
+  }
 
-    return 0;
-  };
-
+  return punteggio;
+};
   const partiteValutate = partite.map(partita => {
     const classifica = classifiche[partita.league.id] || [];
 
     const puntiCasa = punteggioSquadra(
-      partita.teams.home.name,
-      classifica
-    );
+  partita.teams.home.name,
+  classifica,
+  partita.league.id
+);
 
-    const puntiOspite = punteggioSquadra(
-      partita.teams.away.name,
-      classifica
-    );
+const puntiOspite = punteggioSquadra(
+  partita.teams.away.name,
+  classifica,
+  partita.league.id
+);
 
     let punteggio = puntiCasa + puntiOspite;
 
-    if (
-      puntiCasa > 0 &&
-      puntiOspite > 0
-    ) {
-      punteggio += 2;
-    }
+   const prioritarie = SQUADRE_PRIORITARIE[partita.league.id] || [];
+
+const casaPrioritaria = prioritarie.some(
+  nome => nome.toLowerCase() === partita.teams.home.name.toLowerCase()
+);
+
+const ospitePrioritaria = prioritarie.some(
+  nome => nome.toLowerCase() === partita.teams.away.name.toLowerCase()
+);
+
+if (casaPrioritaria && ospitePrioritaria) {
+  punteggio += 2;
+}
 
     return {
       partita,
@@ -460,7 +503,7 @@ async function mostraPartite(partite) {
           <div class="teams">${casa} - ${ospite}</div>
           <div class="prediction">Orario: ${orario}</div>
           <p class="probability">
-            Importanza: ${punteggio}/8
+            Importanza: ${punteggio}
           </p>
         </article>
       `;
