@@ -441,7 +441,7 @@ async function mostraPartite(partite) {
   );
 
   contenitore.innerHTML = partiteValutate
-    .slice(0, 10)
+    .slice(0, 15)
     .map(({ partita, punteggio }) => {
       const casa = escapeHTML(partita.teams.home.name);
       const ospite = escapeHTML(partita.teams.away.name);
