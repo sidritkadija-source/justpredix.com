@@ -454,20 +454,20 @@ const normalizzaNomeSquadra = nome => {
 
   return varianti[nomePulito] || nomePulito;
 };
-  const punteggioSquadra = (nome, classifica, leagueId) => {
+ const punteggioSquadra = (nome, classifica, leagueId) => {
   const nomeNormalizzato = normalizzaNomeSquadra(nome);
 
   const prioritarie = SQUADRE_PRIORITARIE[leagueId] || [];
 
   const squadraPrioritaria = prioritarie.some(s =>
-  normalizzaNomeSquadra(s) === normalizzaNomeSquadra(nome)
-);
+    normalizzaNomeSquadra(s) === nomeNormalizzato
+  );
 
   let punteggio = squadraPrioritaria ? 5 : 0;
 
   const squadra = classifica.find(riga =>
-  normalizzaNomeSquadra(riga.team?.name) === nomeNormalizzato
-);
+    normalizzaNomeSquadra(riga.team?.name) === nomeNormalizzato
+  );
 
   if (squadra) {
     const posizione = Number(squadra.league_rank);
@@ -478,7 +478,7 @@ const normalizzaNomeSquadra = nome => {
       punteggio += 2;
     }
   }
-};
+
   return punteggio;
 };
   const partiteValutate = partite.map(partita => {
