@@ -298,8 +298,22 @@ const API_URL = "https://justpredix-api.sidritkadija.workers.dev";
 const CACHE_TIME = 5 * 60 * 1000;
 async function caricaClassifica(leagueId) {
   const stagione = 2026;
-  const chiave = "justpredix_classifica_" + leagueId;
 
+  const campionati = {
+    39: "epl",
+    140: "laliga",
+    135: "seriea",
+    78: "bundesliga",
+    61: "ligue1"
+  };
+
+  const codice = campionati[leagueId];
+
+  if (!codice) {
+    throw new Error("Campionato non riconosciuto");
+  }
+
+  const chiave = "justpredix_classifica_" + leagueId;
   const salvata = localStorage.getItem(chiave);
 
   if (salvata) {
@@ -309,7 +323,27 @@ async function caricaClassifica(leagueId) {
       return cache.data;
     }
   }
+    const risposta = await fetch(
+    `${API_URL}/ninja-standings?league=${codice}&season=${stagione}`
+  );
 
+  if (!risposta.ok) {
+    throw new Error("Errore classifica: " + risposta.status);
+  }
+
+  const dati = await risposta.json();
+
+  if (!Array.isArray(dati) || dati.length === 0) {
+    throw new Error("Classifica non disponibile");
+  }
+
+  localStorage.setItem(chiave, JSON.stringify({
+    time: Date.now(),
+    data: dati
+  }));
+
+  return dati;
+}
   const risposta = await fetch(
     `${API_URL}/standings?league=${leagueId}&season=${stagione}`
   );
