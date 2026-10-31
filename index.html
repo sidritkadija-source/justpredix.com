@@ -435,23 +435,39 @@ async function mostraPartite(partite) {
   } catch (errore) {
     console.error("Errore nel caricamento classifiche:", errore);
   }
+const normalizzaNomeSquadra = nome => {
+  const varianti = {
+    "ac milan": "milan",
+    "as roma": "roma",
+    "paris saint-germain": "paris saint germain",
+    "atletico de madrid": "atletico madrid",
+    "athletic club": "athletic bilbao"
+  };
 
-  const punteggioSquadra = (nome, classifica, leagueId) => {
-  const nomeNormalizzato = nome
+  const nomePulito = String(nome || "")
     .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9 ]/g, " ")
+    .replace(/\s+/g, " ")
     .trim();
+
+  return varianti[nomePulito] || nomePulito;
+};
+  const punteggioSquadra = (nome, classifica, leagueId) => {
+  const nomeNormalizzato = normalizzaNomeSquadra(nome);
 
   const prioritarie = SQUADRE_PRIORITARIE[leagueId] || [];
 
   const squadraPrioritaria = prioritarie.some(s =>
-    s.toLowerCase() === nomeNormalizzato
-  );
+  normalizzaNomeSquadra(s) === normalizzaNomeSquadra(nome)
+);
 
   let punteggio = squadraPrioritaria ? 5 : 0;
 
   const squadra = classifica.find(riga =>
-    riga.team?.name?.toLowerCase().trim() === nomeNormalizzato
-  );
+  normalizzaNomeSquadra(riga.team?.name) === nomeNormalizzato
+);
 
   if (squadra) {
     const posizione = Number(squadra.league_rank);
@@ -462,7 +478,7 @@ async function mostraPartite(partite) {
       punteggio += 2;
     }
   }
-
+};
   return punteggio;
 };
   const partiteValutate = partite.map(partita => {
