@@ -117,6 +117,29 @@ main {
 }
 
 .match-card {
+.match-status {
+  display: inline-block;
+  padding: 5px 10px;
+  margin-top: 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.match-status.live {
+  background: #16a34a;
+  color: white;
+}
+
+.match-status.finished {
+  background: #475569;
+  color: white;
+}
+
+.match-status.scheduled {
+  background: #2563eb;
+  color: white;
+}
   background: #14233c;
   border: 1px solid #263957;
   border-radius: 13px;
@@ -479,9 +502,30 @@ if (casaPrioritaria && ospitePrioritaria) {
     };
   });
 
-  partiteValutate.sort((a, b) =>
-    b.punteggio - a.punteggio
-  );
+ const prioritaStato = partita => {
+  const stato = partita.fixture.status.short;
+
+  if (["1H", "HT", "2H", "ET", "BT", "P", "LIVE"].includes(stato)) {
+    return 2;
+  }
+
+  if (["FT", "AET", "PEN"].includes(stato)) {
+    return 1;
+  }
+
+  return 0;
+};
+
+partiteValutate.sort((a, b) => {
+  const differenzaStato =
+    prioritaStato(b.partita) - prioritaStato(a.partita);
+
+  if (differenzaStato !== 0) {
+    return differenzaStato;
+  }
+
+  return b.punteggio - a.punteggio;
+});
 
   contenitore.innerHTML = partiteValutate
     .slice(0, 15)
@@ -496,12 +540,34 @@ if (casaPrioritaria && ospitePrioritaria) {
           minute: "2-digit",
           timeZone: "Europe/Tirane"
         });
+const statoPartita = partita.fixture.status.short;
 
+let statoTesto = "PROGRAMMATA";
+let statoClasse = "scheduled";
+
+if (["1H", "HT", "2H", "ET", "BT", "P", "LIVE"].includes(statoPartita)) {
+  statoTesto = "IN CORSO";
+  statoClasse = "live";
+} else if (["FT", "AET", "PEN"].includes(statoPartita)) {
+  statoTesto = "TERMINATA";
+  statoClasse = "finished";
+}
       return `
         <article class="match-card">
           <div class="league">${campionato}</div>
           <div class="teams">${casa} - ${ospite}</div>
-          <div class="prediction">Orario: ${orario}</div>
+
+<div class="match-status ${statoClasse}">
+  ${statoTesto}
+</div>
+
+<div class="prediction">
+  ${
+    statoClasse === "live" || statoClasse === "finished"
+      ? `Risultato: ${partita.goals.home ?? 0} - ${partita.goals.away ?? 0}`
+      : `Orario: ${orario}`
+  }
+</div>
           <p class="probability">
             Importanza: ${punteggio}
           </p>
