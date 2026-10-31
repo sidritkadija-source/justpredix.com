@@ -345,18 +345,19 @@ async function caricaClassifica(leagueId) {
   return dati;
 }
   
-function mostraPartite(partite) {
-console.log("Partite ricevute:", partite.length);
-  
-  const contenitore = document.getElementById("matches");
+async function mostraPartite(partite) {
+  console.log("Partite ricevute:", partite.length);
 
+  const contenitore = document.getElementById("matches");
   if (!contenitore) return;
+
   const campionati = [39, 140, 135, 78, 61];
 
   partite = partite.filter(partita =>
     campionati.includes(partita.league.id)
   );
-  if (!partite || partite.length === 0) {
+
+  if (partite.length === 0) {
     contenitore.innerHTML =
       "<p>Nessuna partita disponibile oggi.</p>";
     return;
@@ -371,29 +372,101 @@ console.log("Partite ricevute:", partite.length);
       "'": "&#39;"
     })[carattere]);
 
-  contenitore.innerHTML = partite.slice(0, 10).map(partita => {
-    const casa = escapeHTML(partita.teams.home.name);
-    const ospite = escapeHTML(partita.teams.away.name);
-    const campionato = escapeHTML(partita.league.name);
+  const classifiche = {};
 
-    const orario = new Date(partita.fixture.date)
-      .toLocaleTimeString("it-IT", {
-        hour: "2-digit",
-        minute: "2-digit",
-        timeZone: "Europe/Tirane"
-      });
+  try {
+    const risultati = await Promise.all(
+      campionati.map(async id => {
+        try {
+          return [id, await caricaClassifica(id)];
+        } catch (errore) {
+          console.error("Classifica non disponibile:", id, errore);
+          return [id, []];
+        }
+      })
+    );
 
-    return `
-      <article class="match-card">
-        <div class="league">${campionato}</div>
-        <div class="teams">${casa} - ${ospite}</div>
-        <div class="prediction">Orario: ${orario}</div>
-        <p class="probability">Partita reale</p>
-      </article>
-    `;
-  }).join("");
+    risultati.forEach(([id, dati]) => {
+      classifiche[id] = dati;
+    });
+  } catch (errore) {
+    console.error("Errore nel caricamento classifiche:", errore);
+  }
+
+  const punteggioSquadra = (nome, classifica) => {
+    const squadra = classifica.find(riga =>
+      riga.team?.name?.toLowerCase() === nome.toLowerCase()
+    );
+
+    if (!squadra) return 0;
+
+    const posizione = Number(squadra.league_rank);
+
+    if (posizione <= 5) return 3;
+    if (posizione <= 8) return 2;
+
+    return 0;
+  };
+
+  const partiteValutate = partite.map(partita => {
+    const classifica = classifiche[partita.league.id] || [];
+
+    const puntiCasa = punteggioSquadra(
+      partita.teams.home.name,
+      classifica
+    );
+
+    const puntiOspite = punteggioSquadra(
+      partita.teams.away.name,
+      classifica
+    );
+
+    let punteggio = puntiCasa + puntiOspite;
+
+    if (
+      puntiCasa > 0 &&
+      puntiOspite > 0
+    ) {
+      punteggio += 2;
+    }
+
+    return {
+      partita,
+      punteggio
+    };
+  });
+
+  partiteValutate.sort((a, b) =>
+    b.punteggio - a.punteggio
+  );
+
+  contenitore.innerHTML = partiteValutate
+    .slice(0, 10)
+    .map(({ partita, punteggio }) => {
+      const casa = escapeHTML(partita.teams.home.name);
+      const ospite = escapeHTML(partita.teams.away.name);
+      const campionato = escapeHTML(partita.league.name);
+
+      const orario = new Date(partita.fixture.date)
+        .toLocaleTimeString("it-IT", {
+          hour: "2-digit",
+          minute: "2-digit",
+          timeZone: "Europe/Tirane"
+        });
+
+      return `
+        <article class="match-card">
+          <div class="league">${campionato}</div>
+          <div class="teams">${casa} - ${ospite}</div>
+          <div class="prediction">Orario: ${orario}</div>
+          <p class="probability">
+            Importanza: ${punteggio}/8
+          </p>
+        </article>
+      `;
+    }).join("");
 }
-
+ 
 async function caricaPartite() {
   const oggi = new Date().toLocaleDateString("en-CA", {
     timeZone: "Europe/Tirane"
