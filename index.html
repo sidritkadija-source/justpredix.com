@@ -296,7 +296,43 @@ footer {
 <script>
 const API_URL = "https://justpredix-api.sidritkadija.workers.dev";
 const CACHE_TIME = 5 * 60 * 1000;
+async function caricaClassifica(leagueId) {
+  const stagione = 2026;
+  const chiave = "justpredix_classifica_" + leagueId;
 
+  const salvata = localStorage.getItem(chiave);
+
+  if (salvata) {
+    const cache = JSON.parse(salvata);
+
+    if (Date.now() - cache.time < CACHE_TIME) {
+      return cache.data;
+    }
+  }
+
+  const risposta = await fetch(
+    `${API_URL}/standings?league=${leagueId}&season=${stagione}`
+  );
+
+  if (!risposta.ok) {
+    throw new Error("Errore classifica: " + risposta.status);
+  }
+
+  const dati = await risposta.json();
+
+  if (dati.errors && Object.keys(dati.errors).length > 0) {
+    throw new Error(JSON.stringify(dati.errors));
+  }
+
+  const classifica = dati.response[0]?.league?.standings?.[0] || [];
+
+  localStorage.setItem(chiave, JSON.stringify({
+    time: Date.now(),
+    data: classifica
+  }));
+
+  return classifica;
+}
 function mostraPartite(partite) {
   const contenitore = document.getElementById("matches");
 
