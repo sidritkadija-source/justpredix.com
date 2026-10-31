@@ -292,29 +292,7 @@ footer {
 <footer>
   © 2026 JustPredix · Football Analytics
 </footer>
-<script>
-const API_URL = "https://justpredix-api.sidritkadija.workers.dev";
-const CACHE_TIME = 5 * 60 * 1000;
 
-async function caricaPartite() {
-  const oggi = new Date().toLocaleDateString("en-CA");
-  const cacheKey = "justpredix_partite_" + oggi;
-
-  try {
-    const salvati = localStorage.getItem(cacheKey);
-
-    if (salvati) {
-      const cache = JSON.parse(salvati);
-
-      if (Date.now() - cache.time < CACHE_TIME) {
-        console.log("Partite dalla memoria:", cache.data);
-        return;
-      }
-    }
-
-    const risposta = await fetch(
-      `${API_URL}/fixtures?date=${oggi}`
-    );
 <script>
 const API_URL = "https://justpredix-api.sidritkadija.workers.dev";
 const CACHE_TIME = 5 * 60 * 1000;
