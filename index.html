@@ -301,7 +301,11 @@ function mostraPartite(partite) {
   const contenitore = document.getElementById("matches");
 
   if (!contenitore) return;
+  const campionati = [39, 140, 135, 78, 61];
 
+  partite = partite.filter(partita =>
+    campionati.includes(partita.league.id)
+  );
   if (!partite || partite.length === 0) {
     contenitore.innerHTML =
       "<p>Nessuna partita disponibile oggi.</p>";
