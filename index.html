@@ -611,6 +611,48 @@ html, body {
   max-width: none;
   align-self: start;
 }
+  /* Gruppi dei campionati */
+.league-group {
+  margin-bottom: 14px;
+  border: 1px solid #263b55;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #0b192b;
+}
+
+/* Intestazione del campionato */
+.league-heading {
+  background: #142b43;
+  color: #ffffff;
+  padding: 14px 16px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.league-heading::-webkit-details-marker {
+  display: none;
+}
+
+/* Freccia per aprire e chiudere */
+.league-heading::after {
+  content: "▼";
+  font-size: 12px;
+  transition: transform 0.2s;
+}
+
+.league-group[open] .league-heading::after {
+  transform: rotate(180deg);
+}
+
+/* Contenitore delle partite */
+.league-matches {
+  padding: 8px;
+}
 </style>
 </head>
 
@@ -1090,7 +1132,30 @@ if (["1H", "HT", "2H", "ET", "BT", "P", "LIVE"].includes(statoPartita)) {
   </article>
 `;
     }).join("");
-  contenitore.innerHTML = creaRighePartite(partiteValutate);
+  const gruppiCampionati = [
+  { id: 135, nome: "🇮🇹 ITALIA: Serie A" },
+  { id: 39, nome: "🏴 INGHILTERRA: Premier League" },
+  { id: 140, nome: "🇪🇸 SPAGNA: La Liga" },
+  { id: 78, nome: "🇩🇪 GERMANIA: Bundesliga" },
+  { id: 61, nome: "🇫🇷 FRANCIA: Ligue 1" }
+];
+
+contenitore.innerHTML = gruppiCampionati.map(({ id, nome }) => {
+  const partiteCampionato = partiteValutate.filter(
+    ({ partita }) => partita.league.id === id
+  );
+
+  if (partiteCampionato.length === 0) return "";
+
+  return `
+    <details class="league-group" open>
+      <summary class="league-heading">${nome}</summary>
+      <div class="league-matches">
+        ${creaRighePartite(partiteCampionato)}
+      </div>
+    </details>
+  `;
+}).join("");
   
  const ticker = document.getElementById("top-matches-track");
 
@@ -1191,7 +1256,13 @@ caricaPartite();
           ? ""
           : "none";
     });
+document.querySelectorAll("#matches .league-group").forEach(gruppo => {
+  const partiteVisibili = Array.from(
+    gruppo.querySelectorAll(".match-row")
+  ).some(riga => riga.style.display !== "none");
 
+  gruppo.style.display = partiteVisibili ? "" : "none";
+});
   });
 });
 </script>
