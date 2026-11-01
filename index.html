@@ -1214,15 +1214,21 @@ contenitore.innerHTML = gruppiCampionati.map(({ id, nome }) => {
   
  const ticker = document.getElementById("top-matches-track");
 
-if (ticker) {
+const dataOggi = new Date().toLocaleDateString("en-CA", {
+  timeZone: "Europe/Tirane"
+});
+
+const dataCalendario = document.getElementById("match-date")?.value;
+
+if (ticker && (!dataCalendario || dataCalendario === dataOggi)) {
   ticker.innerHTML = creaRighePartite(top15Partite);
 }
 }
  
-async function caricaPartite() {
-  const oggi = new Date().toLocaleDateString("en-CA", {
-    timeZone: "Europe/Tirane"
-  });
+async function caricaPartite(dataSelezionata) {
+const oggi = dataSelezionata || new Date().toLocaleDateString("en-CA", {
+  timeZone: "Europe/Tirane"
+});
 
   const cacheKey = "justpredix_partite_" + oggi;
   const contenitore = document.getElementById("matches");
@@ -1292,6 +1298,42 @@ if (salvati) {
 }
 
 caricaPartite();
+  const campoData = document.getElementById("match-date");
+
+if (campoData) {
+  campoData.value = new Date().toLocaleDateString("en-CA", {
+    timeZone: "Europe/Tirane"
+  });
+}
+  if (campoData) {
+  campoData.addEventListener("change", () => {
+    if (!campoData.value) return;
+
+    document.querySelectorAll(".filter-btn").forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.filter === "all");
+    });
+
+    caricaPartite(campoData.value);
+  });
+}
+  document.getElementById("prev-day").addEventListener("click", () => {
+  if (!campoData?.value) return;
+
+  const data = new Date(campoData.value + "T12:00:00Z");
+  data.setUTCDate(data.getUTCDate() - 1);
+
+  campoData.value = data.toISOString().slice(0, 10);
+  campoData.dispatchEvent(new Event("change"));
+});
+  document.getElementById("next-day").addEventListener("click", () => {
+  if (!campoData?.value) return;
+
+  const data = new Date(campoData.value + "T12:00:00Z");
+  data.setUTCDate(data.getUTCDate() + 1);
+
+  campoData.value = data.toISOString().slice(0, 10);
+  campoData.dispatchEvent(new Event("change"));
+});
   document.querySelectorAll(".filter-btn").forEach(pulsante => {
   pulsante.addEventListener("click", () => {
 
