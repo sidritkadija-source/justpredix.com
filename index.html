@@ -532,17 +532,20 @@ if (casaPrioritaria && ospitePrioritaria) {
   return 0;
 };
 
+```javascript
 partiteValutate.sort((a, b) => {
+  // Prima vengono le partite più importanti
+  if (b.punteggio !== a.punteggio) {
+    return b.punteggio - a.punteggio;
+  }
+
+  // A parità di importanza, prima le partite in corso
   const differenzaStato =
     prioritaStato(b.partita) - prioritaStato(a.partita);
 
-  if (differenzaStato !== 0) {
-    return differenzaStato;
-  }
-
-  return b.punteggio - a.punteggio;
+  return differenzaStato;
 });
-
+```
   contenitore.innerHTML = partiteValutate
     .slice(0, 15)
     .map(({ partita, punteggio }) => {
