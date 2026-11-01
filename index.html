@@ -457,7 +457,80 @@ footer {
   border-radius: 2px;
   vertical-align: middle;
   margin-right: 8px;
-}  
+}
+/* TABELLA PARTITE JUSTPREDIX */
+.matches-main .matches {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.match-row {
+  display: grid;
+  grid-template-columns: 55px minmax(0, 1fr) 65px 100px;
+  align-items: center;
+  gap: 12px;
+  background: #102239;
+  border: 1px solid #203b59;
+  border-radius: 6px;
+  padding: 12px;
+  color: #e5edf7;
+  font-size: 13px;
+}
+
+.match-row:hover {
+  background: #18314d;
+}
+
+.match-time {
+  color: #9db3cc;
+  font-weight: 600;
+}
+
+.match-teams {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+  font-weight: 600;
+}
+
+.match-score {
+  text-align: center;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.match-state {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.match-state.live {
+  color: #ff5252;
+}
+
+.match-state.finished {
+  color: #31d08a;
+}
+
+.match-state.scheduled {
+  color: #35a4ff;
+}
+
+@media (max-width: 650px) {
+  .match-row {
+    grid-template-columns: 45px minmax(0, 1fr) 55px;
+    gap: 8px;
+    padding: 10px 8px;
+  }
+
+  .match-state {
+    grid-column: 2 / 4;
+    text-align: left;
+  }
+}
 </style>
 </head>
 
