@@ -942,8 +942,8 @@ partiteValutate.sort((a, b) => {
 
   return differenzaStato;
 });
-
-
+const top15Partite = partiteValutate.slice(0, 15);
+  
   contenitore.innerHTML = partiteValutate
     .slice(0, 15)
     .map(({ partita, punteggio }) => {
