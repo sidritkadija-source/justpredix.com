@@ -496,16 +496,16 @@ const puntiOspite = punteggioSquadra(
   partita.league.id
 );
 
-    let punteggio = puntiCasa + puntiOspite;
-
-   const prioritarie = SQUADRE_PRIORITARIE[partita.league.id] || [];
+    const prioritarie = SQUADRE_PRIORITARIE[partita.league.id] || [];
 
 const casaPrioritaria = prioritarie.some(
-  nome => nome.toLowerCase() === partita.teams.home.name.toLowerCase()
+  nome => normalizzaNomeSquadra(nome) ===
+          normalizzaNomeSquadra(partita.teams.home.name)
 );
 
 const ospitePrioritaria = prioritarie.some(
-  nome => nome.toLowerCase() === partita.teams.away.name.toLowerCase()
+  nome => normalizzaNomeSquadra(nome) ===
+          normalizzaNomeSquadra(partita.teams.away.name)
 );
 
 if (casaPrioritaria && ospitePrioritaria) {
@@ -557,9 +557,6 @@ partiteValutate.sort((a, b) => {
           minute: "2-digit",
           timeZone: "Europe/Tirane"
         });
-const statoPartita = partita.fixture.status.short;
-
-let statoTesto = "PROGRAMMATA";
 const statoPartita = partita.fixture.status.short;
 
 let statoTesto = "PROGRAMMATA";
