@@ -568,6 +568,16 @@ footer {
     transform: translateX(-100%);
   }
 }
+  /* Impedisce al ticker di allargare la pagina */
+html, body {
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+.top-matches-ticker {
+  width: 100%;
+  overflow: hidden;
+}
 </style>
 </head>
 
