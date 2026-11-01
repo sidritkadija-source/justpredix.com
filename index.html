@@ -1222,6 +1222,8 @@ const dataCalendario = document.getElementById("match-date")?.value;
 
 if (ticker && (!dataCalendario || dataCalendario === dataOggi)) {
   ticker.innerHTML = creaRighePartite(top15Partite);
+  // Riapplica il filtro selezionato dopo il caricamento
+document.querySelector(".filter-btn.active")?.click();
 }
 }
  
@@ -1345,6 +1347,18 @@ if (campoData) {
 
     const filtro = pulsante.dataset.filter;
 
+    const dataOggi = new Date().toLocaleDateString("en-CA", {
+  timeZone: "Europe/Tirane"
+});
+
+if (
+  (filtro === "live" || filtro === "finished") &&
+  campoData &&
+  campoData.value !== dataOggi
+) {
+  campoData.value = dataOggi;
+  caricaPartite(dataOggi);
+}
     document.querySelectorAll("#matches .match-row").forEach(riga => {
       const stato = riga.querySelector(".match-state");
 
