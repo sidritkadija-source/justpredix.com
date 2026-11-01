@@ -388,6 +388,34 @@ async function caricaClassifica(leagueId) {
     "Atletico Madrid", "Sevilla"
   ]
 }; 
+  const RIVALITA_STORICHE = {
+  135: [
+    ["Inter", "Milan"],
+    ["Juventus", "Inter"],
+    ["Roma", "Lazio"],
+    ["Juventus", "Milan"]
+  ],
+  39: [
+    ["Liverpool", "Manchester United"],
+    ["Arsenal", "Chelsea"],
+    ["Manchester City", "Manchester United"]
+  ],
+  61: [
+    ["PSG", "Marseille"],
+    ["Lyon", "Saint Etienne"],
+    ["Monaco", "Nice"]
+  ],
+  78: [
+    ["Bayern Munich", "Borussia Dortmund"],
+    ["Bayern Munich", "RB Leipzig"]
+  ],
+  140: [
+    ["Real Madrid", "Barcelona"],
+    ["Real Madrid", "Atletico Madrid"],
+    ["Barcelona", "Atletico Madrid"],
+    ["Sevilla", "Real Betis"]
+  ]
+};
 async function mostraPartite(partite) {
   console.log("Partite ricevute:", partite.length);
 
@@ -512,7 +540,24 @@ const ospitePrioritaria = prioritarie.some(
 if (casaPrioritaria && ospitePrioritaria) {
   punteggio += 2;
 }
+const rivalita = RIVALITA_STORICHE[partita.league.id] || [];
 
+const nomeCasa = normalizzaNomeSquadra(partita.teams.home.name);
+const nomeOspite = normalizzaNomeSquadra(partita.teams.away.name);
+
+const eRivalita = rivalita.some(([squadra1, squadra2]) => {
+  const s1 = normalizzaNomeSquadra(squadra1);
+  const s2 = normalizzaNomeSquadra(squadra2);
+
+  return (
+    (nomeCasa === s1 && nomeOspite === s2) ||
+    (nomeCasa === s2 && nomeOspite === s1)
+  );
+});
+
+if (eRivalita) {
+  punteggio += 3;
+}
     return {
       partita,
       punteggio
