@@ -330,6 +330,75 @@ footer {
     height: 45px;
   }
 }
+/* LAYOUT PRINCIPALE A TRE COLONNE */
+.home-layout {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr) 240px;
+  gap: 18px;
+  width: 94%;
+  max-width: 1600px;
+  margin: 25px auto;
+  align-items: start;
+}
+
+/* COLONNE LATERALI */
+.sidebar-left,
+.sidebar-right {
+  background: #0b192b;
+  border: 1px solid #263b55;
+  border-radius: 10px;
+  padding: 15px;
+  min-width: 0;
+}
+
+/* COLONNA CENTRALE */
+.matches-main {
+  min-width: 0;
+}
+
+/* TITOLI DELLE SEZIONI */
+.home-layout .section-title {
+  color: #ffffff;
+  font-size: 16px;
+  margin: 0 0 15px;
+}
+
+/* ELEMENTI DEI CAMPIONATI E DELLE NAZIONI */
+.home-layout .league-item {
+  background: #12243a;
+  color: #dce7f5;
+  padding: 11px;
+  margin-bottom: 7px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.home-layout .league-item:hover {
+  background: #1b3858;
+}
+
+/* ADATTAMENTO A TABLET E SMARTPHONE */
+@media (max-width: 1000px) {
+  .home-layout {
+    grid-template-columns: 190px minmax(0, 1fr);
+  }
+
+  .sidebar-right {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 650px) {
+  .home-layout {
+    grid-template-columns: 1fr;
+    width: 94%;
+  }
+
+  .sidebar-left,
+  .sidebar-right {
+    grid-column: 1;
+  }
+}  
 </style>
 </head>
 
@@ -377,25 +446,62 @@ footer {
   </div>
 </section>
 
-<section id="partite">
-  <h2 class="section-title">Partite in evidenza</h2>
+<div class="home-layout">
 
- <div id="matches" class="matches">
-  <p>Caricamento delle partite...</p>
+  <!-- COLONNA SINISTRA -->
+  <aside class="sidebar-left">
+
+    <section id="campionati">
+      <h2 class="section-title">CAMPIONATI</h2>
+
+      <div class="leagues">
+        <div class="league-item">🇮🇹 Serie A</div>
+        <div class="league-item">🏴 Premier League</div>
+        <div class="league-item">🇪🇸 La Liga</div>
+        <div class="league-item">🇩🇪 Bundesliga</div>
+        <div class="league-item">🇫🇷 Ligue 1</div>
+      </div>
+    </section>
+
+    <section id="nazioni">
+      <h2 class="section-title">NAZIONI</h2>
+
+      <div class="leagues">
+        <div class="league-item">🇮🇹 Italia</div>
+        <div class="league-item">🏴 Inghilterra</div>
+        <div class="league-item">🇪🇸 Spagna</div>
+        <div class="league-item">🇩🇪 Germania</div>
+        <div class="league-item">🇫🇷 Francia</div>
+      </div>
+    </section>
+
+  </aside>
+
+  <!-- COLONNA CENTRALE -->
+  <main class="matches-main">
+
+    <section id="partite">
+      <h2 class="section-title">Partite in evidenza</h2>
+
+      <div id="matches" class="matches">
+        <p>Caricamento delle partite...</p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- COLONNA DESTRA -->
+  <aside class="sidebar-right">
+
+    <section id="preferiti">
+      <h2 class="section-title">LE MIE PREFERITE</h2>
+
+      <p>Le tue squadre, nazionali, giocatori e campionati preferiti.</p>
+    </section>
+
+  </aside>
+
 </div>
-</section>
-<section id="campionati">
-  <h2 class="section-title">Campionati</h2>
-
-  <div class="leagues">
-    <div class="league-item">🇮🇹 Serie A</div>
-    <div class="league-item">🏴 Premier League</div>
-    <div class="league-item">🇪🇸 La Liga</div>
-    <div class="league-item">🇩🇪 Bundesliga</div>
-    <div class="league-item">🇫🇷 Ligue 1</div>
-  </div>
-</section>
-
 <section id="premium" class="premium">
   <h2>JustPredix Premium</h2>
   <p>
