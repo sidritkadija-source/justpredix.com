@@ -702,6 +702,42 @@ html, body {
     flex-wrap: wrap;
   }
 }
+  /* Quote 1X2 delle partite */
+.match-odds {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.odd-box {
+  background: #203650;
+  color: #ffffff;
+  border: 1px solid #30445e;
+  border-radius: 5px;
+  padding: 6px 8px;
+  font-size: 12px;
+  font-weight: bold;
+  white-space: nowrap;
+}
+  /* Quote 1X2 delle partite */
+.match-odds {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.odd-box {
+  background: #203650;
+  color: #ffffff;
+  border: 1px solid #30445e;
+  border-radius: 5px;
+  padding: 6px 8px;
+  font-size: 12px;
+  font-weight: bold;
+  white-space: nowrap;
+}
 </style>
 </head>
 
@@ -1126,11 +1162,111 @@ partiteValutate.sort((a, b) => {
 });
 const top15Partite = partiteValutate.slice(0, 15);
   
-const creaRighePartite = elenco => elenco
+const quote1x2PerPartita = {};
+  const estraiQuote1x2 = evento => {
+  const bookmakers = evento.bookmakers || [];
+
+  const trovaMercato = bookmaker =>
+    bookmaker.bets?.find(bet =>
+      bet.id === 1 || bet.name === "Match Winner"
+    );
+
+  const bookmaker =
+    bookmakers.find(b =>
+      b.name.toLowerCase() === "bet365" && trovaMercato(b)
+    ) ||
+    bookmakers.find(b => trovaMercato(b));
+
+  if (!bookmaker) return null;
+
+  const valori = trovaMercato(bookmaker).values || [];
+
+  const home = valori.find(v => v.value === "Home")?.odd;
+  const draw = valori.find(v => v.value === "Draw")?.odd;
+  const away = valori.find(v => v.value === "Away")?.odd;
+
+  if (!home || !draw || !away) return null;
+
+  return { home, draw, away };
+};
+async function recuperaQuote(idCampionato, data) {
+  try {
+    const chiaveCacheQuote = `justpredix_quote_${idCampionato}_${data}`;
+
+const cacheSalvata = localStorage.getItem(chiaveCacheQuote);
+
+if (cacheSalvata) {
+  try {
+    const cache = JSON.parse(cacheSalvata);
+
+    if (
+      Date.now() - cache.time < 3 * 60 * 60 * 1000 &&
+      Array.isArray(cache.data)
+    ) {
+      return cache.data;
+    }
+  } catch (errore) {
+    console.warn("Cache quote non valida:", errore);
+  }
+}
+    const url = `${API_URL}/odds?league=${idCampionato}&season=2026&date=${data}&bet=1`;
+
+    const risposta = await fetch(url);
+
+    if (!risposta.ok) {
+      throw new Error("Errore caricamento quote");
+    }
+
+    const dati = await risposta.json();
+
+    if (dati.errors && Object.keys(dati.errors).length > 0) {
+      console.warn("Quote non disponibili:", dati.errors);
+      return [];
+    }
+
+    const quoteRicevute = Array.isArray(dati.response)
+  ? dati.response
+  : [];
+
+localStorage.setItem(chiaveCacheQuote, JSON.stringify({
+  time: Date.now(),
+  data: quoteRicevute
+}));
+
+return quoteRicevute;
+
+  } catch (errore) {
+    console.error("Errore quote:", errore);
+    return [];
+  }
+}
+ const dataQuote = document.getElementById("match-date")?.value ||
+  new Date().toLocaleDateString("en-CA", {
+    timeZone: "Europe/Tirane"
+  });
+
+const campionatiConPartite = [
+  ...new Set(partiteValutate.map(({ partita }) => partita.league.id))
+];
+
+for (const idCampionato of campionatiConPartite) {
+  const eventiConQuote = await recuperaQuote(idCampionato, dataQuote);
+
+  eventiConQuote.forEach(evento => {
+    const quote = estraiQuote1x2(evento);
+
+    if (quote && evento.fixture?.id) {
+      quote1x2PerPartita[evento.fixture.id] = quote;
+    }
+  });
+} 
+const creaRighePartite = (elenco, mostraQuote = false) => elenco
     .map(({ partita, punteggio }) => {
       const casa = escapeHTML(partita.teams.home.name);
       const ospite = escapeHTML(partita.teams.away.name);
       const campionato = escapeHTML(partita.league.name);
+      
+      const quote1x2 = quote1x2PerPartita[partita.fixture.id];
 
       const orario = new Date(partita.fixture.date)
         .toLocaleTimeString("it-IT", {
@@ -1179,7 +1315,13 @@ if (["1H", "HT", "2H", "ET", "BT", "P", "LIVE"].includes(statoPartita)) {
           : "–"
       }
     </div>
-
+${mostraQuote && quote1x2 ? `
+  <div class="match-odds">
+    <span class="odd-box">1 ${escapeHTML(quote1x2.home)}</span>
+    <span class="odd-box">X ${escapeHTML(quote1x2.draw)}</span>
+    <span class="odd-box">2 ${escapeHTML(quote1x2.away)}</span>
+  </div>
+` : ""}
     <div class="match-state ${statoClasse}">
       ${statoTesto}
     </div>
@@ -1206,7 +1348,7 @@ contenitore.innerHTML = gruppiCampionati.map(({ id, nome }) => {
     <details class="league-group" open>
       <summary class="league-heading">${nome}</summary>
       <div class="league-matches">
-        ${creaRighePartite(partiteCampionato)}
+        ${creaRighePartite(partiteCampionato, true)}
       </div>
     </details>
   `;
