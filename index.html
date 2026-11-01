@@ -696,7 +696,7 @@ async function caricaClassifica(leagueId) {
   if (salvata) {
     const cache = JSON.parse(salvata);
 
-    if (Date.now() - cache.time < 6 * 60 * 60 * 1000) {
+    if (Date.now() - cache.time < CACHE_TIME) {
       return cache.data;
     }
   }
