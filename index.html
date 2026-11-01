@@ -549,6 +549,25 @@ footer {
   min-width: 260px;
   gap: 12px;
 }
+  /* Animazione TOP 15 JUSTPREDIX */
+.top-matches-track {
+  animation: scorriTop15 60s linear infinite;
+  will-change: transform;
+}
+
+.top-matches-track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes scorriTop15 {
+  0% {
+    transform: translateX(100vw);
+  }
+
+  100% {
+    transform: translateX(-100%);
+  }
+}
 </style>
 </head>
 
