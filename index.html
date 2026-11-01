@@ -1054,7 +1054,20 @@ async function caricaPartite() {
 
   } catch (errore) {
     console.error("Errore:", errore);
+const salvati = localStorage.getItem(cacheKey);
 
+if (salvati) {
+  try {
+    const cache = JSON.parse(salvati);
+
+    if (Array.isArray(cache.data)) {
+      await mostraPartite(cache.data);
+      return;
+    }
+  } catch (erroreCache) {
+    console.error("Errore cache:", erroreCache);
+  }
+}
     if (contenitore) {
       contenitore.innerHTML =
         "<p>Impossibile caricare le partite. Riprova più tardi.</p>";
