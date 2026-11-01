@@ -901,24 +901,32 @@ if (["1H", "HT", "2H", "ET", "BT", "P", "LIVE"].includes(statoPartita)) {
   statoTesto = "TERMINATA";
   statoClasse = "finished";
 }
-      return `
-        <article class="match-card">
-          <div class="league">${campionato}</div>
-          <div class="teams">${casa} - ${ospite}</div>
+     return `
+  <article class="match-row">
 
-<div class="match-status ${statoClasse}">
-  ${statoTesto}
-</div>
+    <div class="match-time">
+      ${orario}
+    </div>
 
-<div class="prediction">
-  ${
-    statoClasse === "live" || statoClasse === "finished"
-      ? `Risultato: ${partita.goals.home ?? 0} - ${partita.goals.away ?? 0}`
-      : `Orario: ${orario}`
-  }
-</div>
+    <div class="match-teams">
+      <span>${casa}</span>
+      <span>${ospite}</span>
+    </div>
 
-        </article>
+    <div class="match-score ${statoClasse}">
+      ${
+        statoClasse === "live" || statoClasse === "finished"
+          ? `${partita.goals.home ?? 0} - ${partita.goals.away ?? 0}`
+          : "–"
+      }
+    </div>
+
+    <div class="match-state ${statoClasse}">
+      ${statoTesto}
+    </div>
+
+  </article>
+`;
       `;
     }).join("");
 }
