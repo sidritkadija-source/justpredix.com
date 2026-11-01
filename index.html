@@ -995,7 +995,17 @@ const top15Partite = partiteValutate.slice(0, 15);
           timeZone: "Europe/Tirane"
         });
 const statoPartita = partita.fixture.status.short;
+const minutoPartita = partita.fixture.status.elapsed;
 
+let tempoVisualizzato = orario;
+
+if (["1H", "2H", "ET", "LIVE"].includes(statoPartita)) {
+  tempoVisualizzato = minutoPartita != null
+    ? minutoPartita + "'"
+    : "LIVE";
+} else if (statoPartita === "HT") {
+  tempoVisualizzato = "INT.";
+}
 let statoTesto = "PROGRAMMATA";
 let statoClasse = "scheduled";
 
