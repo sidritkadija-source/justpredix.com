@@ -1059,19 +1059,6 @@ if (["1H", "HT", "2H", "ET", "BT", "P", "LIVE"].includes(statoPartita)) {
 if (ticker) {
   ticker.innerHTML = creaRighePartite(top15Partite);
 }
-
-contenitore.innerHTML = partiteValutate
-  .map(({ partita }) => {
-    return top15Partite.find(
-      elemento => elemento.partita.fixture.id === partita.fixture.id
-    );
-  })
-  .filter(Boolean)
-  .map(elemento => {
-    const indice = top15Partite.indexOf(elemento);
-    return ticker ? ticker.children[indice]?.outerHTML || "" : "";
-  })
-  .join("");
 }
  
 async function caricaPartite() {
