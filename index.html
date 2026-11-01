@@ -991,8 +991,7 @@ partiteValutate.sort((a, b) => {
 });
 const top15Partite = partiteValutate.slice(0, 15);
   
-  contenitore.innerHTML = partiteValutate
-    .slice(0, 15)
+const creaRighePartite = elenco => elenco
     .map(({ partita, punteggio }) => {
       const casa = escapeHTML(partita.teams.home.name);
       const ospite = escapeHTML(partita.teams.away.name);
@@ -1053,11 +1052,26 @@ if (["1H", "HT", "2H", "ET", "BT", "P", "LIVE"].includes(statoPartita)) {
   </article>
 `;
     }).join("");
-  const ticker = document.getElementById("top-matches-track");
+  contenitore.innerHTML = creaRighePartite(partiteValutate);
+  
+ const ticker = document.getElementById("top-matches-track");
 
 if (ticker) {
-  ticker.innerHTML = contenitore.innerHTML;
+  ticker.innerHTML = creaRighePartite(top15Partite);
 }
+
+contenitore.innerHTML = partiteValutate
+  .map(({ partita }) => {
+    return top15Partite.find(
+      elemento => elemento.partita.fixture.id === partita.fixture.id
+    );
+  })
+  .filter(Boolean)
+  .map(elemento => {
+    const indice = top15Partite.indexOf(elemento);
+    return ticker ? ticker.children[indice]?.outerHTML || "" : "";
+  })
+  .join("");
 }
  
 async function caricaPartite() {
