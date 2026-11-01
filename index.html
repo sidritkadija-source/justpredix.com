@@ -996,6 +996,11 @@ if (["1H", "HT", "2H", "ET", "BT", "P", "LIVE"].includes(statoPartita)) {
   </article>
 `;
     }).join("");
+  const ticker = document.getElementById("top-matches-track");
+
+if (ticker) {
+  ticker.innerHTML = contenitore.innerHTML;
+}
 }
  
 async function caricaPartite() {
