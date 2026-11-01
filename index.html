@@ -657,6 +657,51 @@ html, body {
 #matches .match-state {
   display: none;
 }
+  /* Pulsanti e calendario sulla stessa riga */
+.match-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+}
+
+/* Calendario sulla destra */
+.match-calendar {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: auto;
+}
+
+.match-calendar button {
+  background: #14243a;
+  color: white;
+  border: 1px solid #30445e;
+  border-radius: 6px;
+  padding: 8px;
+  cursor: pointer;
+}
+
+.match-calendar input {
+  background: #14243a;
+  color: white;
+  border: 1px solid #30445e;
+  border-radius: 6px;
+  padding: 8px;
+  color-scheme: dark;
+  min-width: 0;
+}
+
+.match-filters {
+  flex-shrink: 0;
+}
+
+@media (max-width: 850px) {
+  .match-toolbar {
+    flex-wrap: wrap;
+  }
+}
 </style>
 </head>
 
@@ -752,13 +797,19 @@ html, body {
   <main class="matches-main">
 
     <section id="partite">
-
+<div class="match-toolbar">
     <div class="match-filters">
   <button type="button" class="filter-btn active" data-filter="all">TUTTE</button>
   <button type="button" class="filter-btn" data-filter="live">LIVE</button>
   <button type="button" class="filter-btn" data-filter="scheduled">PROGRAMMA</button>
   <button type="button" class="filter-btn" data-filter="finished">CONCLUSI</button>
+</div><div class="match-calendar">
+  <button type="button" id="prev-day">❮</button>
+  <input type="date" id="match-date">
+  <button type="button" id="next-day">❯</button>
 </div>
+</div>
+  
       <div id="matches" class="matches">
         <p>Caricamento delle partite...</p>
       </div>
