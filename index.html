@@ -578,6 +578,32 @@ html, body {
   width: 100%;
   overflow: hidden;
 }
+  .match-filters {
+  display: flex;
+  gap: 8px;
+  margin: 15px 0;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  background: #14243a;
+  color: #ffffff;
+  border: 1px solid #30445e;
+  border-radius: 6px;
+  padding: 10px 12px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.filter-btn:hover {
+  background: #243c59;
+}
+
+.filter-btn.active {
+  background: #007bff;
+  border-color: #007bff;
+  color: white;
+}
 </style>
 </head>
 
@@ -675,6 +701,12 @@ html, body {
     <section id="partite">
       <h2 class="section-title">Partite in evidenza</h2>
 
+    <div class="match-filters">
+  <button type="button" class="filter-btn active" data-filter="all">TUTTE</button>
+  <button type="button" class="filter-btn" data-filter="live">LIVE</button>
+  <button type="button" class="filter-btn" data-filter="scheduled">PROGRAMMA</button>
+  <button type="button" class="filter-btn" data-filter="finished">CONCLUSI</button>
+</div>
       <div id="matches" class="matches">
         <p>Caricamento delle partite...</p>
       </div>
@@ -1134,6 +1166,28 @@ if (salvati) {
 }
 
 caricaPartite();
+  document.querySelectorAll(".filter-btn").forEach(pulsante => {
+  pulsante.addEventListener("click", () => {
+
+    document.querySelectorAll(".filter-btn").forEach(btn => {
+      btn.classList.remove("active");
+    });
+
+    pulsante.classList.add("active");
+
+    const filtro = pulsante.dataset.filter;
+
+    document.querySelectorAll("#matches .match-row").forEach(riga => {
+      const stato = riga.querySelector(".match-state");
+
+      riga.style.display =
+        filtro === "all" || stato?.classList.contains(filtro)
+          ? ""
+          : "none";
+    });
+
+  });
+});
 </script>
 </body>
 </html>
