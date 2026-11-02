@@ -753,6 +753,21 @@ html, body {
   object-fit: contain;
   flex-shrink: 0;
 }
+  /* Bandiere e nomi dei campionati */
+.league-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.league-label img {
+  width: 24px;
+  height: 18px;
+  object-fit: cover;
+  border-radius: 2px;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
 </style>
 </head>
 
@@ -1369,12 +1384,12 @@ ${mostraQuote && quote1x2 ? `
   </article>
 `;
     }).join("");
-  const gruppiCampionati = [
-  { id: 135, nome: "🇮🇹 ITALIA: Serie A" },
-  { id: 39, nome: "🏴 INGHILTERRA: Premier League" },
-  { id: 140, nome: "🇪🇸 SPAGNA: La Liga" },
-  { id: 78, nome: "🇩🇪 GERMANIA: Bundesliga" },
-  { id: 61, nome: "🇫🇷 FRANCIA: Ligue 1" }
+ const gruppiCampionati = [
+  { id: 135, nome: '<img src="https://flagcdn.com/it.svg" width="24" height="18" alt=""> ITALIA: Serie A' },
+  { id: 39, nome: '<img src="https://flagcdn.com/gb-eng.svg" width="24" height="18" alt=""> INGHILTERRA: Premier League' },
+  { id: 140, nome: '<img src="https://flagcdn.com/es.svg" width="24" height="18" alt=""> SPAGNA: La Liga' },
+  { id: 78, nome: '<img src="https://flagcdn.com/de.svg" width="24" height="18" alt=""> GERMANIA: Bundesliga' },
+  { id: 61, nome: '<img src="https://flagcdn.com/fr.svg" width="24" height="18" alt=""> FRANCIA: Ligue 1' }
 ];
 
 contenitore.innerHTML = gruppiCampionati.map(({ id, nome }) => {
@@ -1386,7 +1401,9 @@ contenitore.innerHTML = gruppiCampionati.map(({ id, nome }) => {
 
   return `
     <details class="league-group" open>
-      <summary class="league-heading">${nome}</summary>
+      <summary class="league-heading">
+  <span class="league-label">${nome}</span>
+</summary>
       <div class="league-matches">
         ${creaRighePartite(partiteCampionato, true)}
       </div>
