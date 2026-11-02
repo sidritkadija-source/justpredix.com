@@ -738,6 +738,21 @@ html, body {
   font-weight: bold;
   white-space: nowrap;
 }
+  /* Loghi delle squadre */
+#matches .team-with-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+/* Dimensione dei loghi */
+#matches .team-logo {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
 </style>
 </head>
 
@@ -1280,6 +1295,8 @@ const creaRighePartite = (elenco, mostraQuote = false) => elenco
     .map(({ partita, punteggio }) => {
       const casa = escapeHTML(partita.teams.home.name);
       const ospite = escapeHTML(partita.teams.away.name);
+      const logoCasa = escapeHTML(partita.teams.home.logo || "");
+const logoOspite = escapeHTML(partita.teams.away.logo || "");
       const campionato = escapeHTML(partita.league.name);
       
       const quote1x2 = quote1x2PerPartita[partita.fixture.id];
@@ -1320,9 +1337,16 @@ if (["1H", "HT", "2H", "ET", "BT", "P", "LIVE"].includes(statoPartita)) {
 </div>
 
     <div class="match-teams">
-      <span>${casa}</span>
-      <span>${ospite}</span>
-    </div>
+  <span class="team-with-logo">
+    ${mostraQuote && logoCasa ? `<img src="${logoCasa}" class="team-logo" alt="">` : ""}
+    ${casa}
+  </span>
+
+  <span class="team-with-logo">
+    ${mostraQuote && logoOspite ? `<img src="${logoOspite}" class="team-logo" alt="">` : ""}
+    ${ospite}
+  </span>
+</div>
 
     <div class="match-score ${statoClasse}">
       ${
