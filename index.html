@@ -1250,6 +1250,8 @@ const campionatiConPartite = [
 ];
 
 for (const idCampionato of campionatiConPartite) {
+  if (idCampionato !== 135) continue;
+  
   const eventiConQuote = await recuperaQuote(idCampionato, dataQuote);
 
   eventiConQuote.forEach(evento => {
