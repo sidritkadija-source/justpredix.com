@@ -1220,7 +1220,7 @@ if (cacheSalvata) {
     const dati = await risposta.json();
 
     if (dati.errors && Object.keys(dati.errors).length > 0) {
-      console.warn("Quote non disponibili:", dati.errors);
+      console.warn("Quote non disponibili:", JSON.stringify(dati.errors));
       return [];
     }
 
