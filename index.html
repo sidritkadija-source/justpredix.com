@@ -1673,6 +1673,96 @@ document.querySelectorAll("#matches .league-group").forEach(gruppo => {
 });
   });
 });
+  // Recupera le partite della Serie A con cache
+async function recuperaPartiteSerieA() {
+  const chiave = "justpredix_seriea_2026";
+  const salvate = localStorage.getItem(chiave);
+
+  if (salvate) {
+    try {
+      const cache = JSON.parse(salvate);
+
+      if (
+        Array.isArray(cache.data) &&
+        Date.now() - cache.time < 30 * 60 * 1000
+      ) {
+        return cache.data;
+      }
+    } catch (errore) {
+      console.warn("Cache Serie A non valida:", errore);
+    }
+  }
+
+  const risposta = await fetch(
+    `${API_URL}/fixtures?league=135&season=2026`
+  );
+
+  if (!risposta.ok) {
+    throw new Error("Errore API Serie A: " + risposta.status);
+  }
+
+  const dati = await risposta.json();
+
+  if (dati.errors && Object.keys(dati.errors).length > 0) {
+    throw new Error(JSON.stringify(dati.errors));
+  }
+
+  if (!Array.isArray(dati.response)) {
+    throw new Error("Dati Serie A non validi");
+  }
+
+  localStorage.setItem(chiave, JSON.stringify({
+    time: Date.now(),
+    data: dati.response
+  }));
+
+  return dati.response;
+}
+  // Recupera le partite della Serie A con cache
+async function recuperaPartiteSerieA() {
+  const chiave = "justpredix_seriea_2026";
+  const salvate = localStorage.getItem(chiave);
+
+  if (salvate) {
+    try {
+      const cache = JSON.parse(salvate);
+
+      if (
+        Array.isArray(cache.data) &&
+        Date.now() - cache.time < 30 * 60 * 1000
+      ) {
+        return cache.data;
+      }
+    } catch (errore) {
+      console.warn("Cache Serie A non valida:", errore);
+    }
+  }
+
+  const risposta = await fetch(
+    `${API_URL}/fixtures?league=135&season=2026`
+  );
+
+  if (!risposta.ok) {
+    throw new Error("Errore API Serie A: " + risposta.status);
+  }
+
+  const dati = await risposta.json();
+
+  if (dati.errors && Object.keys(dati.errors).length > 0) {
+    throw new Error(JSON.stringify(dati.errors));
+  }
+
+  if (!Array.isArray(dati.response)) {
+    throw new Error("Dati Serie A non validi");
+  }
+
+  localStorage.setItem(chiave, JSON.stringify({
+    time: Date.now(),
+    data: dati.response
+  }));
+
+  return dati.response;
+}
   // Apertura della pagina Serie A
 const voceSerieA = document.querySelector('.league-item[data-league="135"]');
 
@@ -1693,7 +1783,21 @@ if (voceSerieA) {
   <div id="serie-a-fixtures"></div>
 </div>
     `;
+// Primo test delle partite della Serie A
+const zonaSerieA = document.getElementById("serie-a-fixtures");
 
+zonaSerieA.textContent = "Caricamento partite Serie A...";
+
+recuperaPartiteSerieA()
+  .then(partite => {
+    zonaSerieA.textContent =
+      `Partite Serie A recuperate: ${partite.length}`;
+  })
+  .catch(errore => {
+    console.error("Errore RIEPILOGO Serie A:", errore);
+    zonaSerieA.textContent =
+      "Impossibile caricare le partite della Serie A.";
+  });
     document.getElementById("back-to-matches").addEventListener("click", () => {
       document.getElementById("league-detail").style.display = "none";
       document.getElementById("partite").style.display = "";
