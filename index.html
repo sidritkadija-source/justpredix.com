@@ -1742,10 +1742,50 @@ const zonaSerieA = document.getElementById("serie-a-fixtures");
 zonaSerieA.textContent = "Caricamento partite Serie A...";
 
 recuperaPartiteSerieA()
-  .then(partite => {
-    zonaSerieA.textContent =
-      `Partite Serie A recuperate: ${partite.length}`;
-  })
+ .then(partite => {
+  zonaSerieA.innerHTML = "";
+
+  const titolo = document.createElement("h4");
+  titolo.textContent = "DOMENICA 8 NOVEMBRE 2026";
+  zonaSerieA.appendChild(titolo);
+
+  partite.forEach(partita => {
+    const riga = document.createElement("div");
+    riga.className = "match-row";
+    riga.style.gridTemplateColumns = "65px minmax(0, 1fr) 65px";
+
+    const orario = document.createElement("div");
+    orario.className = "match-time";
+    orario.textContent = new Date(partita.start_time)
+      .toLocaleTimeString("it-IT", {
+        hour: "2-digit",
+        minute: "2-digit",
+        timeZone: "Europe/Tirane"
+      });
+
+    const squadre = document.createElement("div");
+    squadre.className = "match-teams";
+
+    const casa = document.createElement("span");
+    casa.textContent = partita.home_team?.name || "Squadra casa";
+
+    const ospite = document.createElement("span");
+    ospite.textContent = partita.away_team?.name || "Squadra ospite";
+
+    squadre.append(casa, ospite);
+
+    const risultato = document.createElement("div");
+    risultato.className = "match-score";
+
+    risultato.textContent =
+      partita.home_score != null && partita.away_score != null
+        ? `${partita.home_score} - ${partita.away_score}`
+        : "–";
+
+    riga.append(orario, squadre, risultato);
+    zonaSerieA.appendChild(riga);
+  });
+})
   .catch(errore => {
     console.error("Errore RIEPILOGO Serie A:", errore);
     zonaSerieA.textContent =
