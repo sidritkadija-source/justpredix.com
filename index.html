@@ -1674,48 +1674,65 @@ document.querySelectorAll("#matches .league-group").forEach(gruppo => {
   });
 });
 // Recupera le partite Serie A tramite API Ninjas
+// Recupera le partite della giornata Serie A
 async function recuperaPartiteSerieA() {
-  const dataTest = "2026-11-08";
-  const chiave = "justpredix_seriea_ninja_" + dataTest;
+  const dateGiornata = [
+    "2026-11-06",
+    "2026-11-07",
+    "2026-11-08"
+  ];
 
-  const salvate = localStorage.getItem(chiave);
+  const tutteLePartite = [];
 
-  if (salvate) {
+  for (const data of dateGiornata) {
+    const chiave = "justpredix_seriea_ninja_" + data;
+    let partiteGiorno = null;
+
     try {
-      const cache = JSON.parse(salvate);
+      const salvate = localStorage.getItem(chiave);
 
-      if (
-        Array.isArray(cache.data) &&
-        Date.now() - cache.time < 30 * 60 * 1000
-      ) {
-        return cache.data;
+      if (salvate) {
+        const cache = JSON.parse(salvate);
+
+        if (
+          Array.isArray(cache.data) &&
+          Date.now() - cache.time < 30 * 60 * 1000
+        ) {
+          partiteGiorno = cache.data;
+        }
       }
     } catch (errore) {
-      console.warn("Cache Serie A non valida:", errore);
+      console.warn("Cache Serie A:", errore);
     }
+
+    if (partiteGiorno === null) {
+      const risposta = await fetch(
+        `${API_URL}/ninja-matches?league=seriea&date=${data}`
+      );
+
+      if (!risposta.ok) {
+        throw new Error("Errore API Serie A: " + risposta.status);
+      }
+
+      const dati = await risposta.json();
+
+      if (!Array.isArray(dati)) {
+        throw new Error("Risposta API Ninjas non valida");
+      }
+
+      partiteGiorno = dati;
+
+      localStorage.setItem(chiave, JSON.stringify({
+        time: Date.now(),
+        data: dati
+      }));
+    }
+
+    tutteLePartite.push(...partiteGiorno);
   }
 
-  const risposta = await fetch(
-    `${API_URL}/ninja-matches?league=seriea&date=${dataTest}`
-  );
-
-  if (!risposta.ok) {
-    throw new Error("Errore API Ninjas: " + risposta.status);
-  }
-
-  const dati = await risposta.json();
-
-  if (!Array.isArray(dati)) {
-    throw new Error("Risposta API Ninjas non valida");
-  }
-
-  localStorage.setItem(chiave, JSON.stringify({
-    time: Date.now(),
-    data: dati
-  }));
-
-  return dati;
-} 
+  return tutteLePartite;
+}  
   // Apertura della pagina Serie A
 const voceSerieA = document.querySelector('.league-item[data-league="135"]');
 
@@ -1745,11 +1762,29 @@ recuperaPartiteSerieA()
  .then(partite => {
   zonaSerieA.innerHTML = "";
 
-  const titolo = document.createElement("h4");
-  titolo.textContent = "DOMENICA 8 NOVEMBRE 2026";
-  zonaSerieA.appendChild(titolo);
+const giorniVisualizzati = new Set();
 
-  partite.forEach(partita => {
+partite.sort((a, b) =>
+  new Date(a.start_time) - new Date(b.start_time)
+);
+
+partite.forEach(partita => {
+
+  const dataPartita = new Date(partita.start_time)
+    .toLocaleDateString("it-IT", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+      timeZone: "Europe/Tirane"
+    }).toUpperCase();
+
+  if (!giorniVisualizzati.has(dataPartita)) {
+    const titolo = document.createElement("h4");
+    titolo.textContent = dataPartita;
+    zonaSerieA.appendChild(titolo);
+    giorniVisualizzati.add(dataPartita);
+  }
     const riga = document.createElement("div");
     riga.className = "match-row";
     riga.style.gridTemplateColumns = "65px minmax(0, 1fr) 65px";
