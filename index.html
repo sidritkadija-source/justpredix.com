@@ -830,6 +830,15 @@ html, body {
   cursor: pointer;
   margin-bottom: 15px;
 }
+  /* Allarga le tre colonne sui computer */
+@media (min-width: 1001px) {
+  .home-layout {
+    width: min(96vw, 1600px);
+    max-width: none;
+    margin-left: 50%;
+    transform: translateX(-50%);
+  }
+}
 </style>
 </head>
 
