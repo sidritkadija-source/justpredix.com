@@ -941,26 +941,6 @@ html, body {
         <p>Caricamento delle partite...</p>
       </div>
     </section>
-<!-- Pagina dedicata al campionato -->
-<section id="league-detail" style="display: none;">
-
-  <div class="league-page-header">
-    <h2 id="league-page-title">Serie A</h2>
-    <p>Italia · Stagione 2026/2027</p>
-  </div>
-
-  <div class="league-page-tabs">
-    <button type="button" data-tab="riepilogo">RIEPILOGO</button>
-    <button type="button" data-tab="quote">COMP. QUOTE</button>
-    <button type="button" data-tab="risultati">RISULTATI</button>
-    <button type="button" data-tab="calendario">CALENDARIO</button>
-    <button type="button" data-tab="classifiche">CLASSIFICHE</button>
-    <button type="button" data-tab="archivio">ARCHIVIO</button>
-  </div>
-
-  <div id="league-page-content"></div>
-
-</section>
 
     <!-- Pagina dedicata al campionato -->
 <section id="league-detail" style="display: none;">
@@ -1690,7 +1670,11 @@ if (voceSerieA) {
       <button type="button" id="back-to-matches">
         ← Torna alle partite
       </button>
-      <p>Seleziona una sezione della Serie A.</p>
+      <div id="league-tab-body">
+  <h3>RIEPILOGO</h3>
+  <p>Partite della giornata di Serie A</p>
+  <div id="serie-a-fixtures"></div>
+</div>
     `;
 
     document.getElementById("back-to-matches").addEventListener("click", () => {
