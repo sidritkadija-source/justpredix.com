@@ -830,15 +830,22 @@ html, body {
   cursor: pointer;
   margin-bottom: 15px;
 }
-  /* Allarga le tre colonne sui computer */
-/* Larghezza equilibrata per JustPredix */
+ /* Layout JustPredix centrato */
 @media (min-width: 1001px) {
-  .home-layout {
-    width: min(94vw, 1500px);
-    max-width: none;
+
+  body > main {
+    width: 94%;
+    max-width: 1500px;
     margin: 0 auto;
+  }
+
+  .home-layout {
+    width: 100%;
+    max-width: none;
+    margin: 25px auto;
     transform: none;
   }
+
 }
 </style>
 </head>
