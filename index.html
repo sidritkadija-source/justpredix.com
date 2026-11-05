@@ -1523,7 +1523,104 @@ if (ticker && (!dataCalendario || dataCalendario === dataOggi)) {
 document.querySelector(".filter-btn.active")?.click();
 }
 }
- 
+ // Mostra le partite Serie A nel calendario della homepage
+async function mostraSerieANelCalendario(data) {
+  const box = document.getElementById("matches");
+  if (!box) return;
+
+  box.textContent = "Caricamento Serie A...";
+
+  try {
+    const chiave = "justpredix_seriea_ninja_" + data;
+    let partite = null;
+
+    const salvato = localStorage.getItem(chiave);
+
+    if (salvato) {
+      const cache = JSON.parse(salvato);
+
+      if (
+        Array.isArray(cache.data) &&
+        Date.now() - cache.time < 30 * 60 * 1000
+      ) {
+        partite = cache.data;
+      }
+    }
+
+    if (partite === null) {
+      const risposta = await fetch(
+        `${API_URL}/ninja-matches?league=seriea&date=${data}`
+      );
+
+      if (!risposta.ok) {
+        throw new Error("Errore API Ninjas");
+      }
+
+      partite = await risposta.json();
+
+      if (!Array.isArray(partite)) {
+        throw new Error("Dati non validi");
+      }
+
+      localStorage.setItem(chiave, JSON.stringify({
+        time: Date.now(),
+        data: partite
+      }));
+    }
+
+    box.replaceChildren();
+
+    const titolo = document.createElement("h3");
+    titolo.textContent = "ITALIA: Serie A";
+    box.appendChild(titolo);
+
+    if (partite.length === 0) {
+      const avviso = document.createElement("p");
+      avviso.textContent = "Nessuna partita di Serie A in questa data.";
+      box.appendChild(avviso);
+    }
+
+    partite.forEach(partita => {
+      const riga = document.createElement("div");
+      riga.className = "match-row";
+      riga.style.gridTemplateColumns = "60px minmax(0, 1fr) 65px";
+
+      const orario = document.createElement("div");
+      orario.className = "match-time";
+      orario.textContent = new Date(partita.start_time)
+        .toLocaleTimeString("it-IT", {
+          hour: "2-digit",
+          minute: "2-digit",
+          timeZone: "Europe/Tirane"
+        });
+
+      const squadre = document.createElement("div");
+      squadre.className = "match-teams";
+
+      const casa = document.createElement("span");
+      casa.textContent = partita.home_team?.name || "Squadra casa";
+
+      const ospite = document.createElement("span");
+      ospite.textContent = partita.away_team?.name || "Squadra ospite";
+
+      squadre.append(casa, ospite);
+
+      const risultato = document.createElement("div");
+      risultato.className = "match-score";
+      risultato.textContent =
+        partita.home_score != null && partita.away_score != null
+          ? `${partita.home_score} - ${partita.away_score}`
+          : "–";
+
+      riga.append(orario, squadre, risultato);
+      box.appendChild(riga);
+    });
+
+  } catch (errore) {
+    console.error("Errore calendario Serie A:", errore);
+    box.textContent = "Impossibile caricare la Serie A.";
+  }
+}
 async function caricaPartite(dataSelezionata) {
 const oggi = dataSelezionata || new Date().toLocaleDateString("en-CA", {
   timeZone: "Europe/Tirane"
@@ -1531,7 +1628,16 @@ const oggi = dataSelezionata || new Date().toLocaleDateString("en-CA", {
 
   const cacheKey = "justpredix_partite_" + oggi;
   const contenitore = document.getElementById("matches");
+  
+// Per le date future usa API Ninjas per la Serie A
+const oggiReale = new Date().toLocaleDateString("en-CA", {
+  timeZone: "Europe/Tirane"
+});
 
+if (oggi > oggiReale) {
+  await mostraSerieANelCalendario(oggi);
+  return;
+}
   try {
     const salvati = localStorage.getItem(cacheKey);
 
