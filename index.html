@@ -2092,16 +2092,6 @@ function calcolaClassificaSerieA(partite, tipo = "totale") {
   return classifica;
 }
 
-    if (
-      partita.status !== "final" ||
-      !casa ||
-      !ospite ||
-      !/^\d+$/.test(String(partita.home_score)) ||
-      !/^\d+$/.test(String(partita.away_score))
-    ) {
-      continue;
-    }
-
     const golCasa = Number(partita.home_score);
     const golOspite = Number(partita.away_score);
 
