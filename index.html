@@ -1956,9 +1956,12 @@ async function recuperaStagioneCompletaSerieA() {
 
   return tutteLePartite;
 }
+
+
 function organizzaGiornateSerieA(partite) {
   const ordinate = [...partite].sort(
-    (a, b) => new Date(a.start_time) - new Date(b.start_time)
+    (a, b) =>
+      new Date(a.start_time) - new Date(b.start_time)
   );
 
   const giornate = {};
@@ -1972,6 +1975,17 @@ function organizzaGiornateSerieA(partite) {
 
   return giornate;
 }
+
+  for (const numero of Object.keys(giornate)) {
+    giornate[numero].sort(
+      (a, b) =>
+        new Date(a.fixture.date) - new Date(b.fixture.date)
+    );
+  }
+
+  return giornate;
+}
+
   // Apertura della pagina Serie A
 const voceSerieA = document.querySelector('.league-item[data-league="135"]');
 
