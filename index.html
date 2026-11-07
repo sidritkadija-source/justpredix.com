@@ -1977,28 +1977,120 @@ function organizzaGiornateSerieA(partite) {
 }
 
  
-function calcolaClassificaSerieA(partite) {
+function calcolaClassificaSerieA(partite, tipo = "totale") {
   const squadre = new Map();
+  const cronologia = new Map();
 
-  for (const partita of partite) {
+  function inizializzaSquadra(nome) {
+    if (!nome) return;
+
+    if (!squadre.has(nome)) {
+      squadre.set(nome, {
+        squadra: nome,
+        PG: 0,
+        V: 0,
+        N: 0,
+        P: 0,
+        GF: 0,
+        GS: 0,
+        DR: 0,
+        PT: 0
+      });
+    }
+
+    if (!cronologia.has(nome)) {
+      cronologia.set(nome, []);
+    }
+  }
+
+  const concluse = [...partite]
+    .filter(partita =>
+      partita.status === "final" &&
+      /^\d+$/.test(String(partita.home_score)) &&
+      /^\d+$/.test(String(partita.away_score))
+    )
+    .sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
+
+  for (const partita of concluse) {
     const casa = partita.home_team?.name;
     const ospite = partita.away_team?.name;
 
-    for (const nome of [casa, ospite]) {
-      if (nome && !squadre.has(nome)) {
-        squadre.set(nome, {
-          squadra: nome,
-          PG: 0,
-          V: 0,
-          N: 0,
-          P: 0,
-          GF: 0,
-          GS: 0,
-          DR: 0,
-          PT: 0
-        });
-      }
+    inizializzaSquadra(casa);
+    inizializzaSquadra(ospite);
+
+    const golCasa = Number(partita.home_score);
+    const golOspite = Number(partita.away_score);
+
+    const casaObj = squadre.get(casa);
+    const ospiteObj = squadre.get(ospite);
+
+    const usaCasa = tipo === "totale" || tipo === "casa";
+    const usaOspite = tipo === "totale" || tipo === "fuori";
+
+    if (usaCasa) {
+      casaObj.PG++;
+      casaObj.GF += golCasa;
+      casaObj.GS += golOspite;
     }
+
+    if (usaOspite) {
+      ospiteObj.PG++;
+      ospiteObj.GF += golOspite;
+      ospiteObj.GS += golCasa;
+    }
+
+    if (golCasa > golOspite) {
+      if (usaCasa) {
+        casaObj.V++;
+        casaObj.PT += 3;
+      }
+      if (usaOspite) {
+        ospiteObj.P++;
+      }
+
+      cronologia.get(casa).push("V");
+      cronologia.get(ospite).push("P");
+    } else if (golCasa < golOspite) {
+      if (usaCasa) {
+        casaObj.P++;
+      }
+      if (usaOspite) {
+        ospiteObj.V++;
+        ospiteObj.PT += 3;
+      }
+
+      cronologia.get(casa).push("P");
+      cronologia.get(ospite).push("V");
+    } else {
+      if (usaCasa) {
+        casaObj.N++;
+        casaObj.PT++;
+      }
+      if (usaOspite) {
+        ospiteObj.N++;
+        ospiteObj.PT++;
+      }
+
+      cronologia.get(casa).push("N");
+      cronologia.get(ospite).push("N");
+    }
+  }
+
+  const classifica = [...squadre.values()]
+    .map(squadra => ({
+      ...squadra,
+      DR: squadra.GF - squadra.GS,
+      forma: (cronologia.get(squadra.squadra) || []).slice(-5)
+    }))
+    .sort((a, b) =>
+      b.PT - a.PT ||
+      b.DR - a.DR ||
+      b.GF - a.GF ||
+      a.squadra.localeCompare(b.squadra)
+    );
+
+  return classifica;
+}
 
     if (
       partita.status !== "final" ||
@@ -2194,11 +2286,194 @@ if (tabClassificheSerieA) {
 
     try {
       const partite = await recuperaStagioneCompletaSerieA();
-      const classifica = calcolaClassificaSerieA(partite);
 
-      if (classifica.length !== 20) {
-        throw new Error("Dati classifica incompleti");
+      if (!Array.isArray(partite) || partite.length === 0) {
+        throw new Error("Dati classifica non disponibili");
       }
+
+      let filtro = "totale";
+
+      function coloreForma(esito) {
+        if (esito === "V") return "#16a34a";
+        if (esito === "N") return "#f59e0b";
+        return "#dc2626";
+      }
+
+      function renderClassifica() {
+        const classifica = calcolaClassificaSerieA(partite, filtro);
+
+        schedaClassificheSerieA.replaceChildren();
+
+        const barraTop = document.createElement("div");
+        barraTop.style.cssText =
+          "display:flex;gap:10px;flex-wrap:wrap;margin:0 0 18px 0;";
+
+        ["CLASSIFICHE", "FORMA", "OVER/UNDER", "PT/F", "MARCATORI"]
+          .forEach((nome, indice) => {
+            const btn = document.createElement("button");
+            btn.textContent = nome;
+            btn.type = "button";
+            btn.style.cssText =
+              `padding:10px 16px;border:none;border-radius:10px;font-weight:700;cursor:pointer;` +
+              (indice === 0
+                ? "background:#ff1744;color:#fff;"
+                : "background:#e5e7eb;color:#475569;");
+            barraTop.appendChild(btn);
+          });
+
+        schedaClassificheSerieA.appendChild(barraTop);
+
+        const barraFiltri = document.createElement("div");
+        barraFiltri.style.cssText =
+          "display:flex;gap:10px;flex-wrap:wrap;margin:0 0 18px 0;";
+
+        [
+          { codice: "totale", etichetta: "TOTALE" },
+          { codice: "casa", etichetta: "CASA" },
+          { codice: "fuori", etichetta: "FUORI" }
+        ].forEach(item => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.textContent = item.etichetta;
+          btn.style.cssText =
+            `padding:10px 18px;border:none;border-radius:10px;font-weight:700;cursor:pointer;` +
+            (filtro === item.codice
+              ? "background:#f8fafc;color:#0f172a;"
+              : "background:#e5e7eb;color:#475569;");
+
+          btn.onclick = () => {
+            filtro = item.codice;
+            renderClassifica();
+          };
+
+          barraFiltri.appendChild(btn);
+        });
+
+        schedaClassificheSerieA.appendChild(barraFiltri);
+
+        const contenitore = document.createElement("div");
+        contenitore.style.cssText =
+          "width:100%;overflow-x:auto;border-radius:12px;";
+
+        const tabella = document.createElement("table");
+        tabella.style.cssText =
+          "width:100%;min-width:760px;border-collapse:collapse;font-size:13px;";
+
+        const thead = document.createElement("thead");
+        const rigaHead = document.createElement("tr");
+
+        [
+          "#", "SQUADRA", "PG", "V", "N", "P",
+          "R", "DR", "P", "FORMA"
+        ].forEach((titolo, i) => {
+          const th = document.createElement("th");
+          th.textContent = titolo;
+          th.style.cssText =
+            "padding:10px 6px;border-bottom:1px solid #64748b55;text-align:center;font-size:12px;";
+
+          if (i === 1) {
+            th.style.textAlign = "left";
+          }
+
+          rigaHead.appendChild(th);
+        });
+
+        thead.appendChild(rigaHead);
+        tabella.appendChild(thead);
+
+        const tbody = document.createElement("tbody");
+
+        classifica.forEach((squadra, indice) => {
+          const tr = document.createElement("tr");
+
+          const tdPos = document.createElement("td");
+          tdPos.style.cssText =
+            "padding:10px 6px;border-bottom:1px solid #64748b33;text-align:center;";
+
+          const badge = document.createElement("span");
+          badge.textContent = `${indice + 1}.`;
+          badge.style.cssText =
+            "display:inline-block;min-width:26px;padding:4px 0;border-radius:6px;font-weight:700;color:#fff;";
+
+          if (indice < 4) {
+            badge.style.background = "#0b4f8a";
+          } else if (indice === 4) {
+            badge.style.background = "#7c1d1d";
+          } else if (indice === 5) {
+            badge.style.background = "#b7791f";
+          } else {
+            badge.style.background = "transparent";
+            badge.style.color = "inherit";
+          }
+
+          tdPos.appendChild(badge);
+          tr.appendChild(tdPos);
+
+          const tdSquadra = document.createElement("td");
+          tdSquadra.style.cssText =
+            "padding:10px 6px;border-bottom:1px solid #64748b33;text-align:left;";
+          tdSquadra.appendChild(creaSquadraConLogo(squadra.squadra));
+          tr.appendChild(tdSquadra);
+
+          const celle = [
+            squadra.PG,
+            squadra.V,
+            squadra.N,
+            squadra.P,
+            `${squadra.GF}:${squadra.GS}`,
+            squadra.DR,
+            squadra.PT
+          ];
+
+          celle.forEach((valore, i) => {
+            const td = document.createElement("td");
+            td.textContent = valore;
+            td.style.cssText =
+              "padding:10px 6px;border-bottom:1px solid #64748b33;text-align:center;font-weight:" +
+              (i === 6 ? "700" : "400") + ";";
+            tr.appendChild(td);
+          });
+
+          const tdForma = document.createElement("td");
+          tdForma.style.cssText =
+            "padding:10px 6px;border-bottom:1px solid #64748b33;text-align:center;";
+
+          const boxForma = document.createElement("div");
+          boxForma.style.cssText =
+            "display:flex;justify-content:center;gap:4px;flex-wrap:nowrap;";
+
+          const forma = squadra.forma || [];
+
+          for (let i = 0; i < 5; i++) {
+            const esito = forma[i] || "?";
+            const pill = document.createElement("span");
+            pill.textContent = esito;
+            pill.style.cssText =
+              "display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:5px;font-size:12px;font-weight:700;color:#fff;background:" +
+              (esito === "?" ? "#cbd5e1" : coloreForma(esito)) + ";";
+            boxForma.appendChild(pill);
+          }
+
+          tdForma.appendChild(boxForma);
+          tr.appendChild(tdForma);
+
+          tbody.appendChild(tr);
+        });
+
+        tabella.appendChild(tbody);
+        contenitore.appendChild(tabella);
+        schedaClassificheSerieA.appendChild(contenitore);
+      }
+
+      renderClassifica();
+
+    } catch (errore) {
+      console.error("Errore CLASSIFICHE:", errore);
+      schedaClassificheSerieA.textContent =
+        "Impossibile caricare la classifica.";
+    }
+  };
+}
 
       schedaClassificheSerieA.replaceChildren();
 
