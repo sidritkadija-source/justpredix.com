@@ -2090,7 +2090,7 @@ titoloData.textContent = numeroGiornata
 // Navigazione tra le date dei risultati
 const titoliDate = [...listaRisultati.querySelectorAll("h4")];
 
-if (titoliDate.length > 1) {
+if (titoliDate.length > 0) {
   const gruppi = titoliDate.map(titolo => {
     const elementi = [titolo];
     let successivo = titolo.nextElementSibling;
