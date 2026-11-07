@@ -2298,8 +2298,25 @@ if (tabClassificheSerieA) {
           "width:100%;overflow-x:auto;border-radius:12px;";
 
         const tabella = document.createElement("table");
-        tabella.style.cssText =
-          "width:100%;min-width:760px;border-collapse:collapse;font-size:13px;";
+        
+tabella.style.cssText =
+  "width:100%;min-width:0;table-layout:fixed;border-collapse:collapse;font-size:12px;";
+
+const larghezze = [
+  "6%", "26%", "5%", "5%", "5%",
+  "5%", "10%", "7%", "6%", "25%"
+];
+
+const gruppoColonne = document.createElement("colgroup");
+
+larghezze.forEach(larghezza => {
+  const colonna = document.createElement("col");
+  colonna.style.width = larghezza;
+  gruppoColonne.appendChild(colonna);
+});
+
+tabella.appendChild(gruppoColonne);
+
 
         const thead = document.createElement("thead");
         const rigaHead = document.createElement("tr");
