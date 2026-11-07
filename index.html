@@ -2210,8 +2210,10 @@ if (tabClassificheSerieA) {
       contenitore.style.overflowX = "auto";
 
       const tabella = document.createElement("table");
-      tabella.style.cssText =
-        "width:100%;min-width:650px;border-collapse:collapse;font-size:14px;";
+     
+tabella.style.cssText =
+  "width:100%;min-width:0;border-collapse:collapse;font-size:12px;table-layout:auto;";
+
 
       const colonne = [
         "POS", "SQUADRA", "PG", "V", "N",
@@ -2254,7 +2256,7 @@ if (tabClassificheSerieA) {
           const cella = document.createElement("td");
           cella.textContent = valore;
           cella.style.cssText =
-            "padding:10px 7px;border-bottom:1px solid #64748b55;text-align:center;";
+            "padding:8px 3px;border-bottom:1px solid #64748b55;text-align:center;";
 
           
 if (i === 1) {
