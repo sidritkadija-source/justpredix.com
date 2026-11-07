@@ -1991,14 +1991,54 @@ partiteConcluse
   .sort((a, b) => new Date(a.start_time) - new Date(b.start_time))
   .forEach(partita => {
 
-    const dataPartita = new Date(partita.start_time)
-      .toLocaleDateString("it-IT", {
-        weekday: "long",
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-        timeZone: "Europe/Tirane"
-      }).toUpperCase();
+    const data = new Date(partita.start_time);
+
+const parti = new Intl.DateTimeFormat("en-GB", {
+  timeZone: "Europe/Tirane",
+  day: "2-digit",
+  month: "2-digit",
+  year: "numeric"
+}).formatToParts(data);
+
+const valore = tipo =>
+  Number(parti.find(p => p.type === tipo).value);
+
+const giorno = new Date(Date.UTC(
+  valore("year"),
+  valore("month") - 1,
+  valore("day")
+));
+
+const distanza = (giorno.getUTCDay() + 2) % 7;
+
+let dataPartita;
+
+if (distanza <= 3) {
+  const venerdi = new Date(giorno);
+  venerdi.setUTCDate(venerdi.getUTCDate() - distanza);
+
+  const lunedi = new Date(venerdi);
+  lunedi.setUTCDate(lunedi.getUTCDate() + 3);
+
+  const formato = new Intl.DateTimeFormat("it-IT", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC"
+  });
+
+  dataPartita =
+    `${formato.format(venerdi)} – ${formato.format(lunedi)}`.toUpperCase();
+
+} else {
+  dataPartita = data.toLocaleDateString("it-IT", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "Europe/Tirane"
+  }).toUpperCase();
+}
 
     if (!dateVisualizzate.has(dataPartita)) {
       const titoloData = document.createElement("h4");
