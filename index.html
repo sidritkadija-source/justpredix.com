@@ -1055,6 +1055,13 @@ async function caricaClassifica(leagueId) {
   }
 
   const dati = await risposta.json();
+  
+const partiteTop5 = (dati.response || []).filter(
+  partita => [39, 140, 135, 78, 61].includes(
+    Number(partita.league?.id)
+  )
+);
+
 
   if (!Array.isArray(dati) || dati.length === 0) {
     throw new Error("Classifica non disponibile");
@@ -1654,7 +1661,16 @@ if (oggi > oggiReale) {
       const cache = JSON.parse(salvati);
 
       if (Date.now() - cache.time < CACHE_TIME) {
-        mostraPartite(cache.data);
+        
+mostraPartite(
+  (Array.isArray(cache.data) ? cache.data : [])
+    .filter(partita =>
+      [39, 140, 135, 78, 61].includes(
+        Number(partita.league?.id)
+      )
+    )
+);
+
         console.log("Partite dalla memoria:", cache.data);
         return;
       }
@@ -1683,7 +1699,7 @@ if (oggi > oggiReale) {
 try {
   localStorage.setItem(cacheKey, JSON.stringify({
     time: Date.now(),
-    data: dati.response
+    data: partiteTop5
   }));
 } catch (erroreCache) {
   if (erroreCache.name === "QuotaExceededError") {
@@ -1717,7 +1733,7 @@ try {
 }
 
 
-    mostraPartite(dati.response);
+    mostraPartite(partiteTop5);
 
     console.log("Partite ricevute:", dati.response);
 
@@ -1730,7 +1746,16 @@ if (salvati) {
     const cache = JSON.parse(salvati);
 
     if (Array.isArray(cache.data)) {
-      await mostraPartite(cache.data);
+      
+await mostraPartite(
+  (Array.isArray(cache.data) ? cache.data : [])
+    .filter(partita =>
+      [39, 140, 135, 78, 61].includes(
+        Number(partita.league?.id)
+      )
+    )
+);
+
       return;
     }
   } catch (erroreCache) {
