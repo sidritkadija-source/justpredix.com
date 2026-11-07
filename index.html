@@ -1790,7 +1790,48 @@ document.querySelectorAll("#matches .league-group").forEach(gruppo => {
 });
 // Recupera le partite Serie A tramite API Ninjas
 // Recupera le partite della giornata Serie A
-async function recuperaPartiteSerieA() {
+// Recupera i risultati LIVE della Serie A
+async function recuperaLiveSerieA() {
+  const chiave = "justpredix_live_seriea";
+
+  try {
+    const salvati = JSON.parse(
+      localStorage.getItem(chiave) || "null"
+    );
+
+    if (salvati && Date.now() - salvati.time < 60000) {
+      return salvati.data;
+    }
+
+    const risposta = await fetch(
+      `${API_URL}/fixtures?live=all`
+    );
+
+    const dati = await risposta.json();
+
+    const erroreAPI =
+      !risposta.ok ||
+      (dati.errors && Object.keys(dati.errors).length > 0);
+
+    const partite = erroreAPI
+      ? []
+      : (dati.response || []).filter(
+          partita => partita.league?.id === 135
+        );
+
+    localStorage.setItem(chiave, JSON.stringify({
+      time: Date.now(),
+      data: partite
+    }));
+
+    return partite;
+
+  } catch (errore) {
+    console.warn("LIVE Serie A non disponibile:", errore);
+    return [];
+  }
+}
+  async function recuperaPartiteSerieA() {
   // Data attuale in Albania
 const oggi = new Date().toLocaleDateString("en-CA", {
   timeZone: "Europe/Tirane"
@@ -1896,7 +1937,9 @@ const zonaSerieA = document.getElementById("serie-a-fixtures");
 zonaSerieA.textContent = "Caricamento partite Serie A...";
 
 recuperaPartiteSerieA()
- .then(partite => {
+ .then(async partite => {
+   const partiteLive = await recuperaLiveSerieA();
+   console.log("Partite LIVE Serie A:", partiteLive);
   zonaSerieA.innerHTML = "";
 
 const giorniVisualizzati = new Set();
