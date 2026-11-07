@@ -2122,23 +2122,6 @@ function calcolaClassificaSerieA(partite, tipo = "totale") {
       squadraOspite.PT++;
     }
   }
-
-  const classifica = [...squadre.values()];
-
-  classifica.forEach(squadra => {
-    squadra.DR = squadra.GF - squadra.GS;
-  });
-
-  classifica.sort((a, b) =>
-    b.PT - a.PT ||
-    b.DR - a.DR ||
-    b.GF - a.GF ||
-    a.squadra.localeCompare(b.squadra)
-  );
-
-  return classifica;
-}
-
   
 function creaSquadraConLogo(nome) {
   const idsLoghi = {
