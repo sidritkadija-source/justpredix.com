@@ -2017,10 +2017,117 @@ schedaRisultati.innerHTML = `
 corpoRiepilogo.after(schedaRisultati);
 
 // Apri RISULTATI
-document.querySelector('[data-tab="risultati"]').onclick = () => {
+
+ // Apri RISULTATI con navigazione tra 38 giornate
+document.querySelector('[data-tab="risultati"]').onclick = async () => {
   corpoRiepilogo.style.display = "none";
   schedaRisultati.style.display = "block";
+
+  const lista = document.getElementById("lista-risultati-serie-a");
+  lista.textContent = "Caricamento delle 38 giornate...";
+
+  try {
+    const partite = await recuperaStagioneCompletaSerieA();
+
+    if (partite.length !== 380) {
+      throw new Error("Calendario incompleto");
+    }
+
+    const giornate = organizzaGiornateSerieA(partite);
+    let numero = 1;
+
+    for (let n = 1; n <= 38; n++) {
+      if (giornate[n].some(p =>
+        new Date(p.start_time).getTime() <= Date.now()
+      )) {
+        numero = n;
+      }
+    }
+
+    function visualizzaGiornata() {
+      lista.replaceChildren();
+
+      const navigazione = document.createElement("div");
+      navigazione.style.cssText =
+        "display:flex;justify-content:center;align-items:center;gap:20px;margin:20px 0";
+
+      const precedente = document.createElement("button");
+      precedente.textContent = "❮";
+      precedente.disabled = numero === 1;
+
+      const titolo = document.createElement("strong");
+      titolo.textContent = `GIORNATA ${numero}`;
+
+      const successivo = document.createElement("button");
+      successivo.textContent = "❯";
+      successivo.disabled = numero === 38;
+
+      navigazione.append(precedente, titolo, successivo);
+      lista.appendChild(navigazione);
+
+      giornate[numero].forEach(partita => {
+        const riga = document.createElement("div");
+        riga.className = "match-row";
+        riga.style.gridTemplateColumns =
+          "65px minmax(0, 1fr) 65px";
+
+        const orario = document.createElement("div");
+        orario.className = "match-time";
+        orario.textContent =
+          partita.status === "final" ? "FIN" :
+          partita.status === "in_progress" ? "🔴 LIVE" :
+          new Date(partita.start_time).toLocaleString("it-IT", {
+            day: "2-digit",
+            month: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            timeZone: "Europe/Tirane"
+          });
+
+        const squadre = document.createElement("div");
+        squadre.className = "match-teams";
+
+        const casa = document.createElement("span");
+        casa.textContent = partita.home_team?.name || "";
+
+        const ospite = document.createElement("span");
+        ospite.textContent = partita.away_team?.name || "";
+
+        squadre.append(casa, ospite);
+
+        const risultato = document.createElement("div");
+        risultato.className = "match-score";
+
+        const valido = /^\d+$/.test(String(partita.home_score)) &&
+          /^\d+$/.test(String(partita.away_score));
+
+        risultato.textContent = valido
+          ? `${partita.home_score} - ${partita.away_score}`
+          : "–";
+
+        riga.append(orario, squadre, risultato);
+        lista.appendChild(riga);
+      });
+
+      precedente.onclick = () => {
+        numero--;
+        visualizzaGiornata();
+      };
+
+      successivo.onclick = () => {
+        numero++;
+        visualizzaGiornata();
+      };
+    }
+
+    visualizzaGiornata();
+
+  } catch (errore) {
+    console.error("Errore giornate Serie A:", errore);
+    lista.textContent = "Impossibile caricare le giornate.";
+  }
 };
+
 
 // Torna a RIEPILOGO
 document.querySelector('[data-tab="riepilogo"]').onclick = () => {
