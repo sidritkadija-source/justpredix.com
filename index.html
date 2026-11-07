@@ -2024,11 +2024,152 @@ const pulsanteCalendario = document.querySelector(
   '[data-tab="calendario"]'
 );
 
+
 if (pulsanteCalendario) {
-  pulsanteCalendario.onclick = () => {
+  pulsanteCalendario.onclick = async () => {
     corpoRiepilogo.style.display = "none";
     schedaRisultati.style.display = "none";
     schedaCalendario.style.display = "block";
+
+    const lista = document.getElementById(
+      "lista-calendario-serie-a"
+    );
+
+    lista.textContent = "Caricamento calendario Serie A...";
+
+    try {
+      const partite = await recuperaStagioneCompletaSerieA();
+
+      if (!Array.isArray(partite) || partite.length !== 380) {
+        throw new Error("Calendario incompleto");
+      }
+
+      const giornate = organizzaGiornateSerieA(partite);
+      let numero = 1;
+
+      // Seleziona inizialmente la giornata attuale
+      for (let n = 1; n <= 38; n++) {
+        if (giornate[n].some(p =>
+          new Date(p.start_time).getTime() <= Date.now()
+        )) {
+          numero = n;
+        }
+      }
+
+      function visualizzaCalendario() {
+        lista.replaceChildren();
+
+        const navigazione = document.createElement("div");
+        navigazione.style.cssText =
+          "display:flex;align-items:center;justify-content:center;gap:15px;margin:20px 0";
+
+        const precedente = document.createElement("button");
+        precedente.textContent = "❮";
+        precedente.disabled = numero === 1;
+
+        const selettore = document.createElement("select");
+        selettore.setAttribute(
+          "aria-label",
+          "Seleziona giornata Serie A"
+        );
+
+        for (let n = 1; n <= 38; n++) {
+          const opzione = document.createElement("option");
+          opzione.value = String(n);
+          opzione.textContent = `GIORNATA ${n}`;
+          selettore.appendChild(opzione);
+        }
+
+        selettore.value = String(numero);
+        selettore.style.cssText =
+          "padding:10px;border-radius:8px;font-weight:bold;cursor:pointer;max-width:180px";
+
+        const successivo = document.createElement("button");
+        successivo.textContent = "❯";
+        successivo.disabled = numero === 38;
+
+        navigazione.append(
+          precedente,
+          selettore,
+          successivo
+        );
+
+        lista.appendChild(navigazione);
+
+        giornate[numero].forEach(partita => {
+          const riga = document.createElement("div");
+          riga.className = "match-row";
+          riga.style.gridTemplateColumns =
+            "90px minmax(0, 1fr) 65px";
+
+          const orario = document.createElement("div");
+          orario.className = "match-time";
+
+          orario.textContent = new Date(
+            partita.start_time
+          ).toLocaleString("it-IT", {
+            day: "2-digit",
+            month: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            timeZone: "Europe/Tirane"
+          });
+
+          const squadre = document.createElement("div");
+          squadre.className = "match-teams";
+
+          const casa = document.createElement("span");
+          casa.textContent =
+            partita.home_team?.name || "Squadra casa";
+
+          const ospite = document.createElement("span");
+          ospite.textContent =
+            partita.away_team?.name || "Squadra ospite";
+
+          squadre.append(casa, ospite);
+
+          const risultato = document.createElement("div");
+          risultato.className = "match-score";
+
+          const valido =
+            /^\d+$/.test(String(partita.home_score)) &&
+            /^\d+$/.test(String(partita.away_score));
+
+          risultato.textContent = valido
+            ? `${partita.home_score} - ${partita.away_score}`
+            : "–";
+
+          riga.append(orario, squadre, risultato);
+          lista.appendChild(riga);
+        });
+
+        precedente.onclick = () => {
+          if (numero > 1) {
+            numero--;
+            visualizzaCalendario();
+          }
+        };
+
+        successivo.onclick = () => {
+          if (numero < 38) {
+            numero++;
+            visualizzaCalendario();
+          }
+        };
+
+        selettore.onchange = () => {
+          numero = Number(selettore.value);
+          visualizzaCalendario();
+        };
+      }
+
+      visualizzaCalendario();
+
+    } catch (errore) {
+      console.error("Errore CALENDARIO:", errore);
+      lista.textContent =
+        "Impossibile caricare il calendario Serie A.";
+    }
   };
 }
 
