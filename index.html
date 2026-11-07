@@ -2127,7 +2127,15 @@ if (titoliDate.length > 1) {
       });
     });
 
-    etichetta.textContent = gruppi[indice][0].textContent;
+    const periodo = gruppi[indice][0].textContent.trim();
+
+const giornateSerieA = {
+  "6 NOVEMBRE 2026 – 9 NOVEMBRE 2026": 11
+};
+
+etichetta.textContent = giornateSerieA[periodo]
+  ? `GIORNATA ${giornateSerieA[periodo]}`
+  : periodo;
     precedente.disabled = indice === 0;
     successivo.disabled = indice === gruppi.length - 1;
   }
