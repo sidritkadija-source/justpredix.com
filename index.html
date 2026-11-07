@@ -2005,6 +2005,19 @@ schedaRisultati.innerHTML = `
 `;
 
 corpoRiepilogo.after(schedaRisultati);
+    
+const schedaCalendario = document.createElement("div");
+schedaCalendario.id = "serie-a-calendario";
+schedaCalendario.style.display = "none";
+
+schedaCalendario.innerHTML = `
+  <div id="lista-calendario-serie-a">
+    Calendario Serie A pronto.
+  </div>
+`;
+
+schedaRisultati.after(schedaCalendario);
+
 
 // Apri RISULTATI
 
