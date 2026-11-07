@@ -2632,11 +2632,15 @@ partiteConcluse.forEach(partita => {
         const squadre = document.createElement("div");
         squadre.className = "match-teams";
 
-        const casa = document.createElement("span");
-        casa.textContent = partita.home_team?.name || "";
+       
+const casa = creaSquadraConLogo(
+  partita.home_team?.name || "Squadra casa"
+);
 
-        const ospite = document.createElement("span");
-        ospite.textContent = partita.away_team?.name || "";
+const ospite = creaSquadraConLogo(
+  partita.away_team?.name || "Squadra ospite"
+);
+
 
         squadre.append(casa, ospite);
 
