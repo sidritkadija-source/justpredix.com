@@ -1679,10 +1679,43 @@ if (oggi > oggiReale) {
       throw new Error(JSON.stringify(dati.errors));
     }
 
-    localStorage.setItem(cacheKey, JSON.stringify({
-      time: Date.now(),
-      data: dati.response
-    }));
+    
+try {
+  localStorage.setItem(cacheKey, JSON.stringify({
+    time: Date.now(),
+    data: dati.response
+  }));
+} catch (erroreCache) {
+  if (erroreCache.name === "QuotaExceededError") {
+
+    // Elimina soltanto le vecchie cache giornaliere
+    Object.keys(localStorage).forEach(chiave => {
+      if (
+        chiave.startsWith("justpredix_partite_") &&
+        chiave !== cacheKey
+      ) {
+        localStorage.removeItem(chiave);
+      }
+    });
+
+    // Riprova a memorizzare le partite di oggi
+    try {
+      localStorage.setItem(cacheKey, JSON.stringify({
+        time: Date.now(),
+        data: dati.response
+      }));
+    } catch (errore) {
+      console.warn(
+        "Memoria piena: partite visualizzate senza cache.",
+        errore
+      );
+    }
+
+  } else {
+    console.warn("Errore salvataggio cache:", erroreCache);
+  }
+}
+
 
     mostraPartite(dati.response);
 
