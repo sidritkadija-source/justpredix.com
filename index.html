@@ -2037,6 +2037,68 @@ partiteConcluse
     });
 }
 
+// Navigazione tra le date dei risultati
+const titoliDate = [...listaRisultati.querySelectorAll("h4")];
+
+if (titoliDate.length > 1) {
+  const gruppi = titoliDate.map(titolo => {
+    const elementi = [titolo];
+    let successivo = titolo.nextElementSibling;
+
+    while (successivo && successivo.tagName !== "H4") {
+      elementi.push(successivo);
+      successivo = successivo.nextElementSibling;
+    }
+
+    return elementi;
+  });
+
+  const navigazione = document.createElement("div");
+  navigazione.style.cssText =
+    "display:flex;align-items:center;justify-content:center;gap:20px;margin:20px 0;";
+
+  const precedente = document.createElement("button");
+  precedente.textContent = "❮";
+
+  const etichetta = document.createElement("strong");
+
+  const successivo = document.createElement("button");
+  successivo.textContent = "❯";
+
+  navigazione.append(precedente, etichetta, successivo);
+  listaRisultati.prepend(navigazione);
+
+  let indice = gruppi.length - 1;
+
+  function aggiornaRisultati() {
+    gruppi.forEach((gruppo, i) => {
+      gruppo.forEach(elemento => {
+        elemento.style.display = i === indice ? "" : "none";
+      });
+    });
+
+    etichetta.textContent = gruppi[indice][0].textContent;
+    precedente.disabled = indice === 0;
+    successivo.disabled = indice === gruppi.length - 1;
+  }
+
+  precedente.onclick = () => {
+    if (indice > 0) {
+      indice--;
+      aggiornaRisultati();
+    }
+  };
+
+  successivo.onclick = () => {
+    if (indice < gruppi.length - 1) {
+      indice++;
+      aggiornaRisultati();
+    }
+  };
+
+  aggiornaRisultati();
+}
+    
 const giorniVisualizzati = new Set();
 
 partite.sort((a, b) =>
