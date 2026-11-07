@@ -1911,6 +1911,52 @@ const dateGiornata = Array.from({ length: 4 }, (_, i) => {
 
   return tutteLePartite;
 }  
+  
+async function recuperaStagioneCompletaSerieA() {
+  const chiave = "justpredix_seriea_stagione_2026";
+  const cache = JSON.parse(localStorage.getItem(chiave) || "null");
+
+  // Riutilizza i dati per 30 minuti
+  if (cache && Date.now() - cache.time < 1800000) {
+    return cache.data;
+  }
+
+  const tutteLePartite = [];
+
+  // Recupera fino a 380 partite, 50 alla volta
+  for (let offset = 0; offset < 400; offset += 50) {
+    const url =
+      `${API_URL}/ninja-matches?league=seriea&season=2026&offset=${offset}`;
+
+    const risposta = await fetch(url);
+
+    if (!risposta.ok) {
+      throw new Error("Errore calendario Serie A: " + risposta.status);
+    }
+
+    const dati = await risposta.json();
+
+    if (!Array.isArray(dati)) {
+      throw new Error("Risposta API Ninjas non valida");
+    }
+
+    tutteLePartite.push(...dati);
+
+    if (dati.length < 50) break;
+  }
+
+  tutteLePartite.sort(
+    (a, b) => new Date(a.start_time) - new Date(b.start_time)
+  );
+
+  localStorage.setItem(chiave, JSON.stringify({
+    time: Date.now(),
+    data: tutteLePartite
+  }));
+
+  return tutteLePartite;
+}
+
   // Apertura della pagina Serie A
 const voceSerieA = document.querySelector('.league-item[data-league="135"]');
 
