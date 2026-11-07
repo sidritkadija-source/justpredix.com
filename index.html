@@ -1593,7 +1593,12 @@ async function mostraSerieANelCalendario(data) {
           minute: "2-digit",
           timeZone: "Europe/Tirane"
         });
-
+      // Evidenzia le partite LIVE nel RIEPILOGO
+if (partita.status === "in_progress") {
+  orario.textContent = "🔴 LIVE";
+  orario.style.color = "#ff5252";
+}
+   
       const squadre = document.createElement("div");
       squadre.className = "match-teams";
 
