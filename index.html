@@ -1976,6 +1976,87 @@ function organizzaGiornateSerieA(partite) {
   return giornate;
 }
 
+ 
+function calcolaClassificaSerieA(partite) {
+  const squadre = new Map();
+
+  for (const partita of partite) {
+    const casa = partita.home_team?.name;
+    const ospite = partita.away_team?.name;
+
+    for (const nome of [casa, ospite]) {
+      if (nome && !squadre.has(nome)) {
+        squadre.set(nome, {
+          squadra: nome,
+          PG: 0,
+          V: 0,
+          N: 0,
+          P: 0,
+          GF: 0,
+          GS: 0,
+          DR: 0,
+          PT: 0
+        });
+      }
+    }
+
+    if (
+      partita.status !== "final" ||
+      !casa ||
+      !ospite ||
+      !/^\d+$/.test(String(partita.home_score)) ||
+      !/^\d+$/.test(String(partita.away_score))
+    ) {
+      continue;
+    }
+
+    const golCasa = Number(partita.home_score);
+    const golOspite = Number(partita.away_score);
+
+    const squadraCasa = squadre.get(casa);
+    const squadraOspite = squadre.get(ospite);
+
+    squadraCasa.PG++;
+    squadraOspite.PG++;
+
+    squadraCasa.GF += golCasa;
+    squadraCasa.GS += golOspite;
+
+    squadraOspite.GF += golOspite;
+    squadraOspite.GS += golCasa;
+
+    if (golCasa > golOspite) {
+      squadraCasa.V++;
+      squadraCasa.PT += 3;
+      squadraOspite.P++;
+    } else if (golCasa < golOspite) {
+      squadraOspite.V++;
+      squadraOspite.PT += 3;
+      squadraCasa.P++;
+    } else {
+      squadraCasa.N++;
+      squadraOspite.N++;
+      squadraCasa.PT++;
+      squadraOspite.PT++;
+    }
+  }
+
+  const classifica = [...squadre.values()];
+
+  classifica.forEach(squadra => {
+    squadra.DR = squadra.GF - squadra.GS;
+  });
+
+  classifica.sort((a, b) =>
+    b.PT - a.PT ||
+    b.DR - a.DR ||
+    b.GF - a.GF ||
+    a.squadra.localeCompare(b.squadra)
+  );
+
+  return classifica;
+}
+ 
   // Apertura della pagina Serie A
 const voceSerieA = document.querySelector('.league-item[data-league="135"]');
 
