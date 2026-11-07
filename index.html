@@ -1961,6 +1961,13 @@ const zonaSerieA = document.getElementById("serie-a-fixtures");
 
 zonaSerieA.textContent = "Caricamento partite Serie A...";
 
+ recuperaPartiteSerieA()
+  .then(async partite => {
+    const partiteLive = await recuperaLiveSerieA();
+    console.log("Partite LIVE Serie A:", partiteLive);
+
+    zonaSerieA.innerHTML = "";
+    
 // Mostra i risultati delle partite concluse
 const listaRisultati = document.getElementById("lista-risultati-serie-a");
 
