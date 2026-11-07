@@ -2257,7 +2257,24 @@ selettore.addEventListener("change", () => {
       navigazione.append(precedente, selettore, successivo);
       lista.appendChild(navigazione);
 
-      giornate[numero].forEach(partita => {
+      
+const partiteConcluse = giornate[numero].filter(partita =>
+  partita.status === "final" &&
+  /^\d+$/.test(String(partita.home_score)) &&
+  /^\d+$/.test(String(partita.away_score))
+);
+
+if (partiteConcluse.length === 0) {
+  const avviso = document.createElement("p");
+  avviso.textContent =
+    "Nessun risultato disponibile per questa giornata.";
+  avviso.style.cssText =
+    "text-align:center;padding:20px;";
+  lista.appendChild(avviso);
+}
+
+partiteConcluse.forEach(partita => {
+
         const riga = document.createElement("div");
         riga.className = "match-row";
         riga.style.gridTemplateColumns =
