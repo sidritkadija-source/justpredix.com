@@ -2017,6 +2017,29 @@ schedaCalendario.innerHTML = `
 `;
 
 schedaRisultati.after(schedaCalendario);
+    
+
+ // Apri CALENDARIO Serie A
+const pulsanteCalendario = document.querySelector(
+  '[data-tab="calendario"]'
+);
+
+if (pulsanteCalendario) {
+  pulsanteCalendario.onclick = () => {
+    corpoRiepilogo.style.display = "none";
+    schedaRisultati.style.display = "none";
+    schedaCalendario.style.display = "block";
+  };
+}
+
+// Nascondi CALENDARIO quando apri altre schede
+document.querySelectorAll(
+  '[data-tab="riepilogo"], [data-tab="risultati"]'
+).forEach(pulsante => {
+  pulsante.addEventListener("click", () => {
+    schedaCalendario.style.display = "none";
+  });
+});
 
 
 // Apri RISULTATI
