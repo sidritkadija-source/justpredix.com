@@ -2042,7 +2042,17 @@ if (distanza <= 3) {
 
     if (!dateVisualizzate.has(dataPartita)) {
       const titoloData = document.createElement("h4");
-      titoloData.textContent = dataPartita;
+      const giornateSerieA = {
+  "30 OTTOBRE 2026 – 2 NOVEMBRE 2026": 10,
+  "6 NOVEMBRE 2026 – 9 NOVEMBRE 2026": 11,
+  "20 NOVEMBRE 2026 – 23 NOVEMBRE 2026": 12
+};
+
+const numeroGiornata = giornateSerieA[dataPartita];
+
+titoloData.textContent = numeroGiornata
+  ? `GIORNATA ${numeroGiornata}`
+  : dataPartita;
 
       listaRisultati.appendChild(titoloData);
       dateVisualizzate.add(dataPartita);
