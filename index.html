@@ -1939,7 +1939,6 @@ schedaRisultati.id = "serie-a-risultati";
 schedaRisultati.style.display = "none";
 schedaRisultati.innerHTML = `
   <h3>RISULTATI SERIE A</h3>
-  <p>Risultati delle giornate di campionato</p>
   <div id="lista-risultati-serie-a"></div>
 `;
 
@@ -2123,7 +2122,8 @@ if (titoliDate.length > 0) {
   function aggiornaRisultati() {
     gruppi.forEach((gruppo, i) => {
       gruppo.forEach(elemento => {
-        elemento.style.display = i === indice ? "" : "none";
+        elemento.style.display =
+  i === indice && elemento.tagName !== "H4" ? "" : "none";
       });
     });
 
