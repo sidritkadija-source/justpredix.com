@@ -2077,7 +2077,7 @@ selettore.addEventListener("change", () => {
       successivo.textContent = "❯";
       successivo.disabled = numero === 38;
 
-      navigazione.append(precedente, titolo, successivo);
+      navigazione.append(precedente, selettore, successivo);
       lista.appendChild(navigazione);
 
       giornate[numero].forEach(partita => {
