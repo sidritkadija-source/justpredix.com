@@ -1931,16 +1931,83 @@ if (voceSerieA) {
   <div id="serie-a-fixtures"></div>
 </div>
     `;
+    // Sezione RISULTATI Serie A
+const corpoRiepilogo = document.getElementById("league-tab-body");
+
+const schedaRisultati = document.createElement("div");
+schedaRisultati.id = "serie-a-risultati";
+schedaRisultati.style.display = "none";
+schedaRisultati.innerHTML = `
+  <h3>RISULTATI SERIE A</h3>
+  <p>Risultati delle giornate di campionato</p>
+  <div id="lista-risultati-serie-a"></div>
+`;
+
+corpoRiepilogo.after(schedaRisultati);
+
+// Apri RISULTATI
+document.querySelector('[data-tab="risultati"]').onclick = () => {
+  corpoRiepilogo.style.display = "none";
+  schedaRisultati.style.display = "block";
+};
+
+// Torna a RIEPILOGO
+document.querySelector('[data-tab="riepilogo"]').onclick = () => {
+  schedaRisultati.style.display = "none";
+  corpoRiepilogo.style.display = "block";
+};
 // Primo test delle partite della Serie A
 const zonaSerieA = document.getElementById("serie-a-fixtures");
 
 zonaSerieA.textContent = "Caricamento partite Serie A...";
 
-recuperaPartiteSerieA()
- .then(async partite => {
-   const partiteLive = await recuperaLiveSerieA();
-   console.log("Partite LIVE Serie A:", partiteLive);
-  zonaSerieA.innerHTML = "";
+// Mostra i risultati delle partite concluse
+const listaRisultati = document.getElementById("lista-risultati-serie-a");
+
+if (listaRisultati) {
+  listaRisultati.innerHTML = "";
+
+  const partiteConcluse = partite.filter(partita =>
+    partita.status === "final" &&
+    /^\d+$/.test(String(partita.home_score)) &&
+    /^\d+$/.test(String(partita.away_score))
+  );
+
+  if (partiteConcluse.length === 0) {
+    listaRisultati.textContent = "Nessuna partita conclusa disponibile.";
+  }
+
+  partiteConcluse
+    .sort((a, b) => new Date(b.start_time) - new Date(a.start_time))
+    .forEach(partita => {
+      const riga = document.createElement("div");
+      riga.className = "match-row";
+      riga.style.gridTemplateColumns = "65px minmax(0, 1fr) 65px";
+
+      const stato = document.createElement("div");
+      stato.className = "match-time";
+      stato.textContent = "FIN";
+
+      const squadre = document.createElement("div");
+      squadre.className = "match-teams";
+
+      const casa = document.createElement("span");
+      casa.textContent = partita.home_team?.name || "";
+
+      const ospite = document.createElement("span");
+      ospite.textContent = partita.away_team?.name || "";
+
+      squadre.append(casa, ospite);
+
+      const punteggio = document.createElement("div");
+      punteggio.className = "match-score";
+      punteggio.textContent =
+        `${partita.home_score} - ${partita.away_score}`;
+
+      riga.append(stato, squadre, punteggio);
+      listaRisultati.appendChild(riga);
+    });
+}
 
 const giorniVisualizzati = new Set();
 
