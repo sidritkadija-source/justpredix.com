@@ -1941,10 +1941,11 @@ partite.forEach(partita => {
     const risultato = document.createElement("div");
     risultato.className = "match-score";
 
-    risultato.textContent =
-      partita.home_score != null && partita.away_score != null
-        ? `${partita.home_score} - ${partita.away_score}`
-        : "–";
+   risultato.textContent =
+  /^\d+$/.test(String(partita.home_score)) &&
+  /^\d+$/.test(String(partita.away_score))
+    ? `${partita.home_score} - ${partita.away_score}`
+    : "–";
 
     riga.append(orario, squadre, risultato);
     zonaSerieA.appendChild(riga);
