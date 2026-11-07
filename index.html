@@ -1984,10 +1984,31 @@ if (listaRisultati) {
     listaRisultati.textContent = "Nessuna partita conclusa disponibile.";
   }
 
-  partiteConcluse
-    .sort((a, b) => new Date(b.start_time) - new Date(a.start_time))
-    .forEach(partita => {
-      const riga = document.createElement("div");
+ // Raggruppa i risultati per data
+const dateVisualizzate = new Set();
+
+partiteConcluse
+  .sort((a, b) => new Date(b.start_time) - new Date(a.start_time))
+  .forEach(partita => {
+
+    const dataPartita = new Date(partita.start_time)
+      .toLocaleDateString("it-IT", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+        timeZone: "Europe/Tirane"
+      }).toUpperCase();
+
+    if (!dateVisualizzate.has(dataPartita)) {
+      const titoloData = document.createElement("h4");
+      titoloData.textContent = dataPartita;
+
+      listaRisultati.appendChild(titoloData);
+      dateVisualizzate.add(dataPartita);
+    }
+
+    const riga = document.createElement("div");
       riga.className = "match-row";
       riga.style.gridTemplateColumns = "65px minmax(0, 1fr) 65px";
 
