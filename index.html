@@ -2401,17 +2401,150 @@ tabella.appendChild(gruppoColonne);
           boxForma.style.cssText =
             "display:flex;justify-content:center;gap:4px;flex-wrap:nowrap;";
 
-          const forma = squadra.forma || [];
+          
+const ultimePartite = partite
+  .filter(p =>
+    p.status === "final" &&
+    (
+      p.home_team?.name === squadra.squadra ||
+      p.away_team?.name === squadra.squadra
+    ) &&
+    /^\d+$/.test(String(p.home_score)) &&
+    /^\d+$/.test(String(p.away_score))
+  )
+  .sort((a, b) =>
+    new Date(b.start_time) - new Date(a.start_time)
+  )
+  .slice(0, 5);
 
-          for (let i = 0; i < 5; i++) {
-            const esito = forma[i] || "?";
-            const pill = document.createElement("span");
-            pill.textContent = esito;
-            pill.style.cssText =
-              "display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:5px;font-size:12px;font-weight:700;color:#fff;background:" +
-              (esito === "?" ? "#cbd5e1" : coloreForma(esito)) + ";";
-            boxForma.appendChild(pill);
-          }
+for (let i = 0; i < 5; i++) {
+  const partita = ultimePartite[i];
+  const pill = document.createElement("span");
+
+  let esito = "?";
+
+  if (partita) {
+    const inCasa =
+      partita.home_team?.name === squadra.squadra;
+
+    const gf = Number(
+      inCasa ? partita.home_score : partita.away_score
+    );
+
+    const gs = Number(
+      inCasa ? partita.away_score : partita.home_score
+    );
+
+    esito = gf > gs ? "V" : gf < gs ? "P" : "N";
+
+    const data = new Date(partita.start_time)
+      .toLocaleDateString("it-IT", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        timeZone: "Europe/Tirane"
+      })
+      .replaceAll("/", ".");
+
+    const descrizione =
+      `${partita.home_score}-${partita.away_score} ` +
+      `(${partita.home_team?.name} - ` +
+      `${partita.away_team?.name})\n${data}`;
+
+    pill.setAttribute("aria-label", descrizione);
+    pill.tabIndex = 0;
+
+    let tooltip = null;
+
+    function mostraTooltip() {
+      if (tooltip) tooltip.remove();
+
+      tooltip = document.createElement("div");
+      tooltip.textContent = descrizione;
+
+      tooltip.style.cssText = `
+        position:fixed;
+        z-index:99999;
+        background:#071827;
+        color:white;
+        padding:9px 12px;
+        border-radius:5px;
+        font-size:12px;
+        font-weight:700;
+        line-height:1.5;
+        text-align:center;
+        white-space:pre-line;
+        pointer-events:none;
+        box-shadow:0 4px 12px #0006;
+      `;
+
+      const freccia = document.createElement("span");
+      freccia.style.cssText = `
+        position:absolute;
+        top:-7px;
+        left:50%;
+        transform:translateX(-50%);
+        border-left:7px solid transparent;
+        border-right:7px solid transparent;
+        border-bottom:7px solid #071827;
+      `;
+
+      tooltip.appendChild(freccia);
+      document.body.appendChild(tooltip);
+
+      const rect = pill.getBoundingClientRect();
+
+      let x = rect.left + rect.width / 2 -
+        tooltip.offsetWidth / 2;
+
+      x = Math.max(
+        8,
+        Math.min(x, window.innerWidth - tooltip.offsetWidth - 8)
+      );
+
+      let y = rect.bottom + 10;
+
+      if (y + tooltip.offsetHeight > window.innerHeight) {
+        y = rect.top - tooltip.offsetHeight - 10;
+
+        freccia.style.top = "auto";
+        freccia.style.bottom = "-7px";
+        freccia.style.borderBottom = "none";
+        freccia.style.borderTop = "7px solid #071827";
+      }
+
+      tooltip.style.left = x + "px";
+      tooltip.style.top = y + "px";
+
+      freccia.style.left =
+        (rect.left + rect.width / 2 - x) + "px";
+    }
+
+    function nascondiTooltip() {
+      if (tooltip) {
+        tooltip.remove();
+        tooltip = null;
+      }
+    }
+
+    pill.addEventListener("mouseenter", mostraTooltip);
+    pill.addEventListener("mouseleave", nascondiTooltip);
+    pill.addEventListener("focus", mostraTooltip);
+    pill.addEventListener("blur", nascondiTooltip);
+  }
+
+  pill.textContent = esito;
+
+  pill.style.cssText =
+    "display:inline-flex;align-items:center;" +
+    "justify-content:center;width:24px;height:24px;" +
+    "border-radius:5px;font-size:12px;font-weight:700;" +
+    "color:#fff;cursor:help;background:" +
+    (esito === "?" ? "#cbd5e1" : coloreForma(esito)) +
+    ";";
+
+  boxForma.appendChild(pill);
+}
 
           tdForma.appendChild(boxForma);
           tr.appendChild(tdForma);
