@@ -2056,7 +2056,79 @@ function calcolaClassificaSerieA(partite) {
 
   return classifica;
 }
- 
+
+  
+function creaSquadraConLogo(nome) {
+  const idsLoghi = {
+    inter: 505,
+    milan: 489,
+    juventus: 496,
+    napoli: 492,
+    roma: 497,
+    lazio: 487,
+    atalanta: 499,
+    bologna: 500,
+    fiorentina: 502,
+    torino: 503,
+    como: 895,
+    cagliari: 490,
+    genoa: 495,
+    udinese: 494,
+    lecce: 867,
+    parma: 523,
+    sassuolo: 488,
+    monza: 1579,
+    venezia: 517,
+    frosinone: 512
+  };
+
+  const testo = String(nome || "");
+  const nomeMinuscolo = testo.toLowerCase();
+
+  const squadra = Object.keys(idsLoghi).find(
+    chiave => nomeMinuscolo.includes(chiave)
+  );
+
+  const contenitore = document.createElement("span");
+
+  contenitore.style.cssText = `
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  `;
+
+  if (squadra) {
+    const logo = document.createElement("img");
+
+    logo.src =
+      `https://media.api-sports.io/football/teams/${idsLoghi[squadra]}.png`;
+
+    logo.alt = "";
+    logo.width = 24;
+    logo.height = 24;
+    logo.loading = "lazy";
+
+    logo.style.cssText = `
+      width: 24px;
+      height: 24px;
+      object-fit: contain;
+      flex-shrink: 0;
+    `;
+
+    logo.onerror = () => logo.remove();
+
+    contenitore.appendChild(logo);
+  }
+
+  const nomeSquadra = document.createElement("span");
+  nomeSquadra.textContent = testo;
+
+  contenitore.appendChild(nomeSquadra);
+
+  return contenitore;
+}
+
   // Apertura della pagina Serie A
 const voceSerieA = document.querySelector('.league-item[data-league="135"]');
 
