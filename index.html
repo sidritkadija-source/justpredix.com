@@ -1318,6 +1318,9 @@ const quote1x2PerPartita = {};
   return { home, draw, away };
 };
 async function recuperaQuote(idCampionato, data) {
+  // Quote temporaneamente disattivate
+// Evita richieste API non necessarie
+return [];
   try {
     const chiaveCacheQuote = `justpredix_quote_${idCampionato}_${data}`;
 
