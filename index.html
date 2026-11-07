@@ -1922,15 +1922,13 @@ if (voceSerieA) {
     document.getElementById("league-detail").style.display = "block";
 
     document.getElementById("league-page-content").innerHTML = `
-      <button type="button" id="back-to-matches">
-        ← Torna alle partite
-      </button>
-      <div id="league-tab-body">
-  <h3>RIEPILOGO</h3>
-  <p>Partite della giornata di Serie A</p>
-  <div id="serie-a-fixtures"></div>
-</div>
-    `;
+  <button type="button" id="back-to-matches">
+    ← Torna alle partite
+  </button>
+  <div id="league-tab-body">
+    <div id="serie-a-fixtures"></div>
+  </div>
+`;
     // Sezione RISULTATI Serie A
 const corpoRiepilogo = document.getElementById("league-tab-body");
 
