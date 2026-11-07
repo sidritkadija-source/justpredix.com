@@ -1782,12 +1782,34 @@ document.querySelectorAll("#matches .league-group").forEach(gruppo => {
 // Recupera le partite Serie A tramite API Ninjas
 // Recupera le partite della giornata Serie A
 async function recuperaPartiteSerieA() {
-  const dateGiornata = [
-    "2026-11-06",
-    "2026-11-07",
-    "2026-11-08"
-  ];
+  // Data attuale in Albania
+const oggi = new Date().toLocaleDateString("en-CA", {
+  timeZone: "Europe/Tirane"
+});
 
+const dataBase = new Date(oggi + "T12:00:00Z");
+
+// Trova il venerdì del turno più vicino
+const giorniAlVenerdi = {
+  0: -2,
+  1: -3,
+  2: 3,
+  3: 2,
+  4: 1,
+  5: 0,
+  6: -1
+}[dataBase.getUTCDay()];
+
+dataBase.setUTCDate(
+  dataBase.getUTCDate() + giorniAlVenerdi
+);
+
+// Venerdì, sabato, domenica e lunedì
+const dateGiornata = Array.from({ length: 4 }, (_, i) => {
+  const giorno = new Date(dataBase);
+  giorno.setUTCDate(giorno.getUTCDate() + i);
+  return giorno.toISOString().slice(0, 10);
+});
   const tutteLePartite = [];
 
   for (const data of dateGiornata) {
