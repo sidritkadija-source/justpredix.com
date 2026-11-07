@@ -2091,37 +2091,6 @@ function calcolaClassificaSerieA(partite, tipo = "totale") {
 
   return classifica;
 }
-
-    const golCasa = Number(partita.home_score);
-    const golOspite = Number(partita.away_score);
-
-    const squadraCasa = squadre.get(casa);
-    const squadraOspite = squadre.get(ospite);
-
-    squadraCasa.PG++;
-    squadraOspite.PG++;
-
-    squadraCasa.GF += golCasa;
-    squadraCasa.GS += golOspite;
-
-    squadraOspite.GF += golOspite;
-    squadraOspite.GS += golCasa;
-
-    if (golCasa > golOspite) {
-      squadraCasa.V++;
-      squadraCasa.PT += 3;
-      squadraOspite.P++;
-    } else if (golCasa < golOspite) {
-      squadraOspite.V++;
-      squadraOspite.PT += 3;
-      squadraCasa.P++;
-    } else {
-      squadraCasa.N++;
-      squadraOspite.N++;
-      squadraCasa.PT++;
-      squadraOspite.PT++;
-    }
-  }
   
 function creaSquadraConLogo(nome) {
   const idsLoghi = {
