@@ -2184,9 +2184,70 @@ if (tabClassificheSerieA) {
           cella.style.cssText =
             "padding:10px 7px;border-bottom:1px solid #64748b55;text-align:center;";
 
-          if (i === 1) {
-            cella.style.textAlign = "left";
-          }
+          
+if (i === 1) {
+  const idsLoghi = {
+    inter: 505,
+    milan: 489,
+    juventus: 496,
+    napoli: 492,
+    roma: 497,
+    lazio: 487,
+    atalanta: 499,
+    bologna: 500,
+    fiorentina: 502,
+    torino: 503,
+    como: 895,
+    cagliari: 490,
+    genoa: 495,
+    udinese: 494,
+    lecce: 867,
+    parma: 523,
+    sassuolo: 488,
+    monza: 1579,
+    venezia: 517,
+    frosinone: 512
+  };
+
+  const nome = String(valore);
+  const nomeMinuscolo = nome.toLowerCase();
+
+  const squadra = Object.keys(idsLoghi).find(
+    chiave => nomeMinuscolo.includes(chiave)
+  );
+
+  cella.textContent = "";
+  cella.style.textAlign = "left";
+
+  const contenuto = document.createElement("span");
+  contenuto.style.cssText =
+    "display:inline-flex;align-items:center;gap:9px;white-space:nowrap;";
+
+  if (squadra) {
+    const logo = document.createElement("img");
+
+    logo.src =
+      `https://media.api-sports.io/football/teams/${idsLoghi[squadra]}.png`;
+
+    logo.alt = "";
+    logo.width = 26;
+    logo.height = 26;
+    logo.loading = "lazy";
+
+    logo.style.cssText =
+      "width:26px;height:26px;object-fit:contain;";
+
+    logo.onerror = () => logo.remove();
+
+    contenuto.appendChild(logo);
+  }
+
+  const nomeSquadra = document.createElement("span");
+  nomeSquadra.textContent = nome;
+
+  contenuto.appendChild(nomeSquadra);
+  cella.appendChild(contenuto);
+}
 
           if (i === 9) {
             cella.style.fontWeight = "bold";
