@@ -1956,7 +1956,22 @@ async function recuperaStagioneCompletaSerieA() {
 
   return tutteLePartite;
 }
+function organizzaGiornateSerieA(partite) {
+  const ordinate = [...partite].sort(
+    (a, b) => new Date(a.start_time) - new Date(b.start_time)
+  );
 
+  const giornate = {};
+
+  for (let numero = 1; numero <= 38; numero++) {
+    const inizio = (numero - 1) * 10;
+    const fine = inizio + 10;
+
+    giornate[numero] = ordinate.slice(inizio, fine);
+  }
+
+  return giornate;
+}
   // Apertura della pagina Serie A
 const voceSerieA = document.querySelector('.league-item[data-league="135"]');
 
