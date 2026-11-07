@@ -2045,8 +2045,33 @@ document.querySelector('[data-tab="risultati"]').onclick = async () => {
       precedente.textContent = "❮";
       precedente.disabled = numero === 1;
 
-      const titolo = document.createElement("strong");
-      titolo.textContent = `GIORNATA ${numero}`;
+      
+const selettore = document.createElement("select");
+selettore.setAttribute("aria-label", "Seleziona giornata");
+
+for (let n = 1; n <= 38; n++) {
+  const opzione = document.createElement("option");
+  opzione.value = String(n);
+  opzione.textContent = `GIORNATA ${n}`;
+  selettore.appendChild(opzione);
+}
+
+selettore.value = String(numero);
+
+selettore.style.cssText = `
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  max-width: 180px;
+`;
+
+selettore.addEventListener("change", () => {
+  numero = Number(selettore.value);
+  visualizzaGiornata();
+});
+
 
       const successivo = document.createElement("button");
       successivo.textContent = "❯";
