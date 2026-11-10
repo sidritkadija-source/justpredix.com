@@ -2330,7 +2330,17 @@ schedaClassificheSerieA.appendChild(barraFiltri);
   barraPeriodi.setAttribute("role", "group");
   barraPeriodi.setAttribute("aria-label", "Numero di partite");
 
-  [5, 10, 15].forEach(numero => {
+  const opzioniForma = [5, 10, 15];
+const giornateForma = organizzaGiornateSerieA(partite);
+const giornata16 = giornateForma[16] || [];
+
+const giornata16Conclusa =
+  giornata16.length === 10 &&
+  giornata16.every(partita => partita.status === "final");
+
+if (giornata16Conclusa) opzioniForma.push(20);
+
+opzioniForma.forEach(numero => {
     const btn = document.createElement("button");
     btn.type = "button";
     btn.textContent = String(numero);
