@@ -2325,29 +2325,39 @@ if (tabClassificheSerieA) {
         return "#dc2626";
       }
 
-      function renderClassifica() {
-        const classifica = calcolaClassificaSerieA(partite, filtro);
+function renderClassifica(vista = "CLASSIFICHE") {
+  schedaClassificheSerieA.replaceChildren();
 
-        schedaClassificheSerieA.replaceChildren();
+  const barraTop = document.createElement("div");
+  barraTop.style.cssText =
+    "display:flex;gap:10px;flex-wrap:wrap;margin:0 0 18px 0;";
 
-        const barraTop = document.createElement("div");
-        barraTop.style.cssText =
-          "display:flex;gap:10px;flex-wrap:wrap;margin:0 0 18px 0;";
+  ["CLASSIFICHE", "FORMA", "U/O", "PT/F", "MARCATORI"].forEach(nome => {
+    const btn = document.createElement("button");
+    btn.textContent = nome;
+    btn.type = "button";
+    btn.style.cssText =
+      "padding:10px 16px;border:none;border-radius:10px;font-weight:700;cursor:pointer;" +
+      (nome === vista
+        ? "background:#D3133B;color:#fff;"
+        : "background:#e5e7eb;color:#475569;");
 
-        ["CLASSIFICHE", "FORMA", "OVER/UNDER", "PT/F", "MARCATORI"]
-          .forEach((nome, indice) => {
-            const btn = document.createElement("button");
-            btn.textContent = nome;
-            btn.type = "button";
-            btn.style.cssText =
-              `padding:10px 16px;border:none;border-radius:10px;font-weight:700;cursor:pointer;` +
-              (indice === 0
-                ? "background:#ff1744;color:#fff;"
-                : "background:#e5e7eb;color:#475569;");
-            barraTop.appendChild(btn);
-          });
+    if (nome === vista) btn.setAttribute("aria-current", "true");
 
-        schedaClassificheSerieA.appendChild(barraTop);
+    btn.onclick = () => renderClassifica(nome);
+    barraTop.appendChild(btn);
+  });
+
+  schedaClassificheSerieA.appendChild(barraTop);
+
+  if (vista !== "CLASSIFICHE") {
+    const avviso = document.createElement("p");
+    avviso.textContent = vista + " · In preparazione";
+    schedaClassificheSerieA.appendChild(avviso);
+    return;
+  }
+
+  const classifica = calcolaClassificaSerieA(partite, filtro);
 
         const barraFiltri = document.createElement("div");
         barraFiltri.style.cssText =
