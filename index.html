@@ -2285,43 +2285,43 @@ function renderClassifica(vista = "CLASSIFICHE") {
 
   schedaClassificheSerieA.appendChild(barraTop);
 
-  if (vista !== "CLASSIFICHE") {
-    const avviso = document.createElement("p");
-    avviso.textContent = vista + " · In preparazione";
-    schedaClassificheSerieA.appendChild(avviso);
-    return;
-  }
+  if (vista !== "CLASSIFICHE" && vista !== "FORMA") {
+  const avviso = document.createElement("p");
+  avviso.textContent = vista + " · In preparazione";
+  schedaClassificheSerieA.appendChild(avviso);
+  return;
+}
 
-  const classifica = calcolaClassificaSerieA(partite, filtro);
+const limite = vista === "FORMA" ? 5 : Infinity;
+const classifica = calcolaClassificaSerieA(partite, filtro, limite);
 
-        const barraFiltri = document.createElement("div");
-        barraFiltri.style.cssText =
-          "display:flex;gap:10px;flex-wrap:wrap;margin:0 0 18px 0;";
+const barraFiltri = document.createElement("div");
+barraFiltri.style.cssText =
+  "display:flex;gap:10px;flex-wrap:wrap;margin:0 0 18px 0;";
 
-        [
-          { codice: "totale", etichetta: "TOTALE" },
-          { codice: "casa", etichetta: "CASA" },
-          { codice: "fuori", etichetta: "FUORI" }
-        ].forEach(item => {
-          const btn = document.createElement("button");
-          btn.type = "button";
-          btn.textContent = item.etichetta;
-          btn.style.cssText =
-            `padding:10px 18px;border:none;border-radius:10px;font-weight:700;cursor:pointer;` +
-            (filtro === item.codice
-              ? "background:#D3133B;color:#fff;"
-              : "background:#e5e7eb;color:#475569;");
+[
+  { codice: "totale", etichetta: "TOTALE" },
+  { codice: "casa", etichetta: "CASA" },
+  { codice: "fuori", etichetta: "FUORI" }
+].forEach(item => {
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.textContent = item.etichetta;
+  btn.style.cssText =
+    "padding:10px 18px;border:none;border-radius:10px;font-weight:700;cursor:pointer;" +
+    (filtro === item.codice
+      ? "background:#D3133B;color:#fff;"
+      : "background:#e5e7eb;color:#475569;");
 
-          btn.onclick = () => {
-            filtro = item.codice;
-            renderClassifica();
-          };
+  btn.onclick = () => {
+    filtro = item.codice;
+    renderClassifica(vista);
+  };
 
-          barraFiltri.appendChild(btn);
-        });
+  barraFiltri.appendChild(btn);
+});
 
-        schedaClassificheSerieA.appendChild(barraFiltri);
-
+schedaClassificheSerieA.appendChild(barraFiltri);
         const contenitore = document.createElement("div");
         contenitore.style.cssText =
           "width:100%;overflow-x:auto;border-radius:12px;";
