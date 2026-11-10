@@ -2292,6 +2292,28 @@ schedaClassificheSerieA.id = "serie-a-classifiche";
 schedaClassificheSerieA.style.display = "none";
 
 schedaCalendario.after(schedaClassificheSerieA);
+    const schedaArchivioSerieA = document.createElement("div");
+schedaArchivioSerieA.id = "serie-a-archivio";
+schedaArchivioSerieA.style.display = "none";
+
+schedaClassificheSerieA.after(schedaArchivioSerieA);
+
+const tabArchivioSerieA = document.querySelector(
+  '[data-tab="archivio"]'
+);
+
+if (tabArchivioSerieA) {
+  tabArchivioSerieA.onclick = () => {
+    corpoRiepilogo.style.display = "none";
+    schedaRisultati.style.display = "none";
+    schedaCalendario.style.display = "none";
+    schedaClassificheSerieA.style.display = "none";
+    schedaArchivioSerieA.style.display = "block";
+
+    schedaArchivioSerieA.innerHTML =
+      "<h3>Albo d’oro Serie A</h3>";
+  };
+}
 
 const tabClassificheSerieA = document.querySelector(
   '[data-tab="classifiche"]'
