@@ -2234,15 +2234,7 @@ function selezionaSchedaSerieA(nomeScheda) {
       nomeScheda === "archivio" ? "block" : "none";
   }
 }
-  barraSchedeSerieA.querySelectorAll("button[data-tab]").forEach(pulsante => {
-    if (pulsante.dataset.tab === nomeScheda) {
-      pulsante.setAttribute("aria-current", "true");
-    } else {
-      pulsante.removeAttribute("aria-current");
-    }
-  });
-}
-
+  
 barraSchedeSerieA.addEventListener("click", evento => {
   const pulsante = evento.target.closest("button[data-tab]");
 
