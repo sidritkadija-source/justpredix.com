@@ -2323,6 +2323,34 @@ barraFiltri.style.cssText =
 });
 
 schedaClassificheSerieA.appendChild(barraFiltri);
+  if (vista === "FORMA") {
+  const barraPeriodi = document.createElement("div");
+  barraPeriodi.style.cssText =
+    "display:flex;gap:10px;flex-wrap:wrap;margin:0 0 18px 0;";
+  barraPeriodi.setAttribute("role", "group");
+  barraPeriodi.setAttribute("aria-label", "Numero di partite");
+
+  [5, 10, 15].forEach(numero => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.textContent = String(numero);
+    btn.setAttribute("aria-pressed", String(limiteForma === numero));
+    btn.style.cssText =
+      "padding:10px 18px;border:none;border-radius:10px;font-weight:700;cursor:pointer;" +
+      (limiteForma === numero
+        ? "background:#D3133B;color:#fff;"
+        : "background:#e5e7eb;color:#475569;");
+
+    btn.onclick = () => {
+      limiteForma = numero;
+      renderClassifica("FORMA");
+    };
+
+    barraPeriodi.appendChild(btn);
+  });
+
+  schedaClassificheSerieA.appendChild(barraPeriodi);
+}
         const contenitore = document.createElement("div");
         contenitore.style.cssText =
           "width:100%;overflow-x:auto;border-radius:12px;";
