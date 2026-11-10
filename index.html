@@ -813,7 +813,11 @@ html, body {
 .league-page-tabs button:hover {
   background: #2563eb;
 }
-
+.league-page-tabs button[aria-current="true"] {
+  background: #ff1744;
+  border-color: #ff1744;
+  color: #fff;
+}
 #league-page-content {
   background: #111c2e;
   border-radius: 10px;
@@ -2220,6 +2224,27 @@ function creaSquadraConLogo(nome) {
 
   return contenitore;
 }
+  const barraSchedeSerieA = document.querySelector(
+  "#league-detail .league-page-tabs"
+);
+
+function selezionaSchedaSerieA(nomeScheda) {
+  barraSchedeSerieA.querySelectorAll("button[data-tab]").forEach(pulsante => {
+    if (pulsante.dataset.tab === nomeScheda) {
+      pulsante.setAttribute("aria-current", "true");
+    } else {
+      pulsante.removeAttribute("aria-current");
+    }
+  });
+}
+
+barraSchedeSerieA.addEventListener("click", evento => {
+  const pulsante = evento.target.closest("button[data-tab]");
+
+  if (pulsante && typeof pulsante.onclick === "function") {
+    selezionaSchedaSerieA(pulsante.dataset.tab);
+  }
+});
 
   // Apertura della pagina Serie A
 const voceSerieA = document.querySelector('.league-item[data-league="135"]');
@@ -2230,6 +2255,7 @@ if (voceSerieA) {
   voceSerieA.addEventListener("click", () => {
     document.getElementById("partite").style.display = "none";
     document.getElementById("league-detail").style.display = "block";
+    selezionaSchedaSerieA("riepilogo");
 
     document.getElementById("league-page-content").innerHTML = `
   <button type="button" id="back-to-matches">
