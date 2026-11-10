@@ -2370,10 +2370,8 @@ function renderClassifica(vista = "CLASSIFICHE") {
 
   schedaClassificheSerieA.appendChild(barraTop);
 
-  if (vista !== "CLASSIFICHE" && vista !== "FORMA") {
-  const avviso = document.createElement("p");
-  avviso.textContent = vista + " · In preparazione";
-  schedaClassificheSerieA.appendChild(avviso);
+  if (vista === "MARCATORI") {
+  mostraMarcatoriSerieA(schedaClassificheSerieA);
   return;
 }
 
