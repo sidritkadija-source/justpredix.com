@@ -2268,7 +2268,7 @@ function renderClassifica(vista = "CLASSIFICHE") {
   barraTop.style.cssText =
     "display:flex;gap:10px;flex-wrap:wrap;margin:0 0 18px 0;";
 
-  ["CLASSIFICHE", "FORMA", "U/O", "PT/F", "MARCATORI"].forEach(nome => {
+  ["CLASSIFICHE", "FORMA", "MARCATORI"].forEach(nome => {
     const btn = document.createElement("button");
     btn.textContent = nome;
     btn.type = "button";
