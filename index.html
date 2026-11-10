@@ -2138,13 +2138,7 @@ async function mostraMarcatoriSerieA(contenitore) {
 
     scorrimento.appendChild(tabella);
 
-    const fonte = document.createElement("a");
-    fonte.href = "https://www.football-data.org/";
-    fonte.textContent = "Football data provided by the Football-Data.org API";
-    fonte.style.cssText =
-      "display:block;margin-top:12px;color:#a0aec0;font-size:12px;";
-
-    sezione.replaceChildren(scorrimento, fonte);
+   sezione.replaceChildren(scorrimento);
   } catch (errore) {
     if (sezione.isConnected) {
       sezione.textContent = "Impossibile caricare i marcatori. Riprova tra poco.";
