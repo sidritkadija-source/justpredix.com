@@ -2293,7 +2293,7 @@ function renderClassifica(vista = "CLASSIFICHE") {
   return;
 }
 
-const limite = vista === "FORMA" ? 5 : Infinity;
+const limite = vista === "FORMA" ? limiteForma : Infinity;
 const classifica = calcolaClassificaSerieA(partite, filtro, limite);
 
 const barraFiltri = document.createElement("div");
