@@ -2037,7 +2037,91 @@ function organizzaGiornateSerieA(partite) {
 
   return giornate;
 }
+async function mostraMarcatoriSerieA(contenitore) {
+  const sezione = document.createElement("div");
+  sezione.textContent = "Caricamento marcatori Serie A...";
+  contenitore.appendChild(sezione);
 
+  try {
+    const risposta = await fetch(
+      API_URL + "/fd-topscorers?league=135&season=2026"
+    );
+
+    if (!risposta.ok) {
+      throw new Error("Errore marcatori: " + risposta.status);
+    }
+
+    const dati = await risposta.json();
+
+    if (!Array.isArray(dati.scorers)) {
+      throw new Error("Risposta marcatori non valida");
+    }
+
+    if (!sezione.isConnected) return;
+
+    if (dati.scorers.length === 0) {
+      sezione.textContent = "Nessun marcatore disponibile per questa stagione.";
+      return;
+    }
+
+    const scorrimento = document.createElement("div");
+    scorrimento.style.cssText = "width:100%;overflow-x:auto;";
+
+    const tabella = document.createElement("table");
+    tabella.style.cssText =
+      "width:100%;min-width:600px;border-collapse:collapse;font-size:13px;";
+
+    const stileCella =
+      "padding:12px 8px;border-bottom:1px solid #64748b33;text-align:left;";
+
+    const intestazione = tabella.createTHead().insertRow();
+
+    ["#", "GIOCATORE", "SQUADRA", "PG", "GOL", "ASSIST", "RIGORI"]
+      .forEach(testo => {
+        const cella = document.createElement("th");
+        cella.textContent = testo;
+        cella.style.cssText = stileCella + "background:#1e293b;color:#fff;";
+        cella.scope = "col";
+        intestazione.appendChild(cella);
+      });
+
+    const corpo = tabella.createTBody();
+
+    dati.scorers.forEach((voce, indice) => {
+      const riga = corpo.insertRow();
+      const valori = [
+        indice + 1,
+        voce.player?.name ?? "—",
+        voce.team?.shortName ?? voce.team?.name ?? "—",
+        voce.playedMatches ?? "—",
+        voce.goals ?? "—",
+        voce.assists ?? "—",
+        voce.penalties ?? "—"
+      ];
+
+      valori.forEach((valore, colonna) => {
+        const cella = riga.insertCell();
+        cella.textContent = valore;
+        cella.style.cssText =
+          stileCella + (colonna === 4 ? "font-weight:700;" : "");
+      });
+    });
+
+    scorrimento.appendChild(tabella);
+
+    const fonte = document.createElement("a");
+    fonte.href = "https://www.football-data.org/";
+    fonte.textContent = "Football data provided by the Football-Data.org API";
+    fonte.style.cssText =
+      "display:block;margin-top:12px;color:#a0aec0;font-size:12px;";
+
+    sezione.replaceChildren(scorrimento, fonte);
+  } catch (errore) {
+    if (sezione.isConnected) {
+      sezione.textContent = "Impossibile caricare i marcatori. Riprova tra poco.";
+    }
+  }
+}
  
 function calcolaClassificaSerieA(partite, tipo = "totale", limite = Infinity) {
   const partitePerSquadra = new Map();
