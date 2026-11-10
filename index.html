@@ -2039,119 +2039,54 @@ function organizzaGiornateSerieA(partite) {
 }
 
  
-function calcolaClassificaSerieA(partite, tipo = "totale") {
-  const squadre = new Map();
-  const cronologia = new Map();
+function calcolaClassificaSerieA(partite, tipo = "totale", limite = Infinity) {
+  const partitePerSquadra = new Map();
 
-  function inizializzaSquadra(nome) {
-    if (!nome) return;
-
-    if (!squadre.has(nome)) {
-      squadre.set(nome, {
-        squadra: nome,
-        PG: 0,
-        V: 0,
-        N: 0,
-        P: 0,
-        GF: 0,
-        GS: 0,
-        DR: 0,
-        PT: 0
-      });
-    }
-
-    if (!cronologia.has(nome)) {
-      cronologia.set(nome, []);
-    }
-  }
-
-  const concluse = [...partite]
-    .filter(partita =>
-      partita.status === "final" &&
-      /^\d+$/.test(String(partita.home_score)) &&
-      /^\d+$/.test(String(partita.away_score))
+  const concluse = partite
+    .filter(p =>
+      p.status === "final" &&
+      /^\d+$/.test(String(p.home_score)) &&
+      /^\d+$/.test(String(p.away_score)) &&
+      p.home_team?.name && p.away_team?.name
     )
     .sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
 
-  for (const partita of concluse) {
-    const casa = partita.home_team?.name;
-    const ospite = partita.away_team?.name;
-
-    inizializzaSquadra(casa);
-    inizializzaSquadra(ospite);
-
-    const golCasa = Number(partita.home_score);
-    const golOspite = Number(partita.away_score);
-
-    const casaObj = squadre.get(casa);
-    const ospiteObj = squadre.get(ospite);
-
-    const usaCasa = tipo === "totale" || tipo === "casa";
-    const usaOspite = tipo === "totale" || tipo === "fuori";
-
-    if (usaCasa) {
-      casaObj.PG++;
-      casaObj.GF += golCasa;
-      casaObj.GS += golOspite;
-    }
-
-    if (usaOspite) {
-      ospiteObj.PG++;
-      ospiteObj.GF += golOspite;
-      ospiteObj.GS += golCasa;
-    }
-
-    if (golCasa > golOspite) {
-      if (usaCasa) {
-        casaObj.V++;
-        casaObj.PT += 3;
-      }
-      if (usaOspite) {
-        ospiteObj.P++;
-      }
-
-      cronologia.get(casa).push("V");
-      cronologia.get(ospite).push("P");
-    } else if (golCasa < golOspite) {
-      if (usaCasa) {
-        casaObj.P++;
-      }
-      if (usaOspite) {
-        ospiteObj.V++;
-        ospiteObj.PT += 3;
-      }
-
-      cronologia.get(casa).push("P");
-      cronologia.get(ospite).push("V");
-    } else {
-      if (usaCasa) {
-        casaObj.N++;
-        casaObj.PT++;
-      }
-      if (usaOspite) {
-        ospiteObj.N++;
-        ospiteObj.PT++;
-      }
-
-      cronologia.get(casa).push("N");
-      cronologia.get(ospite).push("N");
-    }
+  function registra(nome, gf, gs, inclusa) {
+    if (!partitePerSquadra.has(nome)) partitePerSquadra.set(nome, []);
+    if (inclusa) partitePerSquadra.get(nome).push({ gf, gs });
   }
 
-  const classifica = [...squadre.values()]
-    .map(squadra => ({
-      ...squadra,
-      DR: squadra.GF - squadra.GS,
-      forma: (cronologia.get(squadra.squadra) || []).slice(-5)
-    }))
-    .sort((a, b) =>
-      b.PT - a.PT ||
-      b.DR - a.DR ||
-      b.GF - a.GF ||
-      a.squadra.localeCompare(b.squadra)
-    );
+  for (const p of concluse) {
+    const casa = Number(p.home_score);
+    const fuori = Number(p.away_score);
 
-  return classifica;
+    registra(p.home_team.name, casa, fuori, tipo !== "fuori");
+    registra(p.away_team.name, fuori, casa, tipo !== "casa");
+  }
+
+  return [...partitePerSquadra].map(([squadra, gare]) => {
+    const selezionate = gare.slice(-limite);
+    const riga = {
+      squadra, PG: selezionate.length, V: 0, N: 0, P: 0,
+      GF: 0, GS: 0, DR: 0, PT: 0, forma: []
+    };
+
+    for (const { gf, gs } of selezionate) {
+      const esito = gf > gs ? "V" : gf < gs ? "P" : "N";
+      riga[esito]++;
+      riga.GF += gf;
+      riga.GS += gs;
+      riga.forma.push(esito);
+    }
+
+    riga.DR = riga.GF - riga.GS;
+    riga.PT = 3 * riga.V + riga.N;
+    riga.forma = riga.forma.slice(-5);
+    return riga;
+  }).sort((a, b) =>
+    b.PT - a.PT || b.DR - a.DR || b.GF - a.GF ||
+    a.squadra.localeCompare(b.squadra)
+  );
 }
   
 function creaSquadraConLogo(nome) {
