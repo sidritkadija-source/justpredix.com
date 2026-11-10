@@ -1924,87 +1924,25 @@ async function recuperaLiveSerieA() {
     return [];
   }
 }
-  async function recuperaPartiteSerieA() {
-  // Data attuale in Albania
-const oggi = new Date().toLocaleDateString("en-CA", {
-  timeZone: "Europe/Tirane"
-});
+ async function recuperaPartiteSerieA() {
+  const partite = await recuperaStagioneCompletaSerieA();
+  const giornate = Object.values(organizzaGiornateSerieA(partite));
 
-const dataBase = new Date(oggi + "T12:00:00Z");
+  const giornataLive = giornate.find(gare =>
+    gare.some(partita => partita.status === "in_progress")
+  );
 
-// Trova il venerdì del turno più vicino
-const giorniAlVenerdi = {
-  0: -2,
-  1: -3,
-  2: 3,
-  3: 2,
-  4: 1,
-  5: 0,
-  6: -1
-}[dataBase.getUTCDay()];
+  if (giornataLive) return giornataLive;
 
-dataBase.setUTCDate(
-  dataBase.getUTCDate() + giorniAlVenerdi
-);
+  const adesso = Date.now();
 
-// Venerdì, sabato, domenica e lunedì
-const dateGiornata = Array.from({ length: 4 }, (_, i) => {
-  const giorno = new Date(dataBase);
-  giorno.setUTCDate(giorno.getUTCDate() + i);
-  return giorno.toISOString().slice(0, 10);
-});
-  const tutteLePartite = [];
-
-  for (const data of dateGiornata) {
-    const chiave = "justpredix_seriea_ninja_" + data;
-    let partiteGiorno = null;
-
-    try {
-      const salvate = localStorage.getItem(chiave);
-
-      if (salvate) {
-        const cache = JSON.parse(salvate);
-
-        if (
-          Array.isArray(cache.data) &&
-          Date.now() - cache.time < 30 * 60 * 1000
-        ) {
-          partiteGiorno = cache.data;
-        }
-      }
-    } catch (errore) {
-      console.warn("Cache Serie A:", errore);
-    }
-
-    if (partiteGiorno === null) {
-      const risposta = await fetch(
-        `${API_URL}/ninja-matches?league=seriea&date=${data}`
-      );
-
-      if (!risposta.ok) {
-        throw new Error("Errore API Serie A: " + risposta.status);
-      }
-
-      const dati = await risposta.json();
-
-      if (!Array.isArray(dati)) {
-        throw new Error("Risposta API Ninjas non valida");
-      }
-
-      partiteGiorno = dati;
-
-      localStorage.setItem(chiave, JSON.stringify({
-        time: Date.now(),
-        data: dati
-      }));
-    }
-
-    tutteLePartite.push(...partiteGiorno);
-  }
-
-  return tutteLePartite;
+  return giornate.find(gare =>
+    gare.some(partita =>
+      partita.status === "scheduled" &&
+      new Date(partita.start_time).getTime() >= adesso
+    )
+  ) || [];
 }  
-  
 async function recuperaStagioneCompletaSerieA() {
   const chiave = "justpredix_seriea_stagione_2026";
   const cache = JSON.parse(localStorage.getItem(chiave) || "null");
