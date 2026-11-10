@@ -2473,7 +2473,9 @@ const ultimePartite = partite
   .sort((a, b) => new Date(b.start_time) - new Date(a.start_time))
   .slice(0, 5);
 
-for (let i = 0; i < 5; i++) {
+const numeroCaselle = vista === "FORMA" ? ultimePartite.length : 5;
+
+for (let i = 0; i < numeroCaselle; i++) {
   const partita = ultimePartite[i];
   const pill = document.createElement("span");
 
