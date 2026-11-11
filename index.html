@@ -2082,7 +2082,7 @@ function organizzaGiornateSerieA(partite) {
     riga.style.background = anno % 2 === 0 ? "#102239" : "#0e1d30";
 
     const stagione = riga.insertCell();
-    stagione.textContent = anno + "/" + String(anno + 1).slice(-2);
+    stagione.textContent = "Serie A " + anno + "/" + (anno + 1);
     stagione.style.cssText =
       "padding:12px;width:140px;border-bottom:1px solid #203b59;";
 
