@@ -3392,7 +3392,7 @@ zonaSerieA.textContent = "Caricamento partite Serie A...";
 // Mostra i risultati delle partite concluse
 const listaRisultati = document.getElementById("lista-risultati-serie-a");
 
-if (listaRisultati) {
+if (listaRisultati && schedaRisultati.style.display !== "block") {
   listaRisultati.innerHTML = "";
 
   const partiteConcluse = partite.filter(partita =>
