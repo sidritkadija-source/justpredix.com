@@ -2710,6 +2710,7 @@ barraFiltri.style.cssText =
   const btn = document.createElement("button");
   btn.type = "button";
   btn.textContent = item.etichetta;
+  btn.setAttribute("aria-pressed", String(filtro === item.codice));
   btn.style.cssText =
     "padding:10px 18px;border:none;border-radius:10px;font-weight:700;cursor:pointer;" +
     (filtro === item.codice
