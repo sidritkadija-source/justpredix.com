@@ -2271,6 +2271,12 @@ classifica.forEach((squadra, indice) => {
 });
 
     contenuto.appendChild(tabella);
+    const titoloMarcatori = document.createElement("h4");
+titoloMarcatori.textContent = "CLASSIFICA MARCATORI";
+titoloMarcatori.style.marginTop = "24px";
+
+contenuto.appendChild(titoloMarcatori);
+mostraMarcatoriSerieA(contenuto);
   }
 
   dettaglio.append(indietro, titolo, barra, contenuto);
