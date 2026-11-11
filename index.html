@@ -2014,6 +2014,177 @@ function organizzaGiornateSerieA(partite) {
 
   return giornate;
 }
+  async function mostraStagioneSerieA(contenitore) {
+  const dettaglio = document.createElement("div");
+
+  const indietro = document.createElement("button");
+  indietro.type = "button";
+  indietro.textContent = "← Archivio";
+  indietro.style.cssText =
+    "padding:9px 14px;background:#1e293b;color:#fff;border:1px solid #334155;border-radius:6px;cursor:pointer;";
+  indietro.onclick = () => mostraArchivioSerieA(contenitore);
+
+  const titolo = document.createElement("h3");
+  titolo.textContent = "Serie A 2026/2027";
+
+  const barra = document.createElement("div");
+  barra.style.cssText = "display:flex;gap:8px;margin-bottom:18px;";
+
+  const contenuto = document.createElement("div");
+  contenuto.style.cssText = "max-height:600px;overflow:auto;";
+
+  let vista = "risultati";
+  let partite = null;
+  let erroreCaricamento = "";
+  const pulsanti = [];
+
+  for (const nome of ["risultati", "classifica"]) {
+    const pulsante = document.createElement("button");
+    pulsante.type = "button";
+    pulsante.textContent = nome.toUpperCase();
+
+    pulsante.onclick = () => {
+      vista = nome;
+      aggiorna();
+    };
+
+    pulsanti.push({ nome, pulsante });
+    barra.appendChild(pulsante);
+  }
+
+  function aggiorna() {
+    for (const { nome, pulsante } of pulsanti) {
+      const attivo = vista === nome;
+      pulsante.setAttribute("aria-pressed", String(attivo));
+      pulsante.style.cssText =
+        "padding:10px 16px;border:none;border-radius:8px;color:#fff;font-weight:bold;cursor:pointer;" +
+        (attivo ? "background:#D3133B;" : "background:#1e293b;");
+    }
+
+    contenuto.replaceChildren();
+
+    if (erroreCaricamento || partite === null) {
+      contenuto.textContent =
+        erroreCaricamento || "Caricamento stagione...";
+      return;
+    }
+
+    if (vista === "risultati") {
+      const concluse = partite
+        .filter(p =>
+          p.status === "final" &&
+          /^\d+$/.test(String(p.home_score)) &&
+          /^\d+$/.test(String(p.away_score))
+        )
+        .sort((a, b) =>
+          new Date(b.start_time) - new Date(a.start_time)
+        );
+
+      if (!concluse.length) {
+        contenuto.textContent = "Nessun risultato disponibile.";
+      }
+
+      for (const partita of concluse) {
+        const riga = document.createElement("div");
+        riga.className = "match-row";
+        riga.style.cssText =
+          "grid-template-columns:90px minmax(0,1fr) 65px;margin-bottom:8px;";
+
+        const data = document.createElement("div");
+        data.className = "match-time";
+        data.textContent = new Date(partita.start_time)
+          .toLocaleDateString("it-IT", {
+            timeZone: "Europe/Tirane"
+          });
+
+        const squadre = document.createElement("div");
+        squadre.className = "match-teams";
+        squadre.append(
+          creaSquadraConLogo(partita.home_team?.name),
+          creaSquadraConLogo(partita.away_team?.name)
+        );
+
+        const punteggio = document.createElement("div");
+        punteggio.className = "match-score";
+        punteggio.textContent =
+          partita.home_score + " - " + partita.away_score;
+
+        riga.append(data, squadre, punteggio);
+        contenuto.appendChild(riga);
+      }
+
+      return;
+    }
+
+    const classifica = calcolaClassificaSerieA(partite);
+
+    if (!classifica.length) {
+      contenuto.textContent = "Classifica non ancora disponibile.";
+      return;
+    }
+
+    const tabella = document.createElement("table");
+    tabella.style.cssText =
+      "width:100%;min-width:560px;border-collapse:collapse;font-size:13px;";
+
+    const stileCella =
+      "padding:10px 8px;text-align:left;border-bottom:1px solid #203b59;";
+
+    const intestazione = tabella.createTHead().insertRow();
+
+    ["#", "SQUADRA", "PG", "V", "N", "P", "R", "DR", "PT"]
+      .forEach(testo => {
+        const cella = document.createElement("th");
+        cella.textContent = testo;
+        cella.scope = "col";
+        cella.style.cssText = stileCella + "background:#1e293b;";
+        intestazione.appendChild(cella);
+      });
+
+    const corpo = tabella.createTBody();
+
+    classifica.forEach((squadra, indice) => {
+      const riga = corpo.insertRow();
+      const valori = [
+        indice + 1,
+        squadra.squadra,
+        squadra.PG,
+        squadra.V,
+        squadra.N,
+        squadra.P,
+        squadra.GF + ":" + squadra.GS,
+        squadra.DR,
+        squadra.PT
+      ];
+
+      valori.forEach((valore, colonna) => {
+        const cella = riga.insertCell();
+        cella.style.cssText = stileCella;
+
+        if (colonna === 1) {
+          cella.appendChild(creaSquadraConLogo(valore));
+        } else {
+          cella.textContent = valore;
+        }
+      });
+    });
+
+    contenuto.appendChild(tabella);
+  }
+
+  dettaglio.append(indietro, titolo, barra, contenuto);
+  contenitore.replaceChildren(dettaglio);
+  aggiorna();
+
+  try {
+    partite = await recuperaStagioneCompletaSerieA();
+    if (dettaglio.isConnected) aggiorna();
+  } catch (errore) {
+    erroreCaricamento =
+      "Impossibile caricare la stagione. Riprova tra poco.";
+    if (dettaglio.isConnected) aggiorna();
+  }
+}
   function mostraArchivioSerieA(contenitore) {
   const titoli = {
     Inter: [
