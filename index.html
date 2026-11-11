@@ -2253,7 +2253,19 @@ function organizzaGiornateSerieA(partite) {
     stagione.textContent = "Serie A " + anno + "/" + (anno + 1);
     stagione.style.cssText =
   "padding:12px;width:400px;white-space:nowrap;border-bottom:1px solid #203b59;";
+if (anno === 2026) {
+  const pulsanteStagione = document.createElement("button");
+  pulsanteStagione.type = "button";
+  pulsanteStagione.textContent = stagione.textContent;
+  pulsanteStagione.style.cssText =
+    "padding:0;border:none;background:transparent;color:#93c5fd;text-decoration:underline;cursor:pointer;font:inherit;";
 
+  pulsanteStagione.onclick = () => {
+    mostraStagioneSerieA(contenitore);
+  };
+
+  stagione.replaceChildren(pulsanteStagione);
+}
     const vincitore = riga.insertCell();
     vincitore.style.cssText =
       "padding:12px;border-bottom:1px solid #203b59;";
