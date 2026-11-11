@@ -2070,51 +2070,66 @@ function organizzaGiornateSerieA(partite) {
     }
 
     if (vista === "risultati") {
-      const concluse = partite
-        .filter(p =>
-          p.status === "final" &&
-          /^\d+$/.test(String(p.home_score)) &&
-          /^\d+$/.test(String(p.away_score))
-        )
-        .sort((a, b) =>
-          new Date(b.start_time) - new Date(a.start_time)
-        );
+  const giornate = Object.entries(
+    organizzaGiornateSerieA(partite)
+  ).reverse();
 
-      if (!concluse.length) {
-        contenuto.textContent = "Nessun risultato disponibile.";
-      }
+  let risultatiMostrati = 0;
 
-      for (const partita of concluse) {
-        const riga = document.createElement("div");
-        riga.className = "match-row";
-        riga.style.cssText =
-          "grid-template-columns:90px minmax(0,1fr) 65px;margin-bottom:8px;";
+  for (const [numero, gare] of giornate) {
+    const concluse = gare.filter(p =>
+      p.status === "final" &&
+      /^\d+$/.test(String(p.home_score)) &&
+      /^\d+$/.test(String(p.away_score))
+    ).sort((a, b) =>
+      new Date(b.start_time) - new Date(a.start_time)
+    );
 
-        const data = document.createElement("div");
-        data.className = "match-time";
-        data.textContent = new Date(partita.start_time)
-          .toLocaleDateString("it-IT", {
-            timeZone: "Europe/Tirane"
-          });
+    if (!concluse.length) continue;
+    risultatiMostrati += concluse.length;
 
-        const squadre = document.createElement("div");
-        squadre.className = "match-teams";
-        squadre.append(
-          creaSquadraConLogo(partita.home_team?.name),
-          creaSquadraConLogo(partita.away_team?.name)
-        );
+    const titoloGiornata = document.createElement("h4");
+    titoloGiornata.textContent = "GIORNATA " + numero;
+    titoloGiornata.style.cssText =
+      "margin:20px 0 10px;color:#a0aec0;";
+    contenuto.appendChild(titoloGiornata);
 
-        const punteggio = document.createElement("div");
-        punteggio.className = "match-score";
-        punteggio.textContent =
-          partita.home_score + " - " + partita.away_score;
+    for (const partita of concluse) {
+      const riga = document.createElement("div");
+      riga.className = "match-row";
+      riga.style.cssText =
+        "grid-template-columns:90px minmax(0,1fr) 65px;margin-bottom:8px;";
 
-        riga.append(data, squadre, punteggio);
-        contenuto.appendChild(riga);
-      }
+      const data = document.createElement("div");
+      data.className = "match-time";
+      data.textContent = new Date(partita.start_time)
+        .toLocaleDateString("it-IT", {
+          timeZone: "Europe/Tirane"
+        });
 
-      return;
+      const squadre = document.createElement("div");
+      squadre.className = "match-teams";
+      squadre.append(
+        creaSquadraConLogo(partita.home_team?.name),
+        creaSquadraConLogo(partita.away_team?.name)
+      );
+
+      const punteggio = document.createElement("div");
+      punteggio.className = "match-score";
+      punteggio.textContent =
+        partita.home_score + " - " + partita.away_score;
+
+      riga.append(data, squadre, punteggio);
+      contenuto.appendChild(riga);
     }
+  }
+
+  if (!risultatiMostrati) {
+    contenuto.textContent = "Nessun risultato disponibile.";
+  }
+
+  return;
+}
 
     const classifica = calcolaClassificaSerieA(partite);
 
