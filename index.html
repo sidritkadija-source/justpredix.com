@@ -2132,42 +2132,79 @@ function organizzaGiornateSerieA(partite) {
 
     const intestazione = tabella.createTHead().insertRow();
 
-    ["#", "SQUADRA", "PG", "V", "N", "P", "R", "DR", "PT"]
-      .forEach(testo => {
-        const cella = document.createElement("th");
-        cella.textContent = testo;
-        cella.scope = "col";
-        cella.style.cssText = stileCella + "background:#1e293b;";
-        intestazione.appendChild(cella);
-      });
+    ["#", "SQUADRA", "PG", "V", "N", "P", "R", "DR", "PT", "FORMA"]
+  .forEach(testo => {
+    const cella = document.createElement("th");
+    cella.textContent = testo;
+    cella.scope = "col";
+    cella.style.cssText = stileCella + "background:#1e293b;";
+    intestazione.appendChild(cella);
+  });
 
-    const corpo = tabella.createTBody();
+const corpo = tabella.createTBody();
 
-    classifica.forEach((squadra, indice) => {
-      const riga = corpo.insertRow();
-      const valori = [
-        indice + 1,
-        squadra.squadra,
-        squadra.PG,
-        squadra.V,
-        squadra.N,
-        squadra.P,
-        squadra.GF + ":" + squadra.GS,
-        squadra.DR,
-        squadra.PT
-      ];
+const coloriForma = {
+  V: "#16a34a",
+  N: "#f59e0b",
+  P: "#dc2626"
+};
 
-      valori.forEach((valore, colonna) => {
-        const cella = riga.insertCell();
-        cella.style.cssText = stileCella;
+const descrizioniForma = {
+  V: "Vittoria",
+  N: "Pareggio",
+  P: "Sconfitta"
+};
 
-        if (colonna === 1) {
-          cella.appendChild(creaSquadraConLogo(valore));
-        } else {
-          cella.textContent = valore;
-        }
-      });
-    });
+classifica.forEach((squadra, indice) => {
+  const riga = corpo.insertRow();
+  const valori = [
+    indice + 1,
+    squadra.squadra,
+    squadra.PG,
+    squadra.V,
+    squadra.N,
+    squadra.P,
+    squadra.GF + ":" + squadra.GS,
+    squadra.DR,
+    squadra.PT
+  ];
+
+  valori.forEach((valore, colonna) => {
+    const cella = riga.insertCell();
+    cella.style.cssText = stileCella;
+
+    if (colonna === 1) {
+      cella.appendChild(creaSquadraConLogo(valore));
+    } else {
+      cella.textContent = valore;
+    }
+  });
+
+  const cellaForma = riga.insertCell();
+  cellaForma.style.cssText = stileCella;
+
+  const gruppoForma = document.createElement("div");
+  gruppoForma.style.cssText =
+    "display:flex;gap:4px;flex-wrap:nowrap;";
+  gruppoForma.setAttribute(
+    "aria-label",
+    "Ultime cinque partite, dalla più recente"
+  );
+
+  for (const esito of squadra.forma.slice().reverse()) {
+    const casella = document.createElement("span");
+    casella.textContent = esito;
+    casella.title = descrizioniForma[esito];
+    casella.style.cssText =
+      "display:inline-flex;align-items:center;justify-content:center;" +
+      "width:24px;height:24px;flex-shrink:0;border-radius:5px;" +
+      "font-size:12px;font-weight:700;color:#fff;background:" +
+      coloriForma[esito] + ";";
+    gruppoForma.appendChild(casella);
+  }
+
+  cellaForma.appendChild(gruppoForma);
+});
 
     contenuto.appendChild(tabella);
   }
