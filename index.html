@@ -3987,6 +3987,59 @@ const ospite = creaSquadraConLogo(
 
   timer = setTimeout(terminaRipristino, 30000);
 })();
+  {
+  const voce = document.getElementById("voce-nations-league");
+  const partite = document.getElementById("partite");
+  const dettaglioCampionato = document.getElementById("league-detail");
+
+  const calendario = document.createElement("section");
+  calendario.hidden = true;
+  calendario.innerHTML = `
+    <button type="button">← Indietro</button>
+    <h2 class="section-title">UEFA Nations League</h2>
+    <p>5ª giornata · Giovedì 12 novembre 2026</p>
+    <div class="match-row">
+      <strong>Albania – Finlandia</strong>
+      <time datetime="2026-11-12T20:45:00+01:00">20:45</time>
+    </div>
+  `;
+  partite.before(calendario);
+
+  let displayPartite;
+  let displayCampionato;
+
+  function apriCalendario() {
+    if (!calendario.hidden) return;
+    displayPartite = partite.style.display;
+    displayCampionato = dettaglioCampionato.style.display;
+    partite.style.display = "none";
+    dettaglioCampionato.style.display = "none";
+    calendario.hidden = false;
+    calendario.querySelector("button").focus();
+  }
+
+  voce.setAttribute("role", "button");
+  voce.tabIndex = 0;
+  voce.addEventListener("click", apriCalendario);
+  voce.addEventListener("keydown", (evento) => {
+    if (evento.key === "Enter" || evento.key === " ") {
+      evento.preventDefault();
+      apriCalendario();
+    }
+  });
+
+  calendario.querySelector("button").addEventListener("click", () => {
+    calendario.hidden = true;
+    partite.style.display = displayPartite;
+    dettaglioCampionato.style.display = displayCampionato;
+    voce.focus();
+  });
+
+  document.querySelector('.league-item[data-league="135"]')
+    .addEventListener("click", () => {
+      calendario.hidden = true;
+    });
+}
 </script>
 </body>
 </html>
