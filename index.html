@@ -2272,13 +2272,50 @@ classifica.forEach((squadra, indice) => {
 });
 
     contenuto.appendChild(tabella);
-    const titoloMarcatori = document.createElement("h4");
-titoloMarcatori.textContent = "CLASSIFICA MARCATORI";
-titoloMarcatori.style.marginTop = "24px";
+   const barraClassifica = document.createElement("div");
+barraClassifica.style.cssText =
+  "display:flex;gap:8px;margin-bottom:18px;";
 
-contenuto.appendChild(titoloMarcatori);
-mostraMarcatoriSerieA(contenuto);
+contenuto.insertBefore(barraClassifica, tabella);
+
+const areaMarcatori = document.createElement("div");
+contenuto.appendChild(areaMarcatori);
+
+const pulsantiClassifica = [];
+
+for (const nome of ["classifica", "marcatori"]) {
+  const pulsante = document.createElement("button");
+  pulsante.type = "button";
+  pulsante.textContent = nome.toUpperCase();
+
+  pulsante.onclick = () => {
+    vistaClassifica = nome;
+    aggiornaSottoscheda();
+  };
+
+  pulsantiClassifica.push({ nome, pulsante });
+  barraClassifica.appendChild(pulsante);
+}
+
+function aggiornaSottoscheda() {
+  for (const { nome, pulsante } of pulsantiClassifica) {
+    const attivo = vistaClassifica === nome;
+    pulsante.setAttribute("aria-current", String(attivo));
+    pulsante.style.cssText =
+      "padding:10px 16px;border:none;border-radius:8px;color:#fff;font-weight:bold;cursor:pointer;" +
+      (attivo ? "background:#D3133B;" : "background:#1e293b;");
   }
+
+  tabella.hidden = vistaClassifica !== "classifica";
+  areaMarcatori.hidden = vistaClassifica !== "marcatori";
+
+  if (vistaClassifica === "marcatori") {
+    areaMarcatori.replaceChildren();
+    mostraMarcatoriSerieA(areaMarcatori);
+  }
+}
+
+aggiornaSottoscheda();
 
   dettaglio.append(indietro, titolo, barra, contenuto);
   contenitore.replaceChildren(dettaglio);
