@@ -3654,6 +3654,96 @@ const ospite = creaSquadraConLogo(
     });
   });
 }
+  (() => {
+  const schede = [
+    "riepilogo", "risultati", "calendario", "classifiche", "archivio"
+  ];
+
+  let ripristino = false;
+
+  function salvaPercorso(percorso) {
+    if (!ripristino) {
+      history.replaceState(history.state, "", "#" + percorso);
+    }
+  }
+
+  function trovaPulsante(contenitore, testo) {
+    return [...contenitore.querySelectorAll("button")].find(
+      pulsante => pulsante.textContent.trim() === testo
+    );
+  }
+
+  document.addEventListener("click", evento => {
+    const elemento = evento.target;
+
+    if (elemento.closest('.league-item[data-league="135"]')) {
+      salvaPercorso("serie-a/riepilogo");
+      return;
+    }
+
+    const pulsante = elemento.closest("button");
+    if (!pulsante) return;
+
+    if (pulsante.id === "back-to-matches") {
+      salvaPercorso("partite");
+      return;
+    }
+
+    if (
+      schede.includes(pulsante.dataset.tab) &&
+      typeof pulsante.onclick === "function"
+    ) {
+      salvaPercorso("serie-a/" + pulsante.dataset.tab);
+      return;
+    }
+
+    if (pulsante.closest("#serie-a-archivio")) {
+      const testo = pulsante.textContent.trim();
+
+      if (testo === "Serie A 2026/2027") {
+        salvaPercorso("serie-a/archivio/2026/risultati");
+      } else if (testo === "RISULTATI" || testo === "CLASSIFICA") {
+        salvaPercorso("serie-a/archivio/2026/" + testo.toLowerCase());
+      } else if (testo === "← Archivio") {
+        salvaPercorso("serie-a/archivio");
+      }
+    }
+  }, true);
+
+  const percorso = location.hash.slice(1).split("/");
+
+  if (
+    percorso[0] !== "serie-a" ||
+    !schede.includes(percorso[1]) ||
+    !voceSerieA
+  ) return;
+
+  ripristino = true;
+
+  try {
+    voceSerieA.click();
+
+    const pulsante = document.querySelector(
+      '#league-detail button[data-tab="' + percorso[1] + '"]'
+    );
+
+    if (typeof pulsante?.onclick === "function") {
+      pulsante.click();
+    }
+
+    if (percorso[1] === "archivio" && percorso[2] === "2026") {
+      const archivio = document.getElementById("serie-a-archivio");
+      trovaPulsante(archivio, "Serie A 2026/2027")?.click();
+
+      const vista =
+        percorso[3] === "classifica" ? "CLASSIFICA" : "RISULTATI";
+
+      trovaPulsante(archivio, vista)?.click();
+    }
+  } finally {
+    ripristino = false;
+  }
+})();
 </script>
 </body>
 </html>
