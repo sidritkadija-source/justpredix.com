@@ -2069,32 +2069,85 @@ function organizzaGiornateSerieA(partite) {
       return;
     }
 
-    if (vista === "risultati") {
-  const giornate = Object.entries(
-    organizzaGiornateSerieA(partite)
-  ).reverse();
+   if (vista === "risultati") {
+  const giornate = organizzaGiornateSerieA(partite);
+  const conclusa = partita =>
+    partita.status === "final" &&
+    /^\d+$/.test(String(partita.home_score)) &&
+    /^\d+$/.test(String(partita.away_score));
 
-  let risultatiMostrati = 0;
+  let numero = 1;
 
-  for (const [numero, gare] of giornate) {
-    const concluse = gare.filter(p =>
-      p.status === "final" &&
-      /^\d+$/.test(String(p.home_score)) &&
-      /^\d+$/.test(String(p.away_score))
-    ).sort((a, b) =>
-      new Date(b.start_time) - new Date(a.start_time)
+  for (let n = 1; n <= 38; n++) {
+    if (giornate[n].some(conclusa)) numero = n;
+  }
+
+  function visualizzaGiornata() {
+    contenuto.replaceChildren();
+
+    const navigazione = document.createElement("div");
+    navigazione.style.cssText =
+      "display:flex;align-items:center;justify-content:center;gap:20px;margin:20px 0;";
+
+    const precedente = document.createElement("button");
+    precedente.type = "button";
+    precedente.textContent = "❮";
+    precedente.disabled = numero === 1;
+
+    const selettore = document.createElement("select");
+    selettore.setAttribute(
+      "aria-label", "Seleziona giornata della stagione"
     );
+    selettore.style.cssText =
+      "padding:10px 14px;border-radius:8px;font-size:15px;font-weight:bold;cursor:pointer;max-width:180px;";
 
-    if (!concluse.length) continue;
-    risultatiMostrati += concluse.length;
+    for (let n = 1; n <= 38; n++) {
+      const opzione = document.createElement("option");
+      opzione.value = String(n);
+      opzione.textContent = "GIORNATA " + n;
+      selettore.appendChild(opzione);
+    }
 
-    const titoloGiornata = document.createElement("h4");
-    titoloGiornata.textContent = "GIORNATA " + numero;
-    titoloGiornata.style.cssText =
-      "margin:20px 0 10px;color:#a0aec0;";
-    contenuto.appendChild(titoloGiornata);
+    selettore.value = String(numero);
 
-    for (const partita of concluse) {
+    const successivo = document.createElement("button");
+    successivo.type = "button";
+    successivo.textContent = "❯";
+    successivo.disabled = numero === 38;
+
+    navigazione.append(precedente, selettore, successivo);
+    contenuto.appendChild(navigazione);
+
+    precedente.onclick = () => {
+      if (numero > 1) {
+        numero--;
+        visualizzaGiornata();
+      }
+    };
+
+    successivo.onclick = () => {
+      if (numero < 38) {
+        numero++;
+        visualizzaGiornata();
+      }
+    };
+
+    selettore.onchange = () => {
+      numero = Number(selettore.value);
+      visualizzaGiornata();
+    };
+
+    const gareConcluse = giornate[numero].filter(conclusa);
+
+    if (!gareConcluse.length) {
+      const avviso = document.createElement("p");
+      avviso.textContent =
+        "Nessun risultato disponibile per questa giornata.";
+      avviso.style.cssText = "text-align:center;padding:20px;";
+      contenuto.appendChild(avviso);
+    }
+
+    for (const partita of gareConcluse) {
       const riga = document.createElement("div");
       riga.className = "match-row";
       riga.style.cssText =
@@ -2124,13 +2177,9 @@ function organizzaGiornateSerieA(partite) {
     }
   }
 
-  if (!risultatiMostrati) {
-    contenuto.textContent = "Nessun risultato disponibile.";
-  }
-
+  visualizzaGiornata();
   return;
 }
-
     const classifica = calcolaClassificaSerieA(partite);
 
     if (!classifica.length) {
