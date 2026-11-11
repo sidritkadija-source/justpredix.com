@@ -2054,9 +2054,6 @@ function organizzaGiornateSerieA(partite) {
     [1944, "Campionato non disputato"]
   ]);
 
-  const titolo = document.createElement("h3");
-  titolo.textContent = "Albo d’oro Serie A";
-
   const scorrimento = document.createElement("div");
   scorrimento.style.cssText = "width:100%;overflow-x:auto;";
 
@@ -2099,7 +2096,7 @@ function organizzaGiornateSerieA(partite) {
   }
 
   scorrimento.appendChild(tabella);
-  contenitore.replaceChildren(titolo, scorrimento);
+  contenitore.replaceChildren(scorrimento);
 }
 async function mostraMarcatoriSerieA(contenitore) {
   const sezione = document.createElement("div");
