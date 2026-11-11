@@ -3745,6 +3745,148 @@ const ospite = creaSquadraConLogo(
     ripristino = false;
   }
 })();
+  (() => {
+  const chiave = "justpredix_stato_vista";
+  let ripristino = false;
+
+  function radiceAttuale() {
+    const scheda = location.hash.slice(1).split("/")[1];
+    const id = {
+      risultati: "serie-a-risultati",
+      calendario: "serie-a-calendario",
+      classifiche: "serie-a-classifiche",
+      archivio: "serie-a-archivio"
+    }[scheda];
+
+    return id ? document.getElementById(id) : null;
+  }
+
+  function salvaVista() {
+    if (ripristino) return;
+
+    const radice = radiceAttuale();
+    if (!radice) return;
+
+    const attivi = [
+      ...radice.querySelectorAll('button[aria-pressed="true"]')
+    ].map(pulsante => pulsante.textContent.trim());
+
+    const stato = {
+      percorso: location.hash,
+      giornata: radice.querySelector("select")?.value,
+      vista: radice.querySelector('button[aria-current="true"]')
+        ?.textContent.trim(),
+      filtro: attivi.find(testo =>
+        ["TOTALE", "CASA", "FUORI"].includes(testo)
+      ),
+      periodo: attivi.find(testo =>
+        ["5", "10", "15", "20"].includes(testo)
+      )
+    };
+
+    try {
+      sessionStorage.setItem(chiave, JSON.stringify(stato));
+    } catch (errore) {
+      console.warn("Salvataggio vista non disponibile:", errore.message);
+    }
+  }
+
+  window.addEventListener("pagehide", salvaVista);
+  document.addEventListener("change", salvaVista);
+  document.addEventListener(
+    "click", () => queueMicrotask(salvaVista), true
+  );
+
+  let salvata;
+
+  try {
+    salvata = JSON.parse(sessionStorage.getItem(chiave) || "null");
+  } catch {
+    return;
+  }
+
+  if (!salvata || salvata.percorso !== location.hash) return;
+
+  const radice = radiceAttuale();
+  if (!radice) return;
+
+  ripristino = true;
+
+  function trovaPulsante(testo) {
+    return [...radice.querySelectorAll("button")].find(
+      pulsante => pulsante.textContent.trim() === testo
+    );
+  }
+
+  function applicaVista() {
+    if (salvata.vista) {
+      const pulsante = trovaPulsante(salvata.vista);
+      if (!pulsante) return false;
+
+      if (pulsante.getAttribute("aria-current") !== "true") {
+        pulsante.click();
+      }
+    }
+
+    if (salvata.filtro) {
+      const pulsante = trovaPulsante(salvata.filtro);
+      if (!pulsante) return false;
+
+      if (pulsante.getAttribute("aria-pressed") !== "true") {
+        pulsante.click();
+      }
+    }
+
+    if (salvata.periodo) {
+      const pulsante = trovaPulsante(salvata.periodo);
+
+      if (pulsante && pulsante.getAttribute("aria-pressed") !== "true") {
+        pulsante.click();
+      }
+    }
+
+    if (salvata.giornata) {
+      const menu = radice.querySelector("select");
+      if (!menu) return false;
+
+      const disponibile = [...menu.options].some(
+        opzione => opzione.value === salvata.giornata
+      );
+
+      if (disponibile && menu.value !== salvata.giornata) {
+        menu.value = salvata.giornata;
+        menu.dispatchEvent(new Event("change", { bubbles: true }));
+      }
+    }
+
+    return true;
+  }
+
+  let osservatore;
+  let timer;
+
+  function terminaRipristino() {
+    osservatore?.disconnect();
+    clearTimeout(timer);
+    ripristino = false;
+  }
+
+  if (applicaVista()) {
+    terminaRipristino();
+    return;
+  }
+
+  osservatore = new MutationObserver(() => {
+    if (applicaVista()) terminaRipristino();
+  });
+
+  osservatore.observe(radice, {
+    childList: true,
+    subtree: true
+  });
+
+  timer = setTimeout(terminaRipristino, 30000);
+})();
 </script>
 </body>
 </html>
