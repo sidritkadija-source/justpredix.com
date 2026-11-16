@@ -4148,7 +4148,67 @@ stato.textContent = elenco.length
     ? titolo
   : "Nessuna partita in programma.";
 
-    for (const partita of elenco) {
+    const gironiNations = {
+  A1: ["France", "Italy", "Belgium", "Türkiye", "Turkey"],
+  A2: ["Germany", "Netherlands", "Serbia", "Greece"],
+  A3: ["Spain", "Croatia", "England", "Czechia", "Czech Republic"],
+  A4: ["Portugal", "Denmark", "Norway", "Wales"],
+  B1: ["Scotland", "Switzerland", "Slovenia", "North Macedonia"],
+  B2: ["Hungary", "Ukraine", "Georgia", "Northern Ireland"],
+  B3: ["Israel", "Austria", "Republic of Ireland", "Ireland", "Kosovo"],
+  B4: ["Poland", "Bosnia and Herzegovina", "Bosnia & Herzegovina", "Romania", "Sweden"],
+  C1: ["Albania", "Finland", "Belarus", "San Marino"],
+  C2: ["Montenegro", "Armenia", "Cyprus", "Latvia"],
+  C3: ["Kazakhstan", "Slovakia", "Faroe Islands", "Moldova"],
+  C4: ["Iceland", "Bulgaria", "Estonia", "Luxembourg"],
+  D1: ["Gibraltar", "Malta", "Andorra"],
+  D2: ["Lithuania", "Azerbaijan", "Liechtenstein"]
+};
+
+function trovaGironeNations(partita) {
+  if (partita.season_type !== "league_phase") return "";
+
+  const casa = partita.home_team?.name;
+  const fuori = partita.away_team?.name;
+
+  for (const [girone, squadre] of Object.entries(gironiNations)) {
+    if (squadre.includes(casa) && squadre.includes(fuori)) return girone;
+  }
+
+  return "";
+}
+
+const raggruppaPerGirone = schedaNations === "riepilogo";
+const righeNations = elenco.map(partita => ({
+  partita,
+  girone: raggruppaPerGirone ? trovaGironeNations(partita) : ""
+}));
+
+if (raggruppaPerGirone) {
+  righeNations.sort((a, b) =>
+    (a.girone || "Z").localeCompare(b.girone || "Z")
+  );
+}
+
+let legaMostrata = "";
+let gironeMostrato = null;
+
+for (const { partita, girone } of righeNations) {
+  if (raggruppaPerGirone && girone !== gironeMostrato) {
+    const lega = girone.charAt(0);
+
+    if (lega && lega !== legaMostrata) {
+      const titoloLega = document.createElement("h3");
+      titoloLega.textContent = "Lega " + lega;
+      lista.append(titoloLega);
+      legaMostrata = lega;
+    }
+
+    const titoloGirone = document.createElement(girone ? "h4" : "h3");
+    titoloGirone.textContent = girone ? "Girone " + girone : "Altre partite";
+    lista.append(titoloGirone);
+    gironeMostrato = girone;
+  }
       const riga = document.createElement("div");
       riga.className = "match-row";
 
