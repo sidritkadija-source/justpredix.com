@@ -4012,15 +4012,8 @@ const ospite = creaSquadraConLogo(
   <button type="button" disabled>ARCHIVIO</button>
 </div>
 <button type="button" id="back-to-nations">← Indietro</button>
-    <p>5ª giornata · Giovedì 12 novembre 2026</p>
-   <div class="match-row"><strong>Turchia – Belgio</strong><time datetime="2026-11-12T18:00:00+01:00">18:00</time></div>
-<div class="match-row"><strong>Armenia – Cipro</strong><time datetime="2026-11-12T18:00:00+01:00">18:00</time></div>
-<div class="match-row"><strong>Italia – Francia</strong><time datetime="2026-11-12T20:45:00+01:00">20:45</time></div>
-<div class="match-row"><strong>Cechia – Spagna</strong><time datetime="2026-11-12T20:45:00+01:00">20:45</time></div>
-<div class="match-row"><strong>Inghilterra – Croazia</strong><time datetime="2026-11-12T20:45:00+01:00">20:45</time></div>
-<div class="match-row"><strong>Albania – Finlandia</strong><time datetime="2026-11-12T20:45:00+01:00">20:45</time></div>
-<div class="match-row"><strong>San Marino – Bielorussia</strong><time datetime="2026-11-12T20:45:00+01:00">20:45</time></div>
-<div class="match-row"><strong>Montenegro – Lettonia</strong><time datetime="2026-11-12T20:45:00+01:00">20:45</time></div>
+    <p id="nations-calendario-stato" role="status"></p>
+<div id="nations-calendario-partite"></div>
   `;
   partite.before(calendario);
 
@@ -4028,6 +4021,81 @@ const ospite = creaSquadraConLogo(
   let displayCampionato;
     let percorsoPrecedente = "#partite";
 
+  async function caricaCalendarioNations() {
+  const stato = calendario.querySelector("#nations-calendario-stato");
+  const lista = calendario.querySelector("#nations-calendario-partite");
+
+  if (stato.dataset.caricamento === "true") return;
+  stato.dataset.caricamento = "true";
+  stato.textContent = "Caricamento partite…";
+
+  try {
+    const partiteNations = new Map();
+
+    for (let offset = 0; ; offset += 50) {
+      const risposta = await fetch(
+        API_URL + "/ninja-matches?league=nationsleague&season=2026&offset=" + offset
+      );
+      if (!risposta.ok) throw new Error("Richiesta non riuscita");
+
+      const pagina = await risposta.json();
+      if (!Array.isArray(pagina)) throw new Error("Risposta inattesa");
+
+      const prima = partiteNations.size;
+      for (const partita of pagina) {
+        partiteNations.set(partita.game_id, partita);
+      }
+
+      if (pagina.length < 50) break;
+      if (partiteNations.size === prima) {
+        throw new Error("Pagina ripetuta");
+      }
+    }
+
+    const formato = new Intl.DateTimeFormat("it-IT", {
+      timeZone: "Europe/Tirane",
+      day: "numeric",
+      month: "short",
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+
+    const elenco = [...partiteNations.values()]
+      .filter(partita =>
+        partita.status === "in_progress" ||
+        (partita.status === "scheduled" &&
+          Date.parse(partita.start_time) >= Date.now())
+      )
+      .sort((a, b) => Date.parse(a.start_time) - Date.parse(b.start_time));
+
+    lista.replaceChildren();
+    stato.textContent = elenco.length
+      ? "Partite in corso e in programma · Ora di Tirana"
+      : "Nessuna partita in programma.";
+
+    for (const partita of elenco) {
+      const riga = document.createElement("div");
+      riga.className = "match-row";
+
+      const squadre = document.createElement("strong");
+      squadre.textContent = partita.home_team.name + " – " + partita.away_team.name;
+
+      const orario = document.createElement("time");
+      orario.dateTime = partita.start_time;
+      orario.textContent = partita.status === "in_progress"
+        ? "🔴 LIVE"
+        : formato.format(new Date(partita.start_time));
+
+      riga.append(squadre, orario);
+      lista.append(riga);
+    }
+  } catch {
+    lista.replaceChildren();
+    stato.textContent = "Impossibile caricare le partite della Nations League.";
+  } finally {
+    stato.dataset.caricamento = "false";
+  }
+}  
   function apriCalendario() {
     if (!calendario.hidden) return;
     if (location.hash !== "#nations-league/calendario") {
@@ -4040,6 +4108,7 @@ const ospite = creaSquadraConLogo(
     dettaglioCampionato.style.display = "none";
     calendario.hidden = false;
     calendario.querySelector("#back-to-nations").focus();
+    caricaCalendarioNations();
   }
 
   voce.setAttribute("role", "button");
