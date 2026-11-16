@@ -4045,6 +4045,7 @@ function selezionaSchedaNations(nome) {
 for (const [nome, pulsante] of Object.entries(schedeNations)) {
   pulsante.addEventListener("click", () => {
     selezionaSchedaNations(nome);
+    caricaCalendarioNations();
   });
 }
   async function caricaCalendarioNations() {
