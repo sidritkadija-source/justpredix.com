@@ -3904,7 +3904,7 @@ const ospite = creaSquadraConLogo(
 
   try {
     salvata = JSON.parse(sessionStorage.getItem(chiave) || "null");
-  } catch {
+  
     return;
   }
 
@@ -4167,6 +4167,10 @@ stato.textContent = elenco.length
   orario.textContent = partita.status === "in_progress"
     ? "🔴 LIVE"
     : formato.format(new Date(partita.start_time));
+    }
+
+      riga.append(squadre, orario);
+      lista.append(riga);
     }
   } catch {
     lista.replaceChildren();
