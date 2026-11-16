@@ -4124,9 +4124,15 @@ for (const [nome, pulsante] of Object.entries(schedeNations)) {
 }  
   function apriCalendario() {
     if (!calendario.hidden) return;
-    if (location.hash !== "#nations-league/calendario") {
-  percorsoPrecedente = location.hash;
-  history.replaceState(history.state, "", "#nations-league/calendario");
+    const indirizzo = location.hash;
+
+if (!indirizzo.startsWith("#nations-league/")) {
+  percorsoPrecedente = indirizzo;
+}
+
+selezionaSchedaNations(
+  indirizzo === "#nations-league/calendario" ? "calendario" : "riepilogo"
+);
 }
     displayPartite = partite.style.display;
     displayCampionato = dettaglioCampionato.style.display;
@@ -4163,7 +4169,10 @@ for (const [nome, pulsante] of Object.entries(schedeNations)) {
     .addEventListener("click", () => {
       calendario.hidden = true;
     });
-    if (location.hash === "#nations-league/calendario") {
+    if (
+  location.hash === "#nations-league/riepilogo" ||
+  location.hash === "#nations-league/calendario"
+) {
   apriCalendario();
 }
 }
