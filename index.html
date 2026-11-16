@@ -4205,8 +4205,50 @@ for (const { partita, girone } of righeNations) {
       const riga = document.createElement("div");
       riga.className = "match-row";
 
-      const squadre = document.createElement("strong");
-      squadre.textContent = partita.home_team.name + " – " + partita.away_team.name;
+      const bandiere = {
+  Albania: "al", Andorra: "ad", Armenia: "am", Austria: "at",
+  Azerbaijan: "az", Belarus: "by", Belgium: "be",
+  "Bosnia and Herzegovina": "ba", "Bosnia & Herzegovina": "ba",
+  "Bosnia-Herzegovina": "ba", Bulgaria: "bg", Croatia: "hr",
+  Cyprus: "cy", Czechia: "cz", "Czech Republic": "cz", Denmark: "dk",
+  England: "gb-eng", Estonia: "ee", "Faroe Islands": "fo", Finland: "fi",
+  France: "fr", Georgia: "ge", Germany: "de", Gibraltar: "gi",
+  Greece: "gr", Hungary: "hu", Iceland: "is", Ireland: "ie",
+  "Republic of Ireland": "ie", Israel: "il", Italy: "it",
+  Kazakhstan: "kz", Kosovo: "xk", Latvia: "lv", Liechtenstein: "li",
+  Lithuania: "lt", Luxembourg: "lu", Malta: "mt", Moldova: "md",
+  Montenegro: "me", Netherlands: "nl", "North Macedonia": "mk",
+  "Northern Ireland": "gb-nir", Norway: "no", Poland: "pl",
+  Portugal: "pt", Romania: "ro", "San Marino": "sm", Scotland: "gb-sct",
+  Serbia: "rs", Slovakia: "sk", Slovenia: "si", Spain: "es",
+  Sweden: "se", Switzerland: "ch", Turkey: "tr", "Türkiye": "tr",
+  Ukraine: "ua", Wales: "gb-wls"
+};
+
+const squadre = document.createElement("div");
+squadre.style.cssText =
+  "display:flex;flex-wrap:wrap;align-items:center;gap:8px;";
+
+for (const [indice, squadra] of [partita.home_team, partita.away_team].entries()) {
+  if (indice === 1) squadre.append("–");
+
+  const nome = squadra.name;
+  const voce = document.createElement("strong");
+  voce.style.cssText = "display:inline-flex;align-items:center;gap:6px;";
+
+  if (Object.hasOwn(bandiere, nome)) {
+    const bandiera = document.createElement("img");
+    bandiera.src = `https://flagcdn.com/w40/${bandiere[nome]}.png`;
+    bandiera.alt = "";
+    bandiera.width = 20;
+    bandiera.loading = "lazy";
+    bandiera.addEventListener("error", () => bandiera.remove());
+    voce.append(bandiera);
+  }
+
+  voce.append(nome);
+  squadre.append(voce);
+}
 
       const orario = document.createElement("time");
       orario.dateTime = partita.start_time;
