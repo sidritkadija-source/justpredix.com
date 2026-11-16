@@ -4086,18 +4086,66 @@ for (const [nome, pulsante] of Object.entries(schedeNations)) {
       minute: "2-digit"
     });
 
-    const elenco = [...partiteNations.values()]
-      .filter(partita =>
-        partita.status === "in_progress" ||
-        (partita.status === "scheduled" &&
-          Date.parse(partita.start_time) >= Date.now())
-      )
-      .sort((a, b) => Date.parse(a.start_time) - Date.parse(b.start_time));
+  const tutte = [...partiteNations.values()]
+  .sort((a, b) => Date.parse(a.start_time) - Date.parse(b.start_time));
 
-    lista.replaceChildren();
-    stato.textContent = elenco.length
-      ? "Partite in corso e in programma · Ora di Tirana"
-      : "Nessuna partita in programma.";
+const adesso = Date.now();
+const inProgramma = tutte.filter(partita =>
+  partita.status === "in_progress" ||
+  (partita.status === "scheduled" &&
+    Date.parse(partita.start_time) >= adesso)
+);
+
+let elenco = inProgramma;
+let titolo = "Partite in corso e in programma";
+
+if (schedaNations === "riepilogo") {
+  const giornate = [
+    ["2026-09-24", "2026-09-26"],
+    ["2026-09-27", "2026-09-29"],
+    ["2026-10-01", "2026-10-03"],
+    ["2026-10-04", "2026-10-06"],
+    ["2026-11-12", "2026-11-14"],
+    ["2026-11-15", "2026-11-17"]
+  ];
+
+  const dataTirana = new Intl.DateTimeFormat("sv-SE", {
+    timeZone: "Europe/Tirane",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  });
+  const oggi = dataTirana.format(new Date(adesso));
+  const prossima = inProgramma.find(p => p.status === "in_progress")
+    || inProgramma[0];
+  const dataRiferimento = prossima
+    ? dataTirana.format(new Date(prossima.start_time))
+    : oggi;
+
+  let indice = giornate.findIndex(([inizio, fine]) =>
+    oggi >= inizio && oggi <= fine
+  );
+
+  if (indice === -1) {
+    indice = giornate.findIndex(([inizio, fine]) =>
+      dataRiferimento >= inizio && dataRiferimento <= fine
+    );
+  }
+
+  if (indice !== -1) {
+    const [inizio, fine] = giornate[indice];
+    elenco = tutte.filter(partita => {
+      const data = dataTirana.format(new Date(partita.start_time));
+      return data >= inizio && data <= fine;
+    });
+    titolo = `${indice + 1}ª giornata`;
+  }
+}
+
+lista.replaceChildren();
+stato.textContent = elenco.length
+  ? `${titolo} · Ora di Tirana`
+  : "Nessuna partita in programma.";
 
     for (const partita of elenco) {
       const riga = document.createElement("div");
@@ -4108,12 +4156,16 @@ for (const [nome, pulsante] of Object.entries(schedeNations)) {
 
       const orario = document.createElement("time");
       orario.dateTime = partita.start_time;
-      orario.textContent = partita.status === "in_progress"
-        ? "🔴 LIVE"
-        : formato.format(new Date(partita.start_time));
-
-      riga.append(squadre, orario);
-      lista.append(riga);
+    if (
+  partita.status === "final" &&
+  Number.isFinite(partita.home_score) &&
+  Number.isFinite(partita.away_score)
+) {
+  orario.textContent = `${partita.home_score} – ${partita.away_score} · Finale`;
+} else {
+  orario.textContent = partita.status === "in_progress"
+    ? "🔴 LIVE"
+    : formato.format(new Date(partita.start_time));
     }
   } catch {
     lista.replaceChildren();
