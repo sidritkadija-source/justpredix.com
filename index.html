@@ -4190,23 +4190,16 @@ if (raggruppaPerGirone) {
   );
 }
 
-let legaMostrata = "";
 let gironeMostrato = null;
 
 for (const { partita, girone } of righeNations) {
-  if (raggruppaPerGirone && girone !== gironeMostrato) {
-    const lega = girone.charAt(0);
+   if (raggruppaPerGirone && girone !== gironeMostrato) {
+    const intestazione = document.createElement("h3");
+    intestazione.textContent = girone
+      ? `Lega ${girone[0]}-Gr${girone.slice(1)}`
+      : "Altre partite";
 
-    if (lega && lega !== legaMostrata) {
-      const titoloLega = document.createElement("h3");
-      titoloLega.textContent = "Lega " + lega;
-      lista.append(titoloLega);
-      legaMostrata = lega;
-    }
-
-    const titoloGirone = document.createElement(girone ? "h4" : "h3");
-    titoloGirone.textContent = girone ? "Girone " + girone : "Altre partite";
-    lista.append(titoloGirone);
+    lista.append(intestazione);
     gironeMostrato = girone;
   }
       const riga = document.createElement("div");
