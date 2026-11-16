@@ -3904,7 +3904,7 @@ const ospite = creaSquadraConLogo(
 
   try {
     salvata = JSON.parse(sessionStorage.getItem(chiave) || "null");
-  
+    } catch {
     return;
   }
 
