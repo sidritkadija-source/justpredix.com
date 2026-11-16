@@ -4021,6 +4021,32 @@ const ospite = creaSquadraConLogo(
   let displayCampionato;
     let percorsoPrecedente = "#partite";
 
+    let schedaNations = "riepilogo";
+
+const schedeNations = {
+  riepilogo: calendario.querySelector("#nations-tab-riepilogo"),
+  calendario: calendario.querySelector("#nations-tab-calendario")
+};
+
+function selezionaSchedaNations(nome) {
+  schedaNations = nome;
+
+  for (const [chiave, pulsante] of Object.entries(schedeNations)) {
+    if (chiave === nome) {
+      pulsante.setAttribute("aria-current", "true");
+    } else {
+      pulsante.removeAttribute("aria-current");
+    }
+  }
+
+  history.replaceState(history.state, "", "#nations-league/" + nome);
+}
+
+for (const [nome, pulsante] of Object.entries(schedeNations)) {
+  pulsante.addEventListener("click", () => {
+    selezionaSchedaNations(nome);
+  });
+}
   async function caricaCalendarioNations() {
   const stato = calendario.querySelector("#nations-calendario-stato");
   const lista = calendario.querySelector("#nations-calendario-partite");
