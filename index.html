@@ -4026,9 +4026,14 @@ const ospite = creaSquadraConLogo(
 
   let displayPartite;
   let displayCampionato;
+    let percorsoPrecedente = "#partite";
 
   function apriCalendario() {
     if (!calendario.hidden) return;
+    if (location.hash !== "#nations-league/calendario") {
+  percorsoPrecedente = location.hash;
+  history.replaceState(history.state, "", "#nations-league/calendario");
+}
     displayPartite = partite.style.display;
     displayCampionato = dettaglioCampionato.style.display;
     partite.style.display = "none";
@@ -4052,12 +4057,20 @@ const ospite = creaSquadraConLogo(
     partite.style.display = displayPartite;
     dettaglioCampionato.style.display = displayCampionato;
     voce.focus();
+    history.replaceState(
+  history.state,
+  "",
+  percorsoPrecedente || location.pathname + location.search
+);
   });
 
   document.querySelector('.league-item[data-league="135"]')
     .addEventListener("click", () => {
       calendario.hidden = true;
     });
+    if (location.hash === "#nations-league/calendario") {
+  apriCalendario();
+}
 }
 </script>
 </body>
