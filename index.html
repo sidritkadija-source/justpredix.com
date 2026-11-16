@@ -4033,7 +4033,7 @@ const ospite = creaSquadraConLogo(
     partite.style.display = "none";
     dettaglioCampionato.style.display = "none";
     calendario.hidden = false;
-    calendario.querySelector("button").focus();
+    calendario.querySelector("#back-to-nations").focus();
   }
 
   voce.setAttribute("role", "button");
@@ -4046,7 +4046,7 @@ const ospite = creaSquadraConLogo(
     }
   });
 
-  calendario.querySelector("button").addEventListener("click", () => {
+  calendario.querySelector("#back-to-nations").addEventListener("click", () => {
     calendario.hidden = true;
     partite.style.display = displayPartite;
     dettaglioCampionato.style.display = displayCampionato;
