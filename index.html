@@ -4264,7 +4264,7 @@ for (const [indice, squadra] of [partita.home_team, partita.away_team].entries()
     : formato.format(new Date(partita.start_time));
     }
 
-      riga.append(squadre, orario);
+      riga.append(orario, squadre);
       lista.append(riga);
     }
   } catch {
