@@ -2706,11 +2706,15 @@ for (const pulsante of barraSchede.children) {
 const eventi = provaEventi ? [
   { tempo: 1, minuto: "14′", lato: "casa", tipo: "Giallo", nome: "Giocatore A" },
   { tempo: 1, minuto: "22′", lato: "ospite", tipo: "Rosso", nome: "Giocatore B" },
+  { tempo: 1, minuto: "35′", lato: "ospite", tipo: "Cambio", nome: "Entra K · Esce L" },
   { tempo: 2, minuto: "53′", lato: "ospite", tipo: "Gol", nome: "Giocatore C · 0–1" },
-  { tempo: 2, minuto: "59′", lato: "casa", tipo: "Cambio", nome: "Entra D · Esce E" },
+  { tempo: 2, minuto: "59′", lato: "casa", tipo: "Cambio", nome: "Entra D · Esce E", infortunio: true },
   { tempo: 2, minuto: "60′", lato: "casa", tipo: "Autogol", nome: "Giocatore H", punteggio: "1–1" },
-{ tempo: 2, minuto: "65′", lato: "ospite", tipo: "Rigore", nome: "Giocatore I", punteggio: "1–2" },
+  { tempo: 2, minuto: "65′", lato: "ospite", tipo: "Rigore", nome: "Giocatore I", punteggio: "1–2" },
+  { tempo: 2, minuto: "71′", lato: "casa", tipo: "VAR", controllo: "gol", nome: "Giocatore F" },
   { tempo: 2, minuto: "72′", lato: "casa", tipo: "Gol annullato", nome: "Giocatore F" },
+  { tempo: 2, minuto: "75′", lato: "ospite", tipo: "VAR", controllo: "cartellino", nome: "Giocatore J" },
+  { tempo: 2, minuto: "90+1′", lato: "casa", tipo: "Doppio giallo", nome: "Giocatore A" },
   { tempo: 2, minuto: "90+2′", lato: "ospite", tipo: "Rigore sbagliato", nome: "Giocatore G" }
 ] : partita.eventi ?? [];
 
@@ -2726,7 +2730,11 @@ if ((provaEventi || ["in_progress", "final"].includes(partita.status)) && eventi
   }
 
   const nomiTempi = { 1: "Primo tempo", 2: "Secondo tempo" };
-  const coloriEventi = { Giallo: "#facc15", Rosso: "#ff526e" };
+  const coloriEventi = {
+  Giallo: "#facc15",
+  Rosso: "#ff526e",
+  "Doppio giallo": "linear-gradient(135deg, #ff0000 50%, #ffcc00 50%)"
+};
   let tempoPrecedente;
 
   for (const evento of eventi) {
@@ -2830,6 +2838,35 @@ if (coloreCartellino) {
     } else {
       tipo.appendChild(risultatoEvento);
     }
+  }
+} else if (evento.tipo === "Gol annullato" || evento.tipo === "VAR") {
+  const badge = document.createElement("span");
+  badge.style.cssText =
+    "position:relative;display:inline-grid;place-items:center;" +
+    "width:34px;height:32px;box-sizing:border-box;" +
+    "border:1px solid #30445e;border-radius:10px;";
+
+  if (evento.tipo === "Gol annullato") {
+    badge.setAttribute("role", "img");
+    badge.setAttribute("aria-label", "Gol annullato");
+    badge.title = "Gol annullato";
+    badge.innerHTML = `
+      <span aria-hidden="true" style="font-size:17px">⚽</span>
+      <span aria-hidden="true" style="position:absolute;bottom:1px;right:2px;color:#ff526e;font-size:18px;font-weight:900;line-height:1">×</span>`;
+    tipo.appendChild(badge);
+  } else {
+    badge.textContent = "VAR";
+    badge.style.cssText += "color:#93c5fd;font-size:10px;font-weight:800;";
+
+    const controllo = document.createElement("span");
+    controllo.textContent = evento.controllo === "gol"
+      ? "Controllo gol"
+      : evento.controllo === "cartellino"
+        ? "Controllo cartellino"
+        : "Controllo in corso";
+
+    tipo.style.cssText = "display:inline-flex;align-items:center;gap:6px;";
+    tipo.append(badge, controllo);
   }
 } else {
   tipo.textContent = evento.tipo;
