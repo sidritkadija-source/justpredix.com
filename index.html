@@ -2734,7 +2734,7 @@ if (indice === 1) metaCampo.style.borderLeft = "2px solid #9ed3b8";
         giocatore.textContent = String(numero);
         giocatore.title = `${squadra.nome} · Titolare ${numero}`;
         giocatore.style.cssText =
-          "display:grid;place-items:center;width:30px;aspect-ratio:1;" +
+          "display:grid;place-items:center;width:min(30px,100%);aspect-ratio:1;" +
           "border:1px solid white;border-radius:50%;font-weight:700;" +
           `background:${squadra.colore};`;
         fila.appendChild(giocatore);
