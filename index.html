@@ -2701,6 +2701,71 @@ for (const pulsante of barraSchede.children) {
     messaggioFormazioni.hidden = pulsante.textContent.trim() !== "Formazioni";
   });
 }
+    const provaEventi = new URLSearchParams(location.search).get("demoEventi") === "1";
+
+const eventi = provaEventi ? [
+  { tempo: 1, minuto: "14′", lato: "casa", tipo: "Giallo", nome: "Giocatore A" },
+  { tempo: 1, minuto: "22′", lato: "ospite", tipo: "Rosso", nome: "Giocatore B" },
+  { tempo: 2, minuto: "53′", lato: "ospite", tipo: "Gol", nome: "Giocatore C · 0–1" },
+  { tempo: 2, minuto: "59′", lato: "casa", tipo: "Cambio", nome: "Entra D · Esce E" },
+  { tempo: 2, minuto: "72′", lato: "casa", tipo: "Gol annullato", nome: "Giocatore F" },
+  { tempo: 2, minuto: "90+2′", lato: "ospite", tipo: "Rigore sbagliato", nome: "Giocatore G" }
+] : partita.eventi ?? [];
+
+if ((provaEventi || ["in_progress", "final"].includes(partita.status)) && eventi.length) {
+  const cronologia = document.createElement("section");
+  cronologia.setAttribute("aria-label", "Cronologia della partita");
+
+  if (provaEventi) {
+    const avviso = document.createElement("p");
+    avviso.textContent = "Eventi dimostrativi";
+    avviso.style.cssText = "padding:10px 12px;color:#bfcde2";
+    cronologia.appendChild(avviso);
+  }
+
+  const nomiTempi = { 1: "Primo tempo", 2: "Secondo tempo" };
+  const coloriEventi = { Giallo: "#facc15", Rosso: "#ff526e" };
+  let tempoPrecedente;
+
+  for (const evento of eventi) {
+    if (evento.tempo !== tempoPrecedente) {
+      const divisore = document.createElement("h3");
+      divisore.textContent = nomiTempi[evento.tempo];
+      divisore.style.cssText =
+        "margin:12px 0 4px;padding:8px 12px;background:#203750;font-size:13px";
+      cronologia.appendChild(divisore);
+      tempoPrecedente = evento.tempo;
+    }
+
+    const rigaEvento = document.createElement("div");
+    const inTrasferta = evento.lato === "ospite";
+    rigaEvento.style.cssText =
+      "display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;" +
+      "padding:10px 12px;border-bottom:1px solid #30445e;" +
+      (inTrasferta ? "flex-direction:row-reverse;text-align:right;" : "");
+
+    const minuto = document.createElement("strong");
+    minuto.textContent = evento.minuto;
+
+    const tipo = document.createElement("span");
+    tipo.textContent = evento.tipo;
+    tipo.style.color = coloriEventi[evento.tipo] || "#93c5fd";
+
+    const nome = document.createElement("span");
+    nome.textContent = evento.nome;
+
+    rigaEvento.append(minuto, tipo, nome);
+    cronologia.appendChild(rigaEvento);
+  }
+
+  scheda.appendChild(cronologia);
+
+  for (const pulsante of barraSchede.children) {
+    pulsante.addEventListener("click", () => {
+      cronologia.hidden = pulsante !== barraSchede.firstElementChild;
+    });
+  }
+}
     paginaSerieA.after(scheda);
     paginaSerieA.style.display = "none";
     intestazione.focus();
