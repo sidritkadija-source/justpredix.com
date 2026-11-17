@@ -2789,14 +2789,23 @@ if (indice === 1) metaCampo.style.borderLeft = "2px solid #9ed3b8";
     colonna.style.cssText =
       `min-width:0;padding:10px 8px;overflow-wrap:anywhere;text-align:${indice === 0 ? "left" : "right"};`;
 
-    const entrato = document.createElement("strong");
-    entrato.textContent = cambio.entrato;
+    const nomiCambio = document.createElement("div");
 
-    const dettaglio = document.createElement("div");
-    dettaglio.textContent = `⇄ ${cambio.minuto} · Esce ${cambio.uscito}`;
-    dettaglio.style.cssText = "margin-top:3px;color:#bfcde2;font-size:12px;";
+const entrato = document.createElement("strong");
+entrato.textContent = cambio.entrato;
+entrato.style.color = "#4ade80";
 
-    colonna.append(entrato, dettaglio);
+const uscito = document.createElement("span");
+uscito.textContent = ` (${cambio.uscito})`;
+uscito.style.color = "#ff526e";
+
+nomiCambio.append(entrato, uscito);
+
+const dettaglio = document.createElement("div");
+dettaglio.textContent = `⇄ ${cambio.minuto}`;
+dettaglio.style.cssText = "margin-top:3px;color:#bfcde2;font-size:12px;";
+
+colonna.append(nomiCambio, dettaglio);
     colonneCambi.appendChild(colonna);
   }
 
