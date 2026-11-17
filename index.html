@@ -2689,6 +2689,17 @@ function selezionaScheda(selezionata) {
 
 selezionaScheda(barraSchede.firstElementChild);
 scheda.append(indietro, intestazione, testata, barraSchede);
+    const messaggioFormazioni = document.createElement("p");
+messaggioFormazioni.textContent = "Nessuna formazione disponibile";
+messaggioFormazioni.style.cssText = "padding:16px 0;color:#bfcde2";
+messaggioFormazioni.hidden = true;
+scheda.appendChild(messaggioFormazioni);
+
+for (const pulsante of barraSchede.children) {
+  pulsante.addEventListener("click", () => {
+    messaggioFormazioni.hidden = pulsante.textContent.trim() !== "Formazioni";
+  });
+}
     paginaSerieA.after(scheda);
     paginaSerieA.style.display = "none";
     intestazione.focus();
