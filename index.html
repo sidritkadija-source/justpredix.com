@@ -2790,6 +2790,45 @@ if (coloreCartellino) {
     "display:inline-grid;place-items:center;flex:0 0 32px;" +
     "width:32px;height:32px;box-sizing:border-box;" +
     "border:1px solid #30445e;border-radius:10px;font-size:18px;";
+} else if (["Rigore", "Autogol", "Rigore sbagliato"].includes(evento.tipo)) {
+  const autogol = evento.tipo === "Autogol";
+  const rigoreSbagliato = evento.tipo === "Rigore sbagliato";
+  const etichetta = evento.tipo === "Rigore" ? "Rigore segnato" : evento.tipo;
+
+  tipo.style.cssText =
+    "display:inline-flex;align-items:center;justify-content:center;gap:5px;" +
+    "min-width:32px;height:32px;padding:0 6px;box-sizing:border-box;" +
+    "border:1px solid #30445e;border-radius:10px;white-space:nowrap;";
+
+  const icona = document.createElement("span");
+  icona.setAttribute("role", "img");
+  icona.setAttribute("aria-label", etichetta);
+  icona.title = etichetta;
+  icona.style.cssText =
+    "display:inline-flex;color:" + (autogol || rigoreSbagliato ? "#ff526e" : "#edf4ff");
+
+  icona.innerHTML = `
+    <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24"
+         fill="none" stroke="currentColor" stroke-width="1.5"
+         stroke-linecap="round" stroke-linejoin="round">
+      ${autogol ? "" : '<path d="M2 13V3h20v10"/>'}
+      <circle cx="12" cy="14" r="8"/>
+      <path d="m12 10 4 3-1.5 4h-5L8 13z" fill="currentColor"/>
+      <path d="M12 10V6 M16 13l4-1 M14.5 17l3 3 M9.5 17l-3 3 M8 13l-4-1"/>
+    </svg>`;
+
+  tipo.appendChild(icona);
+
+  if (!rigoreSbagliato && evento.punteggio) {
+    const risultatoEvento = document.createElement("strong");
+    risultatoEvento.textContent = evento.punteggio;
+
+    if (evento.lato === "ospite") {
+      tipo.prepend(risultatoEvento);
+    } else {
+      tipo.appendChild(risultatoEvento);
+    }
+  }
 } else {
   tipo.textContent = evento.tipo;
   tipo.style.color = "#93c5fd";
