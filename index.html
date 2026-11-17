@@ -2565,33 +2565,39 @@ function calcolaClassificaSerieA(partite, tipo = "totale", limite = Infinity) {
     b.PT - a.PT || b.DR - a.DR || b.GF - a.GF ||
     a.squadra.localeCompare(b.squadra)
   );
-}
- function collegaSchedaPartitaSerieA(riga, partita) {
+}function collegaSchedaPartitaSerieA(riga, partita) {
   const casa = partita.home_team?.name;
   const ospite = partita.away_team?.name;
-  if (!casa || !ospite) return;
+  const paginaSerieA = riga.closest("#league-detail")
+    || document.getElementById("league-detail");
+
+  if (!casa || !ospite || !paginaSerieA) return;
 
   const titolo = `${casa} – ${ospite}`;
   riga.style.cursor = "pointer";
   riga.tabIndex = 0;
   riga.setAttribute("role", "button");
   riga.setAttribute("aria-label", `Apri scheda ${titolo}`);
-  riga.setAttribute("aria-haspopup", "dialog");
 
   riga.addEventListener("click", () => {
-    const scheda = document.createElement("dialog");
-    scheda.style.cssText =
-      "width:min(520px,92vw);box-sizing:border-box;padding:20px;" +
-      "background:#111c2e;color:#edf4ff;border:1px solid #30445e;border-radius:12px";
-    scheda.setAttribute("aria-label", titolo);
+    if (document.getElementById("scheda-partita-serie-a")) return;
+
+    const scheda = document.createElement("section");
+    scheda.id = "scheda-partita-serie-a";
+    scheda.className = "league-page-header";
+    scheda.setAttribute("aria-labelledby", "titolo-scheda-partita");
 
     const indietro = document.createElement("button");
     indietro.type = "button";
-    indietro.textContent = "← Torna alle partite";
-    indietro.addEventListener("click", () => scheda.close());
+    indietro.textContent = "← Torna al riepilogo";
+    indietro.style.cssText =
+      "margin-bottom:16px;padding:7px 12px;border:0;border-radius:6px;" +
+      "background:#2563eb;color:white;cursor:pointer";
 
     const intestazione = document.createElement("h2");
+    intestazione.id = "titolo-scheda-partita";
     intestazione.textContent = titolo;
+    intestazione.tabIndex = -1;
 
     const orario = document.createElement("p");
     const data = new Date(partita.start_time || "");
@@ -2603,14 +2609,17 @@ function calcolaClassificaSerieA(partite, tipo = "totale", limite = Infinity) {
         }).format(data)
       : "Orario da confermare";
 
-    scheda.append(indietro, intestazione, orario);
-    scheda.addEventListener("close", () => {
+    const displayPrecedente = paginaSerieA.style.display;
+    indietro.addEventListener("click", () => {
       scheda.remove();
+      paginaSerieA.style.display = displayPrecedente;
       riga.focus();
-    }, { once: true });
+    });
 
-    document.body.appendChild(scheda);
-    scheda.showModal();
+    scheda.append(indietro, intestazione, orario);
+    paginaSerieA.after(scheda);
+    paginaSerieA.style.display = "none";
+    intestazione.focus();
   });
 
   riga.addEventListener("keydown", evento => {
@@ -2619,7 +2628,7 @@ function calcolaClassificaSerieA(partite, tipo = "totale", limite = Infinity) {
       if (!evento.repeat) riga.click();
     }
   });
-} 
+}
 function creaSquadraConLogo(nome) {
   const idsLoghi = {
     inter: 505,
