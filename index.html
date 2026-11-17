@@ -2616,7 +2616,50 @@ function calcolaClassificaSerieA(partite, tipo = "totale", limite = Infinity) {
       riga.focus();
     });
 
-    scheda.append(indietro, intestazione, orario);
+    intestazione.textContent = "Calcio › Italia › Serie A";
+intestazione.setAttribute("aria-label", titolo);
+intestazione.style.cssText =
+  "font-size:14px;color:#a0aec0;padding-bottom:12px;border-bottom:1px solid #30445e";
+
+const testata = document.createElement("div");
+testata.style.cssText =
+  "display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);" +
+  "align-items:start;gap:8px;padding:18px 0;text-align:center";
+
+const squadraCasa = creaSquadraConLogo(casa);
+const squadraOspite = creaSquadraConLogo(ospite);
+
+for (const squadra of [squadraCasa, squadraOspite]) {
+  squadra.style.cssText =
+    "display:flex;flex-direction:column;align-items:center;" +
+    "gap:8px;min-width:0;font-weight:700;overflow-wrap:anywhere";
+
+  const stemma = squadra.querySelector("img");
+  if (stemma) {
+    stemma.style.cssText =
+      "width:clamp(42px,12vw,78px);height:clamp(42px,12vw,78px);object-fit:contain";
+  }
+}
+
+const centro = document.createElement("div");
+centro.style.cssText =
+  "display:grid;justify-items:center;gap:6px;max-width:140px";
+
+const punteggio = document.createElement("strong");
+punteggio.style.fontSize = "30px";
+const haRisultato =
+  ["in_progress", "final"].includes(partita.status) &&
+  [partita.home_score, partita.away_score].every(
+    valore => /^\d+$/.test(String(valore))
+  );
+
+punteggio.textContent = haRisultato
+  ? `${partita.home_score} – ${partita.away_score}`
+  : "–";
+
+centro.append(orario, punteggio);
+testata.append(squadraCasa, centro, squadraOspite);
+scheda.append(indietro, intestazione, testata);
     paginaSerieA.after(scheda);
     paginaSerieA.style.display = "none";
     intestazione.focus();
