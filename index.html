@@ -2691,7 +2691,8 @@ selezionaScheda(barraSchede.firstElementChild);
 scheda.append(indietro, intestazione, testata, barraSchede);
     const messaggioFormazioni = document.createElement("p");
 messaggioFormazioni.textContent = "Nessuna formazione disponibile";
-messaggioFormazioni.style.cssText = "padding:16px 0;color:#bfcde2";
+messaggioFormazioni.style.cssText =
+  "margin:0;padding:24px 12px;text-align:center;color:#ff526e;font-weight:600;";
 messaggioFormazioni.hidden = true;
 scheda.appendChild(messaggioFormazioni);
 
