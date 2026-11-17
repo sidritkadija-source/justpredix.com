@@ -2851,7 +2851,12 @@ if (coloreCartellino) {
     badge.setAttribute("aria-label", "Gol annullato");
     badge.title = "Gol annullato";
     badge.innerHTML = `
-      <span aria-hidden="true" style="font-size:17px">⚽</span>
+     <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24">
+  <circle cx="12" cy="12" r="10" fill="#e2e8f0" stroke="#6b7280" stroke-width="1.5"/>
+  <path d="m12 8 4 3-1.5 4.5h-5L8 11z" fill="#6b7280"/>
+  <path d="M12 8V2 M16 11l5.5-2 M14.5 15.5l3.5 4.5 M9.5 15.5 6 20 M8 11 2.5 9"
+        fill="none" stroke="#6b7280" stroke-width="1.3"/>
+</svg>
       <span aria-hidden="true" style="position:absolute;bottom:1px;right:2px;color:#ff526e;font-size:18px;font-weight:900;line-height:1">×</span>`;
     tipo.appendChild(badge);
   } else {
