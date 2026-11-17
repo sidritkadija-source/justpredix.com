@@ -2659,7 +2659,36 @@ punteggio.textContent = haRisultato
 
 centro.append(orario, punteggio);
 testata.append(squadraCasa, centro, squadraOspite);
-scheda.append(indietro, intestazione, testata);
+const barraSchede = document.createElement("div");
+barraSchede.setAttribute("role", "group");
+barraSchede.setAttribute("aria-label", "Sezioni della partita");
+barraSchede.style.cssText =
+  "display:flex;flex-wrap:wrap;gap:0 18px;border-top:1px solid #30445e;";
+
+for (const nome of ["Partita", "Comp. Quote", "Testa-a-testa", "Classifiche"]) {
+  const pulsante = document.createElement("button");
+  pulsante.type = "button";
+  pulsante.textContent = nome;
+  pulsante.style.cssText =
+    "padding:12px 4px;background:transparent;border:0;" +
+    "border-bottom:3px solid transparent;cursor:pointer;" +
+    "font:inherit;font-size:13px;font-weight:700;text-transform:uppercase;";
+
+  pulsante.addEventListener("click", () => selezionaScheda(pulsante));
+  barraSchede.appendChild(pulsante);
+}
+
+function selezionaScheda(selezionata) {
+  for (const pulsante of barraSchede.children) {
+    const attiva = pulsante === selezionata;
+    pulsante.setAttribute("aria-pressed", String(attiva));
+    pulsante.style.color = attiva ? "#ff526e" : "#bfcde2";
+    pulsante.style.borderBottomColor = attiva ? "#ff526e" : "transparent";
+  }
+}
+
+selezionaScheda(barraSchede.firstElementChild);
+scheda.append(indietro, intestazione, testata, barraSchede);
     paginaSerieA.after(scheda);
     paginaSerieA.style.display = "none";
     intestazione.focus();
