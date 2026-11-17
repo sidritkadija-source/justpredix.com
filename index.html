@@ -2781,6 +2781,15 @@ if (coloreCartellino) {
       <path d="M4 10 Q12 0 20 10 M20 5 V10 H15" stroke="#ff526e"/>
       <path d="M20 14 Q12 24 4 14 M4 19 V14 H9" stroke="#31d158"/>
     </svg>`;
+} else if (evento.tipo === "Gol") {
+  tipo.textContent = "⚽";
+  tipo.setAttribute("role", "img");
+  tipo.setAttribute("aria-label", "Gol");
+  tipo.title = "Gol";
+  tipo.style.cssText =
+    "display:inline-grid;place-items:center;flex:0 0 32px;" +
+    "width:32px;height:32px;box-sizing:border-box;" +
+    "border:1px solid #30445e;border-radius:10px;font-size:18px;";
 } else {
   tipo.textContent = evento.tipo;
   tipo.style.color = "#93c5fd";
