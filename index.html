@@ -2689,16 +2689,73 @@ function selezionaScheda(selezionata) {
 
 selezionaScheda(barraSchede.firstElementChild);
 scheda.append(indietro, intestazione, testata, barraSchede);
-    const messaggioFormazioni = document.createElement("p");
-messaggioFormazioni.textContent = "Nessuna formazione disponibile";
-messaggioFormazioni.style.cssText =
-  "margin:0;padding:24px 12px;text-align:center;color:#ff526e;font-weight:600;";
-messaggioFormazioni.hidden = true;
-scheda.appendChild(messaggioFormazioni);
+   const pannelloFormazioni = document.createElement("section");
+pannelloFormazioni.setAttribute("aria-label", "Formazioni");
+pannelloFormazioni.hidden = true;
+
+const provaFormazioni =
+  new URLSearchParams(location.search).get("demoFormazioni") === "1";
+
+if (provaFormazioni) {
+  const titolo = document.createElement("p");
+  titolo.textContent = `${casa} 4-3-3 · ${ospite} 3-5-2 — Dati dimostrativi`;
+  titolo.style.cssText = "padding:12px;text-align:center;color:#bfcde2;";
+
+  const campo = document.createElement("div");
+  campo.style.cssText =
+    "max-width:540px;margin:0 auto 16px;background:#146344;" +
+    "border:2px solid #9ed3b8;border-radius:10px;color:white;";
+
+  const squadreDemo = [
+    { nome: casa, file: [1, 4, 3, 3], colore: "#1d4ed8" },
+    { nome: ospite, file: [2, 5, 3, 1], colore: "#b91c36" }
+  ];
+
+  for (const [indice, squadra] of squadreDemo.entries()) {
+    const metaCampo = document.createElement("div");
+    metaCampo.setAttribute("role", "group");
+    metaCampo.setAttribute("aria-label", squadra.nome);
+    metaCampo.style.cssText = "display:grid;gap:12px;padding:14px 6px;";
+    if (indice === 1) metaCampo.style.borderTop = "2px solid #9ed3b8";
+
+    let numero = indice === 0 ? 1 : 11;
+
+    for (const quanti of squadra.file) {
+      const fila = document.createElement("div");
+      fila.style.cssText = "display:flex;justify-content:space-evenly;gap:4px;";
+
+      for (let i = 0; i < quanti; i++) {
+        const giocatore = document.createElement("span");
+        giocatore.textContent = String(numero);
+        giocatore.title = `${squadra.nome} · Titolare ${numero}`;
+        giocatore.style.cssText =
+          "display:grid;place-items:center;width:30px;aspect-ratio:1;" +
+          "border:1px solid white;border-radius:50%;font-weight:700;" +
+          `background:${squadra.colore};`;
+        fila.appendChild(giocatore);
+        numero += indice === 0 ? 1 : -1;
+      }
+
+      metaCampo.appendChild(fila);
+    }
+
+    campo.appendChild(metaCampo);
+  }
+
+  pannelloFormazioni.append(titolo, campo);
+} else {
+  const messaggioFormazioni = document.createElement("p");
+  messaggioFormazioni.textContent = "Nessuna formazione disponibile";
+  messaggioFormazioni.style.cssText =
+    "margin:0;padding:24px 12px;text-align:center;color:#ff526e;font-weight:600;";
+  pannelloFormazioni.appendChild(messaggioFormazioni);
+}
+
+scheda.appendChild(pannelloFormazioni);
 
 for (const pulsante of barraSchede.children) {
   pulsante.addEventListener("click", () => {
-    messaggioFormazioni.hidden = pulsante.textContent.trim() !== "Formazioni";
+    pannelloFormazioni.hidden = pulsante.textContent.trim() !== "Formazioni";
   });
 }
     const provaEventi = new URLSearchParams(location.search).get("demoEventi") === "1";
