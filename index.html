@@ -2711,7 +2711,7 @@ const eventi = provaEventi ? [
   { tempo: 2, minuto: "59′", lato: "casa", tipo: "Cambio", nome: "Entra D · Esce E", infortunio: true },
   { tempo: 2, minuto: "60′", lato: "casa", tipo: "Autogol", nome: "Giocatore H", punteggio: "1–1" },
   { tempo: 2, minuto: "65′", lato: "ospite", tipo: "Rigore", nome: "Giocatore I", punteggio: "1–2" },
-  { tempo: 2, minuto: "71′", lato: "casa", tipo: "VAR", controllo: "gol", nome: "Giocatore F" },
+  { tempo: 2, minuto: "71′", lato: "casa", tipo: "VAR", controllo: "gol", esito: "annullato", nome: "Giocatore F" },
   { tempo: 2, minuto: "72′", lato: "casa", tipo: "Gol annullato", nome: "Giocatore F" },
   { tempo: 2, minuto: "75′", lato: "ospite", tipo: "VAR", controllo: "cartellino", nome: "Giocatore J" },
   { tempo: 2, minuto: "90+1′", lato: "casa", tipo: "Doppio giallo", nome: "Giocatore A" },
@@ -2865,7 +2865,7 @@ if (coloreCartellino) {
 
     const controllo = document.createElement("span");
     controllo.textContent = evento.controllo === "gol"
-      ? "Controllo gol"
+      ? (evento.esito === "annullato" ? "GOL ANNULLATO" : "Controllo gol")
       : evento.controllo === "cartellino"
         ? "Controllo cartellino"
         : "Controllo in corso";
