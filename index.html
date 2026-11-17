@@ -2566,7 +2566,60 @@ function calcolaClassificaSerieA(partite, tipo = "totale", limite = Infinity) {
     a.squadra.localeCompare(b.squadra)
   );
 }
-  
+ function collegaSchedaPartitaSerieA(riga, partita) {
+  const casa = partita.home_team?.name;
+  const ospite = partita.away_team?.name;
+  if (!casa || !ospite) return;
+
+  const titolo = `${casa} – ${ospite}`;
+  riga.style.cursor = "pointer";
+  riga.tabIndex = 0;
+  riga.setAttribute("role", "button");
+  riga.setAttribute("aria-label", `Apri scheda ${titolo}`);
+  riga.setAttribute("aria-haspopup", "dialog");
+
+  riga.addEventListener("click", () => {
+    const scheda = document.createElement("dialog");
+    scheda.style.cssText =
+      "width:min(520px,92vw);box-sizing:border-box;padding:20px;" +
+      "background:#111c2e;color:#edf4ff;border:1px solid #30445e;border-radius:12px";
+    scheda.setAttribute("aria-label", titolo);
+
+    const indietro = document.createElement("button");
+    indietro.type = "button";
+    indietro.textContent = "← Torna alle partite";
+    indietro.addEventListener("click", () => scheda.close());
+
+    const intestazione = document.createElement("h2");
+    intestazione.textContent = titolo;
+
+    const orario = document.createElement("p");
+    const data = new Date(partita.start_time || "");
+    orario.textContent = Number.isFinite(data.getTime())
+      ? new Intl.DateTimeFormat("it-IT", {
+          dateStyle: "medium",
+          timeStyle: "short",
+          timeZone: "Europe/Tirane"
+        }).format(data)
+      : "Orario da confermare";
+
+    scheda.append(indietro, intestazione, orario);
+    scheda.addEventListener("close", () => {
+      scheda.remove();
+      riga.focus();
+    }, { once: true });
+
+    document.body.appendChild(scheda);
+    scheda.showModal();
+  });
+
+  riga.addEventListener("keydown", evento => {
+    if (evento.key === "Enter" || evento.key === " ") {
+      evento.preventDefault();
+      if (!evento.repeat) riga.click();
+    }
+  });
+} 
 function creaSquadraConLogo(nome) {
   const idsLoghi = {
     inter: 505,
@@ -3744,8 +3797,9 @@ const ospite = creaSquadraConLogo(
     ? `${partita.home_score} - ${partita.away_score}`
     : "–";
 
-    riga.append(orario, squadre, risultato);
-    zonaSerieA.appendChild(riga);
+   riga.append(orario, squadre, risultato);
+collegaSchedaPartitaSerieA(riga, partita);
+zonaSerieA.appendChild(riga);
   });
 })
   .catch(errore => {
