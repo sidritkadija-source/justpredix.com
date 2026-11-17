@@ -2703,8 +2703,9 @@ if (provaFormazioni) {
 
   const campo = document.createElement("div");
   campo.style.cssText =
-    "max-width:540px;margin:0 auto 16px;background:#146344;" +
-    "border:2px solid #9ed3b8;border-radius:10px;color:white;";
+  "display:grid;grid-template-columns:repeat(2,minmax(0,1fr));" +
+  "min-height:220px;max-width:720px;margin:0 auto 16px;" +
+  "background:#146344;border:2px solid #9ed3b8;border-radius:10px;color:white;";
 
   const squadreDemo = [
     { nome: casa, file: [1, 4, 3, 3], colore: "#1d4ed8" },
@@ -2715,14 +2716,18 @@ if (provaFormazioni) {
     const metaCampo = document.createElement("div");
     metaCampo.setAttribute("role", "group");
     metaCampo.setAttribute("aria-label", squadra.nome);
-    metaCampo.style.cssText = "display:grid;gap:12px;padding:14px 6px;";
-    if (indice === 1) metaCampo.style.borderTop = "2px solid #9ed3b8";
+metaCampo.style.cssText =
+  "display:grid;grid-template-columns:repeat(4,minmax(0,1fr));" +
+  "gap:4px;padding:8px 4px;";
+
+if (indice === 1) metaCampo.style.borderLeft = "2px solid #9ed3b8";
 
     let numero = indice === 0 ? 1 : 11;
 
     for (const quanti of squadra.file) {
       const fila = document.createElement("div");
-      fila.style.cssText = "display:flex;justify-content:space-evenly;gap:4px;";
+      fila.style.cssText =
+  "display:flex;flex-direction:column;align-items:center;justify-content:space-evenly;gap:4px;";
 
       for (let i = 0; i < quanti; i++) {
         const giocatore = document.createElement("span");
