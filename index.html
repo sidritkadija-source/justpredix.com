@@ -4228,17 +4228,24 @@ for (const { partita, girone } of righeNations) {
   Ukraine: "ua", Wales: "gb-wls"
 };
 
-riga.style.gridTemplateColumns = "90px minmax(0, 1fr) 65px";
+riga.style.gridTemplateColumns = "65px minmax(0, 1fr) 65px";
 
 const orario = document.createElement("div");
 orario.className = "match-time";
-orario.textContent = new Date(partita.start_time).toLocaleString("it-IT", {
+
+const inizio = new Date(partita.start_time);
+const data = inizio.toLocaleDateString("it-IT", {
   day: "2-digit",
   month: "2-digit",
+  timeZone: "Europe/Tirane"
+});
+const ora = inizio.toLocaleTimeString("it-IT", {
   hour: "2-digit",
   minute: "2-digit",
   timeZone: "Europe/Tirane"
 });
+
+orario.append(data, document.createElement("br"), ora);
 
 const squadre = document.createElement("div");
 squadre.className = "match-teams";
