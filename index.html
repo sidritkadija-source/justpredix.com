@@ -2697,9 +2697,19 @@ const provaFormazioni =
   new URLSearchParams(location.search).get("demoFormazioni") === "1";
 
 if (provaFormazioni) {
-  const titolo = document.createElement("p");
-  titolo.textContent = `${casa} 4-3-3 · ${ospite} 3-5-2 — Dati dimostrativi`;
-  titolo.style.cssText = "padding:12px;text-align:center;color:#bfcde2;";
+ const titolo = document.createElement("div");
+titolo.style.cssText =
+  "display:flex;justify-content:space-between;max-width:720px;" +
+  "box-sizing:border-box;margin:0 auto;padding:10px 4px;" +
+  "color:#bfcde2;font-weight:700;";
+
+const moduloSinistra = document.createElement("span");
+moduloSinistra.textContent = "4-3-3";
+
+const moduloDestra = document.createElement("span");
+moduloDestra.textContent = "2-5-3";
+
+titolo.append(moduloSinistra, moduloDestra);
 
   const campo = document.createElement("div");
   campo.style.cssText =
