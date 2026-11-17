@@ -2788,7 +2788,16 @@ if (coloreCartellino) {
 
     const nome = document.createElement("span");
     nome.textContent = evento.nome;
-
+if (evento.tipo === "Cambio" && evento.infortunio === true) {
+  const simboloInfortunio = document.createElement("span");
+  simboloInfortunio.textContent = " +";
+  simboloInfortunio.setAttribute("role", "img");
+  simboloInfortunio.setAttribute("aria-label", "Uscito per infortunio");
+  simboloInfortunio.title = "Uscito per infortunio";
+  simboloInfortunio.style.cssText =
+    "color:#ff526e;font-size:18px;font-weight:900";
+  nome.appendChild(simboloInfortunio);
+}
     rigaEvento.append(minuto, tipo, nome);
     cronologia.appendChild(rigaEvento);
   }
