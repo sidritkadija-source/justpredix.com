@@ -4197,7 +4197,7 @@ let gironeMostrato = null;
 
 for (const { partita, girone } of righeNations) {
    if (raggruppaPerGirone && girone !== gironeMostrato) {
-    const intestazione = document.createElement("h3");
+    const intestazione = document.createElement("h4");
     intestazione.textContent = girone
       ? `Lega ${girone[0]}-Gr${girone.slice(1)}`
       : "Altre partite";
