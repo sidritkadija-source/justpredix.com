@@ -2764,6 +2764,45 @@ if (indice === 1) metaCampo.style.borderLeft = "2px solid #9ed3b8";
 
   pannelloFormazioni.append(titolo, campo);
 } else {
+  const subentrati = document.createElement("section");
+subentrati.style.cssText = "max-width:720px;margin:0 auto 16px;";
+
+const titoloSubentrati = document.createElement("h3");
+titoloSubentrati.textContent = "Giocatori subentrati";
+titoloSubentrati.style.cssText =
+  "margin:0;padding:8px;background:#203750;border-radius:6px;" +
+  "text-align:center;font-size:13px;text-transform:uppercase;";
+
+const colonneCambi = document.createElement("div");
+colonneCambi.style.cssText =
+  "display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;";
+
+// Gli stessi cambi dimostrativi della scheda Partita.
+const cambiDemo = [
+  { squadra: casa, entrato: "Giocatore D", uscito: "Giocatore E", minuto: "59′" },
+  { squadra: ospite, entrato: "Giocatore K", uscito: "Giocatore L", minuto: "35′" }
+];
+
+for (const [indice, cambio] of cambiDemo.entries()) {
+  const colonna = document.createElement("div");
+  colonna.style.cssText =
+    `min-width:0;padding:10px 8px;overflow-wrap:anywhere;text-align:${indice === 0 ? "left" : "right"};`;
+
+  const entrato = document.createElement("strong");
+  entrato.textContent = cambio.entrato;
+
+  const dettaglio = document.createElement("div");
+  dettaglio.textContent = `⇄ ${cambio.minuto} · Esce ${cambio.uscito}`;
+  dettaglio.style.cssText = "margin-top:3px;color:#bfcde2;font-size:12px;";
+
+  colonna.setAttribute("role", "group");
+  colonna.setAttribute("aria-label", cambio.squadra);
+  colonna.append(entrato, dettaglio);
+  colonneCambi.appendChild(colonna);
+}
+
+subentrati.append(titoloSubentrati, colonneCambi);
+pannelloFormazioni.appendChild(subentrati);
   const messaggioFormazioni = document.createElement("p");
   messaggioFormazioni.textContent = "Nessuna formazione disponibile";
   messaggioFormazioni.style.cssText =
