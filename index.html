@@ -3397,6 +3397,117 @@ for (const pulsante of barraSchede.children) {
     salvaSchedaPartita(pulsante.textContent.trim());
   });
 }
+    const pannelloClassifica = document.createElement("section");
+pannelloClassifica.hidden = true;
+pannelloClassifica.setAttribute("aria-label", "Classifica Serie A");
+pannelloClassifica.style.cssText = "padding-top:16px;overflow-x:auto;";
+scheda.appendChild(pannelloClassifica);
+
+let classificaCaricata = false;
+let classificaInCaricamento = false;
+
+async function caricaClassificaPartita() {
+  if (classificaCaricata || classificaInCaricamento) return;
+  classificaInCaricamento = true;
+  pannelloClassifica.textContent = "Caricamento classifica…";
+
+  try {
+    const gare = await recuperaStagioneCompletaSerieA();
+    const classifica = calcolaClassificaSerieA(gare);
+
+    if (!classifica.length) {
+      pannelloClassifica.textContent = "Classifica non ancora disponibile.";
+      return;
+    }
+
+    const tabella = document.createElement("table");
+    tabella.setAttribute("aria-label", "Classifica attuale Serie A");
+    tabella.style.cssText =
+      "width:100%;min-width:650px;border-collapse:collapse;font-size:13px;";
+
+    const intestazioneTabella = tabella.createTHead().insertRow();
+
+    for (const nome of ["#", "Squadra", "PG", "V", "N", "P", "GF:GS", "DR", "PT", "Forma"]) {
+      const cella = document.createElement("th");
+      cella.scope = "col";
+      cella.textContent = nome;
+      cella.style.cssText =
+        "padding:9px 6px;background:#203750;text-align:center;";
+      if (nome === "Squadra") cella.style.textAlign = "left";
+      intestazioneTabella.appendChild(cella);
+    }
+
+    const corpo = tabella.createTBody();
+    const coloriForma = { V: "#00b050", N: "#f59e0b", P: "#e31335" };
+    const descrizioniForma = { V: "Vittoria", N: "Pareggio", P: "Sconfitta" };
+
+    classifica.forEach((squadra, indice) => {
+      const riga = corpo.insertRow();
+      const evidenziata = [casa, ospite].includes(squadra.squadra);
+
+      if (evidenziata) riga.style.background = "#193c57";
+
+      const valori = [
+        indice + 1,
+        squadra.squadra,
+        squadra.PG,
+        squadra.V,
+        squadra.N,
+        squadra.P,
+        `${squadra.GF}:${squadra.GS}`,
+        squadra.DR,
+        squadra.PT
+      ];
+
+      valori.forEach((valore, colonna) => {
+        const cella = riga.insertCell();
+        cella.style.cssText =
+          "padding:9px 6px;border-bottom:1px solid #30445e;text-align:center;";
+
+        if (colonna === 1) {
+          cella.style.textAlign = "left";
+          cella.appendChild(creaSquadraConLogo(squadra.squadra));
+          if (evidenziata) cella.style.fontWeight = "700";
+        } else {
+          cella.textContent = valore;
+        }
+
+        if (colonna === 8) cella.style.fontWeight = "800";
+      });
+
+      const forma = riga.insertCell();
+      forma.style.cssText =
+        "padding:9px 6px;border-bottom:1px solid #30445e;white-space:nowrap;";
+
+      for (const esito of squadra.forma) {
+        const casella = document.createElement("span");
+        casella.textContent = esito;
+        casella.title = descrizioniForma[esito];
+        casella.style.cssText =
+          "display:inline-grid;place-items:center;width:23px;height:23px;" +
+          "margin:0 2px;border-radius:5px;color:white;font-weight:700;" +
+          `background:${coloriForma[esito]};`;
+        forma.appendChild(casella);
+      }
+    });
+
+    pannelloClassifica.replaceChildren(tabella);
+    classificaCaricata = true;
+  } catch {
+    pannelloClassifica.textContent =
+      "Impossibile caricare la classifica. Riapri Classifiche per riprovare.";
+  } finally {
+    classificaInCaricamento = false;
+  }
+}
+
+for (const pulsante of barraSchede.children) {
+  pulsante.addEventListener("click", () => {
+    const selezionata = pulsante.textContent.trim() === "Classifiche";
+    pannelloClassifica.hidden = !selezionata;
+    if (selezionata) caricaClassificaPartita();
+  });
+}
     paginaSerieA.after(scheda);
     paginaSerieA.style.display = "none";
     intestazione.style.outline = "none";
