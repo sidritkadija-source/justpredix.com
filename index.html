@@ -3629,6 +3629,9 @@ if (voceSerieA) {
   voceSerieA.style.cursor = "pointer";
 
   voceSerieA.addEventListener("click", () => {
+    document.getElementById("scheda-partita-serie-a")?.remove();
+sessionStorage.removeItem("justpredix_partita_aperta");
+    
     document.getElementById("partite").style.display = "none";
     document.getElementById("league-detail").style.display = "block";
     selezionaSchedaSerieA("riepilogo");
