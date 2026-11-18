@@ -5770,6 +5770,151 @@ laterale.appendChild(marcatori);
 colonne.append(cardClassifica, laterale);
 fasciaStagione.append(numeri, record, colonne);
 
+    function aggiungiStatisticheRiepilogo(fascia, gare, ambito) {
+  const statistiche = elemento("div", null, "demo-numeri");
+
+  let vittorieCasa = 0;
+  let vittorieOspite = 0;
+  let pareggi = 0;
+
+  for (const gara of gare) {
+    const golCasa = Number(gara.home_score);
+    const golOspite = Number(gara.away_score);
+
+    if (golCasa > golOspite) vittorieCasa++;
+    else if (golCasa < golOspite) vittorieOspite++;
+    else pareggi++;
+  }
+
+  const esempi = ambito === "giornata"
+    ? {
+        ammonizioni: 46,
+        espulsioni: 3,
+        rigori: 4,
+        spettatori: 285000,
+        partiteSpettatori: 10
+      }
+    : {
+        ammonizioni: 492,
+        espulsioni: 28,
+        rigori: 35,
+        spettatori: 3135000,
+        partiteSpettatori: 110
+      };
+
+  const formatoNumero = new Intl.NumberFormat("it-IT");
+  const mediaSpettatori = Math.round(
+    esempi.spettatori / esempi.partiteSpettatori
+  );
+
+  const dati = [
+    ["Vittorie in casa", gare.length ? vittorieCasa : "—", false],
+    ["Vittorie in trasferta", gare.length ? vittorieOspite : "—", false],
+    ["Pareggi", gare.length ? pareggi : "—", false],
+    ["Ammonizioni", esempi.ammonizioni, true],
+    ["Espulsioni", esempi.espulsioni, true],
+    ["Rigori segnati", esempi.rigori, true],
+    ["Spettatori totali", esempi.spettatori, true],
+    ["Media spettatori per partita", mediaSpettatori, true]
+  ];
+
+  for (const [etichetta, valore, dimostrativo] of dati) {
+    const card = elemento("div", null, "demo-card");
+    card.append(
+      elemento("span", etichetta),
+      elemento(
+        "strong",
+        typeof valore === "number" ? formatoNumero.format(valore) : valore,
+        "demo-numero"
+      )
+    );
+
+    if (dimostrativo) {
+      const nota = elemento("p", "Esempio dimostrativo");
+      nota.style.cssText = "margin:8px 0 0;font-size:11px;";
+      card.appendChild(nota);
+    }
+
+    statistiche.appendChild(card);
+  }
+
+  const formazione = elemento("section", null, "demo-card");
+  formazione.style.marginBottom = "22px";
+  formazione.append(
+    elemento(
+      "h2",
+      ambito === "giornata"
+        ? "Formazione migliore della giornata"
+        : "Formazione migliore della stagione"
+    ),
+    elemento("p", "4-3-3 · Giocatori dimostrativi")
+  );
+
+  const mezzoCampo = elemento("div");
+  mezzoCampo.setAttribute("role", "group");
+  mezzoCampo.setAttribute("aria-label", "Migliori undici dimostrativi su metà campo");
+  mezzoCampo.style.cssText =
+    "position:relative;isolation:isolate;display:grid;gap:18px;" +
+    "max-width:650px;margin:0 auto;padding:20px 8px;" +
+    "min-height:330px;overflow:hidden;background:#146344;" +
+    "border:2px solid #9ed3b8;border-radius:8px;";
+
+  const areaRigore = elemento("div");
+  areaRigore.setAttribute("aria-hidden", "true");
+  areaRigore.style.cssText =
+    "position:absolute;bottom:0;left:28%;width:44%;height:27%;" +
+    "border:2px solid #9ed3b8;border-bottom:0;z-index:-1;";
+  mezzoCampo.appendChild(areaRigore);
+
+  let numeroDemo = 11;
+
+  for (const [ruolo, quanti] of [
+    ["Attaccante", 3],
+    ["Centrocampista", 3],
+    ["Difensore", 4],
+    ["Portiere", 1]
+  ]) {
+    const reparto = elemento("div");
+    reparto.style.cssText =
+      "display:flex;align-items:center;justify-content:space-around;gap:4px;";
+
+    for (let indice = 1; indice <= quanti; indice++) {
+      const giocatore = elemento("div");
+      giocatore.style.cssText =
+        "display:grid;justify-items:center;gap:5px;min-width:0;flex:1;";
+
+      const maglia = elemento("span", numeroDemo--);
+      maglia.style.cssText =
+        "display:grid;place-items:center;width:32px;height:32px;" +
+        "border:1px solid white;border-radius:50%;" +
+        "background:#1d4ed8;color:white;font-weight:700;";
+
+      const nome = elemento("span", `${ruolo} ${indice}`);
+      nome.style.cssText =
+        "font-size:11px;color:white;text-align:center;overflow-wrap:anywhere;";
+
+      giocatore.append(maglia, nome);
+      reparto.appendChild(giocatore);
+    }
+
+    mezzoCampo.appendChild(reparto);
+  }
+
+  formazione.appendChild(mezzoCampo);
+  fascia.append(statistiche, formazione);
+}
+
+aggiungiStatisticheRiepilogo(
+  fasciaGiornata,
+  gareGiornataDemo,
+  "giornata"
+);
+
+aggiungiStatisticheRiepilogo(
+  fasciaStagione,
+  concluse,
+  "stagione"
+);
 pagina.append(fasciaGiornata, fasciaStagione);
   } catch {
     stato.textContent =
