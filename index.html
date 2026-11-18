@@ -2828,12 +2828,12 @@ for (const pulsante of barraSchede.children) {
 }
     const provaEventi = new URLSearchParams(location.search).get("demoEventi") === "1";
 
-const eventi = provaEventi ? [
+const eventiDemo = [
   { tempo: 1, minuto: "14′", lato: "casa", tipo: "Giallo", nome: "Giocatore A" },
   { tempo: 1, minuto: "22′", lato: "ospite", tipo: "Rosso", nome: "Giocatore B" },
-  { tempo: 1, minuto: "35′", lato: "ospite", tipo: "Cambio", nome: "Entra K · Esce L" },
+  { tempo: 1, minuto: "35′", lato: "ospite", tipo: "Cambio", nome: "Entra K · Esce L", entrato: "Giocatore K", uscito: "Giocatore L" },
   { tempo: 2, minuto: "53′", lato: "ospite", tipo: "Gol", nome: "Giocatore C · 0–1" },
-  { tempo: 2, minuto: "59′", lato: "casa", tipo: "Cambio", nome: "Entra D · Esce E", infortunio: true },
+  { tempo: 2, minuto: "59′", lato: "casa", tipo: "Cambio", nome: "Entra D · Esce E", entrato: "Giocatore D", uscito: "Giocatore E", infortunio: true },
   { tempo: 2, minuto: "60′", lato: "casa", tipo: "Autogol", nome: "Giocatore H", punteggio: "1–1" },
   { tempo: 2, minuto: "65′", lato: "ospite", tipo: "Rigore", nome: "Giocatore I", punteggio: "1–2" },
   { tempo: 2, minuto: "71′", lato: "casa", tipo: "VAR", controllo: "gol", esito: "annullato", nome: "Giocatore F" },
@@ -2841,7 +2841,137 @@ const eventi = provaEventi ? [
   { tempo: 2, minuto: "75′", lato: "ospite", tipo: "VAR", controllo: "cartellino", nome: "Giocatore J" },
   { tempo: 2, minuto: "90+1′", lato: "casa", tipo: "Doppio giallo", nome: "Giocatore A" },
   { tempo: 2, minuto: "90+2′", lato: "ospite", tipo: "Rigore sbagliato", nome: "Giocatore G" }
-] : partita.eventi ?? [];
+];
+
+const eventi = provaEventi ? eventiDemo : (partita.eventi ?? []);
+
+if (provaFormazioni) {
+  const nomiTitolari = [
+    { 2: "Giocatore A", 5: "Giocatore E", 9: "Giocatore F" },
+    { 2: "Giocatore L", 4: "Giocatore B", 5: "Giocatore H",
+      8: "Giocatore I", 9: "Giocatore C", 10: "Giocatore G" }
+  ];
+
+  const titolari = nomiTitolari.map(nomi =>
+    Array.from({ length: 11 }, (_, indice) => ({
+      numero: indice + 1,
+      nome: nomi[indice + 1] || `Titolare ${indice + 1}`,
+      ruolo: indice === 0 ? " (P)" : indice === 7 ? " (C)" : ""
+    }))
+  );
+
+  const panchina = ["Giocatore D", "Giocatore K"].map(nome => [
+    { numero: 12, nome },
+    { numero: 13, nome: "Riserva 2" },
+    { numero: 14, nome: "Riserva 3" }
+  ]);
+
+  const coloriCartellini = {
+    Giallo: "#facc15",
+    Rosso: "#ff526e",
+    "Doppio giallo": "linear-gradient(135deg,#ff0000 50%,#ffcc00 50%)"
+  };
+
+  function creaCellaGiocatore(giocatore, ospite) {
+    const cella = document.createElement("div");
+    cella.style.cssText =
+      "min-width:0;overflow-wrap:anywhere;" +
+      (ospite ? "text-align:right;" : "");
+
+    if (!giocatore) return cella;
+
+    const nome = document.createElement("strong");
+    const testo = giocatore.nome + (giocatore.ruolo || "");
+    nome.textContent = ospite
+      ? `${testo} · ${giocatore.numero}`
+      : `${giocatore.numero} · ${testo}`;
+    cella.appendChild(nome);
+
+    const lato = ospite ? "ospite" : "casa";
+
+    for (const evento of eventiDemo) {
+      const cambio = evento.tipo === "Cambio" && evento.lato === lato &&
+        [evento.entrato, evento.uscito].includes(giocatore.nome);
+
+      const autore = evento.nome.split(" · ")[0];
+      const latoAutore = evento.tipo === "Autogol"
+        ? (evento.lato === "casa" ? "ospite" : "casa")
+        : evento.lato;
+      const stessoGiocatore = latoAutore === lato && autore === giocatore.nome;
+      const cartellino = stessoGiocatore && coloriCartellini[evento.tipo];
+      const gol = stessoGiocatore && ["Gol", "Rigore", "Autogol"].includes(evento.tipo);
+
+      if (!cambio && !cartellino && !gol) continue;
+
+      const simbolo = document.createElement("span");
+      simbolo.style.cssText =
+        "display:inline-flex;align-items:center;gap:3px;margin:0 4px;" +
+        "vertical-align:middle;white-space:nowrap;font-size:12px;";
+
+      if (cambio) {
+        const azione = evento.entrato === giocatore.nome ? "Entrato" : "Uscito";
+        simbolo.title = `${azione} al ${evento.minuto}`;
+        simbolo.innerHTML = `
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24"
+               fill="none" stroke-width="1.8" stroke-linecap="round"
+               stroke-linejoin="round">
+            <path d="M4 10 Q12 0 20 10 M20 5 V10 H15" stroke="#ff526e"/>
+            <path d="M20 14 Q12 24 4 14 M4 19 V14 H9" stroke="#31d158"/>
+          </svg>`;
+        simbolo.append(evento.minuto);
+        simbolo.setAttribute("aria-label", simbolo.title);
+      } else {
+        simbolo.setAttribute("role", "img");
+        simbolo.title = evento.tipo;
+        simbolo.setAttribute("aria-label", evento.tipo);
+
+        if (cartellino) {
+          simbolo.style.cssText +=
+            `width:9px;height:14px;border-radius:2px;background:${cartellino};`;
+        } else {
+          simbolo.textContent = "⚽";
+        }
+      }
+
+      if (ospite) cella.insertBefore(simbolo, nome);
+      else cella.appendChild(simbolo);
+    }
+
+    return cella;
+  }
+
+  for (const [etichetta, [listaCasa, listaOspite]] of [
+    ["Formazioni iniziali", titolari],
+    ["Panchina", panchina]
+  ]) {
+    const elenco = document.createElement("section");
+    elenco.style.cssText = "max-width:720px;margin:0 auto 16px;";
+
+    const intestazione = document.createElement("h3");
+    intestazione.textContent = etichetta;
+    intestazione.style.cssText =
+      "margin:0;padding:8px;background:#203750;border-radius:6px;" +
+      "text-align:center;font-size:13px;text-transform:uppercase;";
+    elenco.appendChild(intestazione);
+
+    const totaleRighe = Math.max(listaCasa.length, listaOspite.length);
+    for (let indice = 0; indice < totaleRighe; indice++) {
+      const riga = document.createElement("div");
+      riga.style.cssText =
+        "display:grid;grid-template-columns:repeat(2,minmax(0,1fr));" +
+        "gap:12px;padding:9px 10px;" +
+        (indice % 2 === 1 ? "background:#162942;" : "");
+
+      riga.append(
+        creaCellaGiocatore(listaCasa[indice], false),
+        creaCellaGiocatore(listaOspite[indice], true)
+      );
+      elenco.appendChild(riga);
+    }
+
+    pannelloFormazioni.appendChild(elenco);
+  }
+}
 
 if ((provaEventi || ["in_progress", "final"].includes(partita.status)) && eventi.length) {
   const cronologia = document.createElement("section");
