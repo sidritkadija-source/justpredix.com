@@ -5459,7 +5459,7 @@ selezionaSchedaNations(
       grid-template-columns: 52px minmax(0, 1fr) auto;
       gap: 10px;
       align-items: center;
-      padding: 12px 0;
+      padding: 7px 0;
       border-bottom: 1px solid #30445e;
       font-size: 13px;
     }
@@ -5678,6 +5678,9 @@ titolo.append(logoSerieA, nomeSerieA);
 
     const laterale = elemento("div", null, "demo-laterale");
     const risultati = elemento("section", null, "demo-card");
+    risultati.style.cssText =
+  "width:100%;max-width:680px;box-sizing:border-box;" +
+  "margin:0 auto 18px;padding:12px 16px;";
    const giornateDemo = organizzaGiornateSerieA(stagione);
 
 const ultimaGiornataConclusa = Object.entries(giornateDemo)
