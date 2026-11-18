@@ -5368,6 +5368,328 @@ selezionaSchedaNations(
 
   pulsante?.click();
 })();
+  (async () => {
+  const parametri = new URLSearchParams(location.search);
+  if (parametri.get("demoRiepilogo") !== "1") return;
+
+  const layout = document.querySelector(".home-layout");
+  if (!layout) return;
+
+  const stile = document.createElement("style");
+  stile.textContent = `
+    body.demo-riepilogo .hero,
+    body.demo-riepilogo .top-matches-section,
+    body.demo-riepilogo .home-layout {
+      display: none !important;
+    }
+
+    #demo-riepilogo-stagione {
+      width: 94%;
+      max-width: 1200px;
+      margin: 24px auto;
+      color: #e5edf7;
+    }
+
+    #demo-riepilogo-stagione h1 {
+      margin: 12px 0 4px;
+      font-size: clamp(25px, 4vw, 36px);
+    }
+
+    #demo-riepilogo-stagione h2 {
+      margin: 0 0 16px;
+      font-size: 18px;
+    }
+
+    #demo-riepilogo-stagione p {
+      color: #bfcde2;
+    }
+
+    #demo-riepilogo-stagione .demo-numeri,
+    #demo-riepilogo-stagione .demo-record {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      margin: 22px 0;
+    }
+
+    #demo-riepilogo-stagione .demo-card {
+      padding: 20px;
+      border: 1px solid #30445e;
+      border-radius: 12px;
+      background: #111c2e;
+      min-width: 0;
+    }
+
+    #demo-riepilogo-stagione .demo-numero {
+      display: block;
+      margin-top: 8px;
+      font-size: 30px;
+      font-weight: 800;
+      color: white;
+    }
+
+    #demo-riepilogo-stagione .demo-colonne {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    #demo-riepilogo-stagione table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    #demo-riepilogo-stagione th,
+    #demo-riepilogo-stagione td {
+      padding: 10px 7px;
+      border-bottom: 1px solid #30445e;
+      text-align: center;
+    }
+
+    #demo-riepilogo-stagione th {
+      color: #bfcde2;
+      font-size: 11px;
+    }
+
+    #demo-riepilogo-stagione .demo-risultato {
+      display: grid;
+      grid-template-columns: 52px minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #30445e;
+      font-size: 13px;
+    }
+
+    #demo-riepilogo-stagione .demo-risultato span {
+      overflow-wrap: anywhere;
+    }
+
+    #demo-riepilogo-stagione .demo-laterale {
+      display: grid;
+      gap: 18px;
+    }
+
+    @media (max-width: 800px) {
+      #demo-riepilogo-stagione .demo-colonne {
+        grid-template-columns: 1fr;
+      }
+    }
+  `;
+
+  document.head.appendChild(stile);
+  document.body.classList.add("demo-riepilogo");
+
+  function elemento(tag, testo, classe) {
+    const nodo = document.createElement(tag);
+    if (testo != null) nodo.textContent = testo;
+    if (classe) nodo.className = classe;
+    return nodo;
+  }
+
+  const pagina = elemento("section");
+  pagina.id = "demo-riepilogo-stagione";
+  pagina.setAttribute("aria-label", "Riepilogo stagione Serie A");
+  layout.before(pagina);
+
+  const indietro = elemento("button", "← Torna alla Serie A");
+  indietro.type = "button";
+  indietro.style.cssText =
+    "padding:8px 12px;background:#2563eb;color:white;" +
+    "border:0;border-radius:6px;cursor:pointer;";
+
+  indietro.addEventListener("click", () => {
+    pagina.remove();
+    stile.remove();
+    document.body.classList.remove("demo-riepilogo");
+
+    const indirizzo = new URL(location.href);
+    indirizzo.searchParams.delete("demoRiepilogo");
+    history.replaceState(history.state, "", indirizzo);
+
+    document.querySelector('.league-item[data-league="135"]')?.click();
+  });
+
+  const titolo = elemento("h1", "La stagione di Serie A");
+  const sottotitolo = elemento(
+    "p",
+    "2026/27 · Anteprima del nuovo Riepilogo"
+  );
+  const stato = elemento("p", "Caricamento dei dati della stagione…");
+  stato.setAttribute("role", "status");
+
+  pagina.append(indietro, titolo, sottotitolo, stato);
+
+  try {
+    const stagione = await recuperaStagioneCompletaSerieA();
+
+    const concluse = stagione.filter(gara =>
+      gara.status === "final" &&
+      gara.home_team?.name &&
+      gara.away_team?.name &&
+      /^\d+$/.test(String(gara.home_score)) &&
+      /^\d+$/.test(String(gara.away_score)) &&
+      Number.isFinite(new Date(gara.start_time).getTime())
+    ).sort((a, b) =>
+      new Date(b.start_time) - new Date(a.start_time)
+    );
+
+    if (!concluse.length) {
+      stato.textContent = "Nessuna partita conclusa disponibile.";
+      return;
+    }
+
+    const classifica = calcolaClassificaSerieA(concluse);
+    const forma = calcolaClassificaSerieA(concluse, "totale", 5);
+
+    const golTotali = concluse.reduce(
+      (totale, gara) =>
+        totale + Number(gara.home_score) + Number(gara.away_score),
+      0
+    );
+
+    const mediaGol = (golTotali / concluse.length).toLocaleString(
+      "it-IT",
+      { minimumFractionDigits: 2, maximumFractionDigits: 2 }
+    );
+
+    const formatoData = new Intl.DateTimeFormat("it-IT", {
+      day: "2-digit",
+      month: "2-digit",
+      timeZone: "Europe/Tirane"
+    });
+
+    stato.textContent =
+      "Dati calcolati dai risultati conclusi caricati nel sito. " +
+      "Ultima partita inclusa del " +
+      formatoData.format(new Date(concluse[0].start_time)) + ".";
+
+    const numeri = elemento("div", null, "demo-numeri");
+
+    for (const [etichetta, valore] of [
+      ["Partite disputate", concluse.length],
+      ["Gol segnati", golTotali],
+      ["Media gol per partita", mediaGol],
+      ["Squadre con risultati", classifica.length]
+    ]) {
+      const card = elemento("div", null, "demo-card");
+      card.append(
+        elemento("span", etichetta),
+        elemento("strong", valore, "demo-numero")
+      );
+      numeri.appendChild(card);
+    }
+
+    const migliorAttacco = Math.max(...classifica.map(s => s.GF));
+    const migliorDifesa = Math.min(...classifica.map(s => s.GS));
+    const miglioriPuntiForma = Math.max(...forma.map(s => s.PT));
+
+    const record = elemento("div", null, "demo-record");
+
+    for (const [etichetta, squadre, dettaglio] of [
+      [
+        "Miglior attacco",
+        classifica.filter(s => s.GF === migliorAttacco),
+        `${migliorAttacco} gol segnati`
+      ],
+      [
+        "Miglior difesa",
+        classifica.filter(s => s.GS === migliorDifesa),
+        `${migliorDifesa} gol subiti`
+      ],
+      [
+        "Miglior forma",
+        forma.filter(s => s.PT === miglioriPuntiForma),
+        `${miglioriPuntiForma} punti nelle ultime 5`
+      ]
+    ]) {
+      const card = elemento("div", null, "demo-card");
+      card.append(
+        elemento("h2", etichetta),
+        elemento("strong", squadre.map(s => s.squadra).join(" · ")),
+        elemento("p", dettaglio)
+      );
+      record.appendChild(card);
+    }
+
+    const colonne = elemento("div", null, "demo-colonne");
+    const cardClassifica = elemento("section", null, "demo-card");
+    cardClassifica.appendChild(elemento("h2", "La corsa in campionato"));
+
+    const scorrimento = elemento("div");
+    scorrimento.style.overflowX = "auto";
+
+    const tabella = elemento("table");
+    tabella.setAttribute("aria-label", "Classifica Serie A");
+    const intestazione = tabella.createTHead().insertRow();
+
+    for (const testo of ["#", "Squadra", "PG", "V", "N", "P", "GF:GS", "DR", "PT"]) {
+      const cella = elemento("th", testo);
+      cella.scope = "col";
+      if (testo === "Squadra") cella.style.textAlign = "left";
+      intestazione.appendChild(cella);
+    }
+
+    const corpo = tabella.createTBody();
+
+    classifica.forEach((squadra, indice) => {
+      const riga = corpo.insertRow();
+
+      for (const [colonna, valore] of [
+        indice + 1, squadra.squadra, squadra.PG,
+        squadra.V, squadra.N, squadra.P,
+        `${squadra.GF}:${squadra.GS}`, squadra.DR, squadra.PT
+      ].entries()) {
+        const cella = riga.insertCell();
+
+        if (colonna === 1) {
+          cella.style.textAlign = "left";
+          cella.appendChild(creaSquadraConLogo(squadra.squadra));
+        } else {
+          cella.textContent = valore;
+        }
+
+        if (colonna === 8) {
+          cella.style.fontWeight = "800";
+          cella.style.color = "#93c5fd";
+        }
+      }
+    });
+
+    scorrimento.appendChild(tabella);
+    cardClassifica.appendChild(scorrimento);
+
+    const laterale = elemento("div", null, "demo-laterale");
+    const risultati = elemento("section", null, "demo-card");
+    risultati.appendChild(elemento("h2", "Ultimi risultati"));
+
+    for (const gara of concluse.slice(0, 10)) {
+      const riga = elemento("div", null, "demo-risultato");
+      riga.append(
+        elemento("span", formatoData.format(new Date(gara.start_time))),
+        elemento("span", `${gara.home_team.name} – ${gara.away_team.name}`),
+        elemento("strong", `${gara.home_score} – ${gara.away_score}`)
+      );
+      risultati.appendChild(riga);
+    }
+
+    const marcatori = elemento("section", null, "demo-card");
+    marcatori.append(
+      elemento("h2", "I protagonisti"),
+      elemento("p", "Qui inseriremo la classifica marcatori della stagione.")
+    );
+
+    laterale.append(risultati, marcatori);
+    colonne.append(cardClassifica, laterale);
+    pagina.append(numeri, record, colonne);
+  } catch {
+    stato.textContent =
+      "Impossibile caricare il riepilogo. Aggiorna la pagina per riprovare.";
+  }
+})();
 </script>
 </body>
 </html>
