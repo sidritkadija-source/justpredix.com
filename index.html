@@ -3157,6 +3157,123 @@ if (evento.tipo === "Cambio" && evento.infortunio === true) {
     });
   }
 }
+    const pannelloTestaATesta = document.createElement("section");
+pannelloTestaATesta.hidden = true;
+pannelloTestaATesta.setAttribute("aria-label", "Testa-a-testa");
+scheda.appendChild(pannelloTestaATesta);
+
+let testaATestaCaricato = false;
+let testaATestaInCaricamento = false;
+
+async function caricaTestaATesta() {
+  if (testaATestaCaricato || testaATestaInCaricamento) return;
+
+  testaATestaInCaricamento = true;
+  pannelloTestaATesta.textContent = "Caricamento dei risultati…";
+
+  try {
+    const dataPartita = new Date(partita.start_time).getTime();
+    if (!Number.isFinite(dataPartita)) {
+      throw new Error("Data partita non disponibile");
+    }
+
+    const stagione = await recuperaStagioneCompletaSerieA();
+
+    const concluse = stagione.filter(gara =>
+      gara.status === "final" &&
+      /^\d+$/.test(String(gara.home_score)) &&
+      /^\d+$/.test(String(gara.away_score)) &&
+      gara.home_team?.name &&
+      gara.away_team?.name &&
+      new Date(gara.start_time).getTime() < dataPartita
+    ).sort((a, b) =>
+      new Date(b.start_time) - new Date(a.start_time)
+    );
+
+    const coinvolge = (gara, squadra) =>
+      gara.home_team.name === squadra || gara.away_team.name === squadra;
+
+    const blocchi = [
+      [`Ultime 5 · ${casa}`, concluse.filter(gara => coinvolge(gara, casa))],
+      [`Ultime 5 · ${ospite}`, concluse.filter(gara => coinvolge(gara, ospite))],
+      ["Ultimi 5 scontri diretti", concluse.filter(gara =>
+        coinvolge(gara, casa) && coinvolge(gara, ospite)
+      )]
+    ];
+
+    pannelloTestaATesta.replaceChildren();
+
+    const formatoData = new Intl.DateTimeFormat("it-IT", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "2-digit",
+      timeZone: "Europe/Tirane"
+    });
+
+    for (const [nomeBlocco, gare] of blocchi) {
+      const blocco = document.createElement("section");
+      blocco.style.marginTop = "18px";
+
+      const titoloBlocco = document.createElement("h3");
+      titoloBlocco.textContent = nomeBlocco;
+      titoloBlocco.style.cssText =
+        "margin:0;padding:8px 12px;background:#203750;" +
+        "border-radius:6px;font-size:13px;text-transform:uppercase;";
+      blocco.appendChild(titoloBlocco);
+
+      for (const gara of gare.slice(0, 5)) {
+        const riga = document.createElement("div");
+        riga.style.cssText =
+          "display:grid;grid-template-columns:65px minmax(0,1fr) auto;" +
+          "gap:10px;align-items:center;padding:10px 8px;" +
+          "border-bottom:1px solid #30445e;font-size:13px;";
+
+        const data = document.createElement("span");
+        data.textContent = formatoData.format(new Date(gara.start_time));
+        data.style.color = "#bfcde2";
+
+        const squadre = document.createElement("div");
+        squadre.style.cssText = "display:grid;gap:4px;min-width:0;";
+        squadre.append(
+          creaSquadraConLogo(gara.home_team.name),
+          creaSquadraConLogo(gara.away_team.name)
+        );
+
+        const risultato = document.createElement("strong");
+        risultato.textContent = `${gara.home_score} – ${gara.away_score}`;
+
+        riga.append(data, squadre, risultato);
+        blocco.appendChild(riga);
+      }
+
+      if (gare.length < 5) {
+        const nota = document.createElement("p");
+        nota.textContent = gare.length
+          ? `${gare.length} partite disponibili nella stagione caricata.`
+          : "Nessun precedente disponibile nella stagione caricata.";
+        nota.style.cssText = "padding:8px;color:#bfcde2;font-size:12px;";
+        blocco.appendChild(nota);
+      }
+
+      pannelloTestaATesta.appendChild(blocco);
+    }
+
+    testaATestaCaricato = true;
+  } catch {
+    pannelloTestaATesta.textContent =
+      "Impossibile caricare i risultati. Riapri Testa-a-testa per riprovare.";
+  } finally {
+    testaATestaInCaricamento = false;
+  }
+}
+
+for (const pulsante of barraSchede.children) {
+  pulsante.addEventListener("click", () => {
+    const selezionato = pulsante.textContent.trim() === "Testa-a-testa";
+    pannelloTestaATesta.hidden = !selezionato;
+    if (selezionato) caricaTestaATesta();
+  });
+}
     paginaSerieA.after(scheda);
     paginaSerieA.style.display = "none";
     intestazione.focus();
