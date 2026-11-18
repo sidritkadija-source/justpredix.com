@@ -3787,6 +3787,24 @@ barraFiltri.style.cssText =
 });
 
 schedaClassificheSerieA.appendChild(barraFiltri);
+  const provaStileClassifica =
+  new URLSearchParams(location.search).get("demoClassifica") === "1";
+
+if (provaStileClassifica) {
+  for (const pulsante of barraTop.querySelectorAll("button")) {
+    pulsante.style.padding = "9px 14px";
+    pulsante.style.fontSize = "13px";
+    pulsante.style.fontWeight = "700";
+    pulsante.style.borderRadius = "6px";
+  }
+
+  for (const pulsante of barraFiltri.querySelectorAll("button")) {
+    pulsante.style.padding = "6px 10px";
+    pulsante.style.fontSize = "12px";
+    pulsante.style.fontWeight = "600";
+    pulsante.style.borderRadius = "5px";
+  }
+}
   if (vista === "FORMA") {
   const barraPeriodi = document.createElement("div");
   barraPeriodi.style.cssText =
