@@ -3212,6 +3212,7 @@ async function caricaTestaATesta() {
     for (const [nomeBlocco, gare, squadraEvidenziata] of blocchi) {
       const blocco = document.createElement("section");
       blocco.style.marginTop = "18px";
+      let numeroVisibili = 5;
       if (squadraEvidenziata === null) {
   const etichettaFiltro = document.createElement("label");
   etichettaFiltro.style.cssText =
@@ -3234,7 +3235,8 @@ async function caricaTestaATesta() {
         )
       : gare;
 
-    mostraGareBlocco(gareFiltrate);
+    numeroVisibili = 5;
+mostraGareBlocco(gareFiltrate);
   });
 }
 function mostraGareBlocco(gare) {
@@ -3246,7 +3248,7 @@ function mostraGareBlocco(gare) {
         "border-radius:6px;font-size:13px;text-transform:uppercase;";
       blocco.appendChild(titoloBlocco);
 
-      for (const gara of gare.slice(0, 5)) {
+      for (const gara of gare.slice(0, numeroVisibili)) {
   const riga = document.createElement("div");
   riga.style.cssText =
     "display:grid;grid-template-columns:65px 52px minmax(0,1fr) 24px 26px;" +
@@ -3322,6 +3324,22 @@ function mostraGareBlocco(gare) {
   blocco.appendChild(riga);
 }
 
+  if (numeroVisibili < Math.min(30, gare.length)) {
+  const mostraAltri = document.createElement("button");
+  mostraAltri.type = "button";
+  mostraAltri.textContent = "Mostra più incontri ﹀";
+  mostraAltri.style.cssText =
+    "display:block;margin:10px auto;padding:6px 12px;" +
+    "background:transparent;border:0;color:#edf4ff;" +
+    "font:inherit;font-size:13px;text-decoration:underline;cursor:pointer;";
+
+  mostraAltri.addEventListener("click", () => {
+    numeroVisibili = Math.min(numeroVisibili + 5, 30, gare.length);
+    mostraGareBlocco(gare);
+  });
+
+  blocco.appendChild(mostraAltri);
+}
       if (gare.length < 5) {
         const nota = document.createElement("p");
         nota.textContent = gare.length
