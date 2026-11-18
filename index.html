@@ -3221,30 +3221,80 @@ async function caricaTestaATesta() {
       blocco.appendChild(titoloBlocco);
 
       for (const gara of gare.slice(0, 5)) {
-        const riga = document.createElement("div");
-        riga.style.cssText =
-          "display:grid;grid-template-columns:65px minmax(0,1fr) auto;" +
-          "gap:10px;align-items:center;padding:10px 8px;" +
-          "border-bottom:1px solid #30445e;font-size:13px;";
+  const riga = document.createElement("div");
+  riga.style.cssText =
+    "display:grid;grid-template-columns:65px 52px minmax(0,1fr) 24px 26px;" +
+    "gap:10px;align-items:center;padding:10px 8px;" +
+    "border-bottom:1px solid #30445e;font-size:13px;";
 
-        const data = document.createElement("span");
-        data.textContent = formatoData.format(new Date(gara.start_time));
-        data.style.color = "#bfcde2";
+  const data = document.createElement("span");
+  data.textContent = formatoData.format(new Date(gara.start_time));
+  data.style.color = "#bfcde2";
 
-        const squadre = document.createElement("div");
-        squadre.style.cssText = "display:grid;gap:4px;min-width:0;";
-       for (const nomeSquadra of [gara.home_team.name, gara.away_team.name]) {
-  const squadra = creaSquadraConLogo(nomeSquadra);
-  squadra.style.fontWeight = nomeSquadra === squadraEvidenziata ? "700" : "400";
-  squadre.appendChild(squadra);
+  const competizione = document.createElement("div");
+  competizione.title = "Serie A";
+  competizione.style.cssText =
+    "display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;";
+
+  const bandiera = document.createElement("img");
+  bandiera.src = "https://flagcdn.com/w40/it.png";
+  bandiera.alt = "Italia";
+  bandiera.width = 20;
+  bandiera.height = 14;
+  bandiera.style.objectFit = "cover";
+
+  const sigla = document.createElement("abbr");
+  sigla.textContent = "SA";
+  sigla.title = "Serie A";
+  sigla.style.textDecoration = "none";
+
+  competizione.append(bandiera, sigla);
+
+  const squadre = document.createElement("div");
+  squadre.style.cssText = "display:grid;gap:4px;min-width:0;";
+
+  for (const nomeSquadra of [gara.home_team.name, gara.away_team.name]) {
+    const squadra = creaSquadraConLogo(nomeSquadra);
+    squadra.style.fontWeight =
+      nomeSquadra === squadraEvidenziata ? "700" : "400";
+    squadre.appendChild(squadra);
+  }
+
+  const risultato = document.createElement("div");
+  risultato.style.cssText =
+    "display:grid;gap:4px;text-align:center;font-weight:700;";
+
+  for (const gol of [gara.home_score, gara.away_score]) {
+    const punteggio = document.createElement("span");
+    punteggio.style.cssText =
+      "display:flex;align-items:center;justify-content:center;min-height:24px;";
+    punteggio.textContent = gol;
+    risultato.appendChild(punteggio);
+  }
+
+  const esito = document.createElement("span");
+
+  if (squadraEvidenziata) {
+    const inCasa = gara.home_team.name === squadraEvidenziata;
+    const golFatti = Number(inCasa ? gara.home_score : gara.away_score);
+    const golSubiti = Number(inCasa ? gara.away_score : gara.home_score);
+
+    const lettera = golFatti > golSubiti ? "V" : golFatti < golSubiti ? "P" : "N";
+    const colori = { V: "#00b050", N: "#64748b", P: "#e31335" };
+    const descrizioni = { V: "Vittoria", N: "Pareggio", P: "Sconfitta" };
+
+    esito.textContent = lettera;
+    esito.title = `${descrizioni[lettera]} · ${squadraEvidenziata}`;
+    esito.setAttribute("aria-label", esito.title);
+    esito.style.cssText =
+      "display:grid;place-items:center;width:25px;height:25px;" +
+      "border-radius:5px;color:white;font-weight:700;" +
+      `background:${colori[lettera]};`;
+  }
+
+  riga.append(data, competizione, squadre, risultato, esito);
+  blocco.appendChild(riga);
 }
-
-        const risultato = document.createElement("strong");
-        risultato.textContent = `${gara.home_score} – ${gara.away_score}`;
-
-        riga.append(data, squadre, risultato);
-        blocco.appendChild(riga);
-      }
 
       if (gare.length < 5) {
         const nota = document.createElement("p");
