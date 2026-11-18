@@ -2600,7 +2600,15 @@ function calcolaClassificaSerieA(partite, tipo = "totale", limite = Infinity) {
 
     const indietro = document.createElement("button");
     indietro.type = "button";
-    indietro.textContent = "← Torna al riepilogo";
+    const sezioneOrigine = paginaSerieA.querySelector(
+  '.league-page-tabs button[aria-current="true"]'
+)?.dataset.tab;
+
+indietro.textContent = sezioneOrigine === "risultati"
+  ? "← Torna ai risultati"
+  : sezioneOrigine === "calendario"
+    ? "← Torna al calendario"
+    : "← Torna al riepilogo";
     indietro.style.cssText =
       "margin-bottom:16px;padding:7px 12px;border:0;border-radius:6px;" +
       "background:#2563eb;color:white;cursor:pointer";
@@ -4297,8 +4305,9 @@ const ospite = creaSquadraConLogo(
           ? `${partita.home_score} - ${partita.away_score}`
           : "–";
 
-        riga.append(orario, squadre, risultato);
-        lista.appendChild(riga);
+       riga.append(orario, squadre, risultato);
+collegaSchedaPartitaSerieA(riga, partita);
+lista.appendChild(riga);
       });
 
       precedente.onclick = () => {
