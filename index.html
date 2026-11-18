@@ -3820,24 +3820,24 @@ const giornata16Conclusa =
 if (giornata16Conclusa) opzioniForma.push(20);
 
 opzioniForma.forEach(numero => {
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.textContent = String(numero);
-    btn.setAttribute("aria-pressed", String(limiteForma === numero));
-    btn.style.cssText =
-      "padding:10px 18px;border:none;border-radius:10px;font-weight:700;cursor:pointer;" +
-      (limiteForma === numero
-        ? "background:#D3133B;color:#fff;"
-        : "background:#e5e7eb;color:#475569;");
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.textContent = String(numero);
+  btn.setAttribute("aria-pressed", String(limiteForma === numero));
+  btn.style.cssText =
+    "padding:6px 10px;border:none;border-radius:5px;" +
+    "font-size:12px;font-weight:600;cursor:pointer;" +
+    (limiteForma === numero
+      ? "background:#D3133B;color:#fff;"
+      : "background:#e5e7eb;color:#475569;");
 
-    btn.onclick = () => {
-      limiteForma = numero;
-      renderClassifica("FORMA");
-    };
+  btn.onclick = () => {
+    limiteForma = numero;
+    renderClassifica("FORMA");
+  };
 
-    barraPeriodi.appendChild(btn);
-  });
-
+  barraPeriodi.appendChild(btn);
+});
   schedaClassificheSerieA.appendChild(barraPeriodi);
 }
         const contenitore = document.createElement("div");
