@@ -5513,7 +5513,21 @@ selezionaSchedaNations(
     document.querySelector('.league-item[data-league="135"]')?.click();
   });
 
-  const titolo = elemento("h1", "Riepilogo Serie A");
+  const titolo = elemento("div");
+titolo.style.cssText =
+  "display:flex;align-items:center;gap:16px;margin:20px 0 12px;";
+
+const logoSerieA = document.createElement("img");
+logoSerieA.src = "https://media.api-sports.io/football/leagues/135.png";
+logoSerieA.alt = "Logo Serie A";
+logoSerieA.style.cssText =
+  "width:64px;height:80px;object-fit:contain;flex-shrink:0;";
+
+const nomeSerieA = elemento("h1", "SERIE A 2026-2027");
+nomeSerieA.style.cssText =
+  "margin:0;font-size:clamp(22px,3vw,32px);font-weight:800;";
+
+titolo.append(logoSerieA, nomeSerieA);
   const sottotitolo = elemento(
     "p",
     "2026/27 · Anteprima del nuovo Riepilogo"
