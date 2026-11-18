@@ -3194,13 +3194,12 @@ async function caricaTestaATesta() {
       gara.home_team.name === squadra || gara.away_team.name === squadra;
 
     const blocchi = [
-      [`Ultime 5 · ${casa}`, concluse.filter(gara => coinvolge(gara, casa))],
-      [`Ultime 5 · ${ospite}`, concluse.filter(gara => coinvolge(gara, ospite))],
-      ["Ultimi 5 scontri diretti", concluse.filter(gara =>
-        coinvolge(gara, casa) && coinvolge(gara, ospite)
-      )]
-    ];
-
+  [`Ultime 5 · ${casa}`, concluse.filter(gara => coinvolge(gara, casa)), casa],
+  [`Ultime 5 · ${ospite}`, concluse.filter(gara => coinvolge(gara, ospite)), ospite],
+  ["Ultimi 5 scontri diretti", concluse.filter(gara =>
+    coinvolge(gara, casa) && coinvolge(gara, ospite)
+  ), null]
+];
     pannelloTestaATesta.replaceChildren();
 
     const formatoData = new Intl.DateTimeFormat("it-IT", {
@@ -3210,7 +3209,7 @@ async function caricaTestaATesta() {
       timeZone: "Europe/Tirane"
     });
 
-    for (const [nomeBlocco, gare] of blocchi) {
+    for (const [nomeBlocco, gare, squadraEvidenziata] of blocchi) {
       const blocco = document.createElement("section");
       blocco.style.marginTop = "18px";
 
@@ -3234,10 +3233,11 @@ async function caricaTestaATesta() {
 
         const squadre = document.createElement("div");
         squadre.style.cssText = "display:grid;gap:4px;min-width:0;";
-        squadre.append(
-          creaSquadraConLogo(gara.home_team.name),
-          creaSquadraConLogo(gara.away_team.name)
-        );
+       for (const nomeSquadra of [gara.home_team.name, gara.away_team.name]) {
+  const squadra = creaSquadraConLogo(nomeSquadra);
+  squadra.style.fontWeight = nomeSquadra === squadraEvidenziata ? "700" : "400";
+  squadre.appendChild(squadra);
+}
 
         const risultato = document.createElement("strong");
         risultato.textContent = `${gara.home_score} – ${gara.away_score}`;
