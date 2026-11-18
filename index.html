@@ -4256,9 +4256,9 @@ const ospite = creaSquadraConLogo(
             : "–";
 
           riga.append(orario, squadre, risultato);
+          collegaSchedaPartitaSerieA(riga, partita);
           lista.appendChild(riga);
-        });
-
+          
         precedente.onclick = () => {
           if (numero > 1) {
             numero--;
