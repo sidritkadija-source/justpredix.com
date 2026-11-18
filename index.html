@@ -5750,8 +5750,7 @@ if (gareGiornataDemo.length) {
 
   for (const [etichetta, valore] of [
     ["Partite disputate", gareGiornataDemo.length],
-    ["Gol della giornata", golGiornata],
-    ["Media gol per partita", mediaGiornata]
+    ["Gol della giornata", golGiornata]
   ]) {
     const card = elemento("div", null, "demo-card");
     card.append(
@@ -5761,6 +5760,11 @@ if (gareGiornataDemo.length) {
     if (etichetta === "Partite disputate") {
   card.style.width = "50%";
   card.style.boxSizing = "border-box";
+}
+    if (etichetta === "Gol della giornata") {
+  const media = elemento("p", `${mediaGiornata} gol di media per partita`);
+  media.style.cssText = "margin:6px 0 0;font-size:12px;color:#bfcde2;";
+  card.appendChild(media);
 }
     numeriGiornata.appendChild(card);
   }
