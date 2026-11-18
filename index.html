@@ -5839,7 +5839,8 @@ fasciaStagione.append(numeri, record, colonne);
   }
 
   const formazione = elemento("section", null, "demo-card");
-  formazione.style.marginBottom = "22px";
+  formazione.style.cssText =
+  "width:100%;max-width:680px;box-sizing:border-box;margin:0 auto 18px;padding:12px;";
   formazione.append(
     elemento(
       "h2",
