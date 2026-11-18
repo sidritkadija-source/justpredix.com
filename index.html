@@ -5513,7 +5513,7 @@ selezionaSchedaNations(
     document.querySelector('.league-item[data-league="135"]')?.click();
   });
 
-  const titolo = elemento("h1", "La stagione di Serie A");
+  const titolo = elemento("h1", "Riepilogo Serie A");
   const sottotitolo = elemento(
     "p",
     "2026/27 · Anteprima del nuovo Riepilogo"
@@ -5664,9 +5664,29 @@ selezionaSchedaNations(
 
     const laterale = elemento("div", null, "demo-laterale");
     const risultati = elemento("section", null, "demo-card");
-    risultati.appendChild(elemento("h2", "Ultimi risultati"));
+   const giornateDemo = organizzaGiornateSerieA(stagione);
 
-    for (const gara of concluse.slice(0, 10)) {
+const ultimaGiornataConclusa = Object.entries(giornateDemo)
+  .filter(([, gare]) =>
+    gare.length === 10 &&
+    gare.every(gara =>
+      gara.status === "final" &&
+      /^\d+$/.test(String(gara.home_score)) &&
+      /^\d+$/.test(String(gara.away_score))
+    )
+  )
+  .sort((a, b) => Number(b[0]) - Number(a[0]))[0];
+
+const numeroGiornataDemo = ultimaGiornataConclusa?.[0];
+const gareGiornataDemo = ultimaGiornataConclusa?.[1] || [];
+
+risultati.appendChild(elemento("h2", "Risultati della giornata"));
+
+if (!gareGiornataDemo.length) {
+  risultati.appendChild(elemento("p", "Nessuna giornata completa disponibile."));
+}
+
+for (const gara of gareGiornataDemo) {
       const riga = elemento("div", null, "demo-risultato");
       riga.append(
         elemento("span", formatoData.format(new Date(gara.start_time))),
@@ -5682,9 +5702,61 @@ selezionaSchedaNations(
       elemento("p", "Qui inseriremo la classifica marcatori della stagione.")
     );
 
-    laterale.append(risultati, marcatori);
-    colonne.append(cardClassifica, laterale);
-    pagina.append(numeri, record, colonne);
+    const fasciaGiornata = elemento("section");
+fasciaGiornata.setAttribute("aria-label", "Riepilogo della giornata");
+fasciaGiornata.style.cssText =
+  "margin-top:28px;padding-bottom:28px;border-bottom:2px solid #30445e;";
+
+fasciaGiornata.appendChild(
+  elemento(
+    "h2",
+    numeroGiornataDemo
+      ? `Riepilogo della giornata · ${numeroGiornataDemo}ª`
+      : "Riepilogo della giornata"
+  )
+);
+
+const numeriGiornata = elemento("div", null, "demo-numeri");
+
+if (gareGiornataDemo.length) {
+  const golGiornata = gareGiornataDemo.reduce(
+    (totale, gara) =>
+      totale + Number(gara.home_score) + Number(gara.away_score),
+    0
+  );
+
+  const mediaGiornata = (golGiornata / gareGiornataDemo.length)
+    .toLocaleString("it-IT", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+
+  for (const [etichetta, valore] of [
+    ["Partite disputate", gareGiornataDemo.length],
+    ["Gol della giornata", golGiornata],
+    ["Media gol per partita", mediaGiornata]
+  ]) {
+    const card = elemento("div", null, "demo-card");
+    card.append(
+      elemento("span", etichetta),
+      elemento("strong", valore, "demo-numero")
+    );
+    numeriGiornata.appendChild(card);
+  }
+}
+
+fasciaGiornata.append(numeriGiornata, risultati);
+
+const fasciaStagione = elemento("section");
+fasciaStagione.setAttribute("aria-label", "Riepilogo della stagione");
+fasciaStagione.style.marginTop = "28px";
+fasciaStagione.appendChild(elemento("h2", "Riepilogo della stagione"));
+
+laterale.appendChild(marcatori);
+colonne.append(cardClassifica, laterale);
+fasciaStagione.append(numeri, record, colonne);
+
+pagina.append(fasciaGiornata, fasciaStagione);
   } catch {
     stato.textContent =
       "Impossibile caricare il riepilogo. Aggiorna la pagina per riprovare.";
