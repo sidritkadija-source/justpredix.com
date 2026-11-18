@@ -2574,6 +2574,17 @@ function calcolaClassificaSerieA(partite, tipo = "totale", limite = Infinity) {
   if (!casa || !ospite || !paginaSerieA) return;
 
   const titolo = `${casa} – ${ospite}`;
+  function salvaSchedaPartita(nomeScheda) {
+  try {
+    sessionStorage.setItem("justpredix_partita_aperta", JSON.stringify({
+      indirizzo: location.href,
+      partita,
+      scheda: nomeScheda
+    }));
+  } catch (errore) {
+    console.warn("Impossibile salvare la scheda partita", errore);
+  }
+}
   riga.style.cursor = "pointer";
   riga.tabIndex = 0;
   riga.setAttribute("role", "button");
@@ -2612,6 +2623,7 @@ function calcolaClassificaSerieA(partite, tipo = "totale", limite = Infinity) {
     const displayPrecedente = paginaSerieA.style.display;
     indietro.addEventListener("click", () => {
       scheda.remove();
+      sessionStorage.removeItem("justpredix_partita_aperta");
       paginaSerieA.style.display = displayPrecedente;
       riga.focus();
     });
@@ -3368,6 +3380,13 @@ for (const pulsante of barraSchede.children) {
     const selezionato = pulsante.textContent.trim() === "Testa-a-testa";
     pannelloTestaATesta.hidden = !selezionato;
     if (selezionato) caricaTestaATesta();
+  });
+}
+    salvaSchedaPartita("Partita");
+
+for (const pulsante of barraSchede.children) {
+  pulsante.addEventListener("click", () => {
+    salvaSchedaPartita(pulsante.textContent.trim());
   });
 }
     paginaSerieA.after(scheda);
@@ -5163,6 +5182,43 @@ selezionaSchedaNations(
   apriCalendario();
 }
 }
+  (() => {
+  const navigazione = performance.getEntriesByType("navigation")[0];
+  if (navigazione?.type !== "reload") return;
+
+  let salvata;
+
+  try {
+    salvata = JSON.parse(
+      sessionStorage.getItem("justpredix_partita_aperta") || "null"
+    );
+  } catch {
+    return;
+  }
+
+  if (!salvata || salvata.indirizzo !== location.href) return;
+
+  const partita = salvata.partita;
+  if (!partita?.home_team?.name || !partita?.away_team?.name) return;
+
+  const paginaSerieA = document.getElementById("league-detail");
+  const voceSerieA = document.querySelector('.league-item[data-league="135"]');
+  if (!paginaSerieA || !voceSerieA) return;
+
+  if (getComputedStyle(paginaSerieA).display === "none") {
+    voceSerieA.click();
+  }
+
+  const rigaRipristino = document.createElement("div");
+  collegaSchedaPartitaSerieA(rigaRipristino, partita);
+  rigaRipristino.click();
+
+  const schedaAperta = document.getElementById("scheda-partita-serie-a");
+  const pulsante = [...(schedaAperta?.querySelectorAll("button") || [])]
+    .find(elemento => elemento.textContent.trim() === salvata.scheda);
+
+  pulsante?.click();
+})();
 </script>
 </body>
 </html>
