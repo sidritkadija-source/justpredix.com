@@ -3212,7 +3212,33 @@ async function caricaTestaATesta() {
     for (const [nomeBlocco, gare, squadraEvidenziata] of blocchi) {
       const blocco = document.createElement("section");
       blocco.style.marginTop = "18px";
+      if (squadraEvidenziata === null) {
+  const etichettaFiltro = document.createElement("label");
+  etichettaFiltro.style.cssText =
+    "display:flex;align-items:center;gap:8px;margin-top:18px;" +
+    "cursor:pointer;font-size:13px;";
 
+  const filtroCasa = document.createElement("input");
+  filtroCasa.type = "checkbox";
+  filtroCasa.style.cssText =
+    "width:18px;height:18px;margin:0;accent-color:#2563eb;";
+
+  etichettaFiltro.append(filtroCasa, `Solo in casa del ${casa}`);
+  pannelloTestaATesta.appendChild(etichettaFiltro);
+
+  filtroCasa.addEventListener("change", () => {
+    const gareFiltrate = filtroCasa.checked
+      ? gare.filter(gara =>
+          gara.home_team.name === casa &&
+          gara.away_team.name === ospite
+        )
+      : gare;
+
+    mostraGareBlocco(gareFiltrate);
+  });
+}
+function mostraGareBlocco(gare) {
+  blocco.replaceChildren();
       const titoloBlocco = document.createElement("h3");
       titoloBlocco.textContent = nomeBlocco;
       titoloBlocco.style.cssText =
@@ -3304,7 +3330,9 @@ async function caricaTestaATesta() {
         nota.style.cssText = "padding:8px;color:#bfcde2;font-size:12px;";
         blocco.appendChild(nota);
       }
+}
 
+   mostraGareBlocco(gare);
       pannelloTestaATesta.appendChild(blocco);
     }
 
