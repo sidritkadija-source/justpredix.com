@@ -4013,16 +4013,25 @@ if (pulsanteCalendario) {
       }
 
       const giornate = organizzaGiornateSerieA(partite);
-      let numero = 1;
+      const adesso = Date.now();
 
-      // Seleziona inizialmente la giornata attuale
-      for (let n = 1; n <= 38; n++) {
-        if (giornate[n].some(p =>
-          new Date(p.start_time).getTime() <= Date.now()
-        )) {
-          numero = n;
-        }
-      }
+const gareConGiornata = Object.entries(giornate)
+  .flatMap(([giornata, gare]) =>
+    gare.map(gara => ({ giornata: Number(giornata), gara }))
+  )
+  .sort((a, b) =>
+    new Date(a.gara.start_time) - new Date(b.gara.start_time)
+  );
+
+const prossima = gareConGiornata.find(
+  ({ gara }) => gara.status === "in_progress"
+) || gareConGiornata.find(
+  ({ gara }) =>
+    gara.status === "scheduled" &&
+    new Date(gara.start_time).getTime() >= adesso
+);
+
+let numero = prossima ? prossima.giornata : 38;
 
       function visualizzaCalendario() {
         lista.replaceChildren();
