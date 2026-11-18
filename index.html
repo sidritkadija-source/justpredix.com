@@ -5758,6 +5758,10 @@ if (gareGiornataDemo.length) {
       elemento("span", etichetta),
       elemento("strong", valore, "demo-numero")
     );
+    if (etichetta === "Partite disputate") {
+  card.style.width = "50%";
+  card.style.boxSizing = "border-box";
+}
     numeriGiornata.appendChild(card);
   }
 }
