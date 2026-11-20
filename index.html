@@ -3198,6 +3198,80 @@ async function caricaTestaATesta() {
     }
 
     const stagione = await recuperaStagioneCompletaSerieA();
+    const dateStagione = stagione
+  .map(gara => new Date(gara.start_time).getTime())
+  .filter(data => Number.isFinite(data))
+  .sort((a, b) => a - b);
+
+const turniStagione = Object.values(organizzaGiornateSerieA(stagione));
+
+const giornateCompletate = turniStagione.filter(gare =>
+  gare.length === 10 &&
+  gare.every(gara =>
+    gara.status === "final" &&
+    /^\d+$/.test(String(gara.home_score)) &&
+    /^\d+$/.test(String(gara.away_score))
+  )
+).length;
+
+const totaleGiornate = 38;
+const avanzamento = Math.min(giornateCompletate / totaleGiornate, 1);
+
+const progressoStagione = elemento("div");
+progressoStagione.style.cssText = "margin:18px 0 22px;";
+
+const barraStagione = elemento("div");
+barraStagione.setAttribute("role", "progressbar");
+barraStagione.setAttribute("aria-label", "Avanzamento della stagione");
+barraStagione.setAttribute("aria-valuemin", "0");
+barraStagione.setAttribute("aria-valuemax", String(totaleGiornate));
+barraStagione.setAttribute("aria-valuenow", String(giornateCompletate));
+barraStagione.setAttribute(
+  "aria-valuetext",
+  `${giornateCompletate} giornate concluse su ${totaleGiornate}`
+);
+barraStagione.style.cssText =
+  "height:7px;background:#39475b;border-radius:8px;overflow:hidden;";
+
+const riempimentoBarra = elemento("div");
+riempimentoBarra.style.cssText =
+  `width:${avanzamento * 100}%;height:100%;` +
+  "background:#35a4ff;border-radius:8px;";
+barraStagione.appendChild(riempimentoBarra);
+
+const dateBarra = elemento("div");
+dateBarra.style.cssText =
+  "display:flex;justify-content:space-between;gap:12px;" +
+  "margin-top:7px;font-size:12px;color:#bfcde2;";
+
+const formatoDateStagione = new Intl.DateTimeFormat("it-IT", {
+  day: "numeric",
+  month: "short",
+  timeZone: "Europe/Tirane"
+});
+
+const inizioStagione = dateStagione.length
+  ? formatoDateStagione.format(new Date(dateStagione[0]))
+  : "Inizio da confermare";
+
+const fineStagione = dateStagione.length
+  ? formatoDateStagione.format(new Date(dateStagione[dateStagione.length - 1]))
+  : "Fine da confermare";
+
+dateBarra.append(
+  elemento("span", inizioStagione),
+  elemento("span", fineStagione)
+);
+
+const conteggioGiornate = elemento(
+  "p",
+  `${giornateCompletate} giornate concluse su ${totaleGiornate}`
+);
+conteggioGiornate.style.cssText =
+  "margin:6px 0 0;text-align:center;font-size:12px;";
+
+progressoStagione.append(barraStagione, dateBarra, conteggioGiornate);
+pagina.insertBefore(progressoStagione, sottotitolo);
 
     const concluse = stagione.filter(gara =>
       gara.status === "final" &&
