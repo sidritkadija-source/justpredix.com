@@ -6104,6 +6104,68 @@ aggiungiStatisticheRiepilogo(
   concluse,
   "stagione"
 );
+    const stileDisposizione = elemento("style");
+stileDisposizione.textContent = `
+  #demo-riepilogo-stagione .demo-statistiche-unite {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin: 18px 0;
+  }
+
+  #demo-riepilogo-stagione .demo-dettagli-giornata {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.7fr);
+    gap: 18px;
+    align-items: start;
+  }
+
+  @media (max-width: 800px) {
+    #demo-riepilogo-stagione .demo-dettagli-giornata {
+      grid-template-columns: 1fr;
+    }
+  }
+`;
+pagina.appendChild(stileDisposizione);
+
+for (const fascia of [fasciaGiornata, fasciaStagione]) {
+  const gruppiNumeri = [...fascia.children].filter(
+    nodo => nodo.classList.contains("demo-numeri")
+  );
+
+  const statisticheUnite = elemento("div", null, "demo-statistiche-unite");
+
+  for (const gruppo of gruppiNumeri) {
+    for (const card of [...gruppo.children]) {
+      card.style.width = "100%";
+      card.style.boxSizing = "border-box";
+      statisticheUnite.appendChild(card);
+    }
+
+    gruppo.remove();
+  }
+
+  fascia.querySelector("h2").after(statisticheUnite);
+}
+
+const formazioneGiornata = fasciaGiornata.lastElementChild;
+const formazioneStagione = fasciaStagione.lastElementChild;
+
+risultati.style.cssText =
+  "width:100%;max-width:none;box-sizing:border-box;" +
+  "margin:0;padding:12px 16px;";
+
+for (const formazione of [formazioneGiornata, formazioneStagione]) {
+  formazione.style.cssText =
+    "width:100%;max-width:none;box-sizing:border-box;" +
+    "margin:0;padding:12px;";
+}
+
+const dettagliGiornata = elemento("div", null, "demo-dettagli-giornata");
+dettagliGiornata.append(risultati, formazioneGiornata);
+fasciaGiornata.appendChild(dettagliGiornata);
+
+laterale.appendChild(formazioneStagione);
 pagina.append(fasciaGiornata, fasciaStagione);
   } catch {
     stato.textContent =
