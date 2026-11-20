@@ -5956,150 +5956,55 @@ fasciaStagione.append(numeri, record, colonne);
     else pareggi++;
   }
 
-  const esempi = ambito === "giornata"
-    ? {
-        ammonizioni: 46,
-        espulsioni: 3,
-        rigori: 3,
-        rigoriAssegnati: 4,
-        spettatori: 285000,
-        partiteSpettatori: 10
-      }
-    : {
-        ammonizioni: 492,
-        espulsioni: 28,
-        rigori: 35,
-        rigoriAssegnati: 44,
-        spettatori: 3135000,
-        partiteSpettatori: 110
-      };
+const formatoNumero = new Intl.NumberFormat("it-IT");
 
-  const formatoNumero = new Intl.NumberFormat("it-IT");
-  const mediaSpettatori = Math.round(
-    esempi.spettatori / esempi.partiteSpettatori
-  );
+const dati = [
+  ["Vittorie in casa", gare.length ? vittorieCasa : null],
+  ["Vittorie in trasferta", gare.length ? vittorieOspite : null],
+  ["Pareggi", gare.length ? pareggi : null],
+  ["Ammonizioni", null],
+  ["Espulsioni", null],
+  ["Rigori assegnati", null],
+  ["Spettatori totali", null]
+];
 
-  const dati = [
-    ["Vittorie in casa", gare.length ? vittorieCasa : "—", false],
-    ["Vittorie in trasferta", gare.length ? vittorieOspite : "—", false],
-    ["Pareggi", gare.length ? pareggi : "—", false],
-    ["Ammonizioni", esempi.ammonizioni, true],
-    ["Espulsioni", esempi.espulsioni, true],
-    ["Rigori assegnati", esempi.rigoriAssegnati, true],
-   ["Spettatori totali", esempi.spettatori, true]
-  ];
+for (const [etichetta, valore] of dati) {
+  const card = elemento("div", null, "demo-card");
+  card.appendChild(elemento("span", etichetta));
 
-  for (const [etichetta, valore, dimostrativo] of dati) {
-    const card = elemento("div", null, "demo-card");
-    card.append(
-      elemento("span", etichetta),
-      elemento(
-        "strong",
-        typeof valore === "number" ? formatoNumero.format(valore) : valore,
-        "demo-numero"
-      )
+  if (valore === null) {
+    const messaggio = elemento("p", "Dati non disponibili");
+    messaggio.style.cssText =
+      "margin:12px 0 0;font-size:13px;color:#94a3b8;";
+    card.appendChild(messaggio);
+  } else {
+    card.appendChild(
+      elemento("strong", formatoNumero.format(valore), "demo-numero")
     );
 
-    if (!dimostrativo && typeof valore === "number" && gare.length > 0) {
-  const percentuale = (valore / gare.length).toLocaleString("it-IT", {
-    style: "percent",
-    maximumFractionDigits: 1
-  });
+    const percentuale = (valore / gare.length).toLocaleString("it-IT", {
+      style: "percent",
+      maximumFractionDigits: 1
+    });
 
-  const testoPercentuale = elemento("p", percentuale);
-  testoPercentuale.style.cssText =
-    "margin:4px 0 0;font-size:14px;font-weight:600;color:#93c5fd;";
-
-  card.appendChild(testoPercentuale);
-}
-    if (etichetta === "Rigori assegnati") {
-  const percentualeRigori = esempi.rigoriAssegnati > 0
-    ? (esempi.rigori / esempi.rigoriAssegnati).toLocaleString("it-IT", {
-        style: "percent",
-        maximumFractionDigits: 1
-      })
-    : "—";
-
-  const dettaglioRigori = elemento(
-    "p",
-    `${esempi.rigori} (${percentualeRigori}) realizzati`
-  );
-  dettaglioRigori.style.cssText =
-    "margin:4px 0 0;font-size:12px;color:#bfcde2;";
-  card.appendChild(dettaglioRigori);
-}
-    if (etichetta === "Ammonizioni") {
-  const mediaAmmonizioni = (
-    esempi.ammonizioni / esempi.partiteSpettatori
-  ).toLocaleString("it-IT", {
-    maximumFractionDigits: 2
-  });
-
-  const media = elemento(
-    "p",
-    `${mediaAmmonizioni} ammonizioni di media per partita`
-  );
-  media.style.cssText = "margin:4px 0 0;font-size:12px;color:#bfcde2;";
-  card.appendChild(media);
-}
-    if (etichetta === "Spettatori totali") {
-  const media = elemento(
-    "p",
-    `${formatoNumero.format(mediaSpettatori)} spettatori di media per partita`
-  );
-  media.style.cssText = "margin:4px 0 0;font-size:12px;color:#bfcde2;";
-  card.appendChild(media);
-}
-    if (dimostrativo) {
-      const nota = elemento("p", "Esempio dimostrativo");
-      nota.style.cssText = "margin:8px 0 0;font-size:11px;";
-      card.appendChild(nota);
-    }
-
-    statistiche.appendChild(card);
+    const dettaglio = elemento("p", percentuale);
+    dettaglio.style.cssText =
+      "margin:4px 0 0;font-size:14px;font-weight:600;color:#93c5fd;";
+    card.appendChild(dettaglio);
   }
 
-      const riempimento = elemento("div", null, "demo-card");
-riempimento.appendChild(elemento("span", "% spettatori"));
-
-const esempiRiempimento = ambito === "giornata"
-  ? [
-      { etichetta: "Più alta", partita: "Squadra A – Squadra B", percentuale: 98.4 },
-      { etichetta: "Più bassa", partita: "Squadra C – Squadra D", percentuale: 56.2 }
-    ]
-  : [
-      { etichetta: "Più alta", partita: "Squadra E – Squadra F", percentuale: 99.7 },
-      { etichetta: "Più bassa", partita: "Squadra G – Squadra H", percentuale: 42.8 }
-    ];
-
-for (const dato of esempiRiempimento) {
-  const riga = elemento("div");
-  riga.style.cssText = "margin-top:12px;";
-
-  const percentuale = dato.percentuale.toLocaleString("it-IT", {
-    minimumFractionDigits: 1,
-    maximumFractionDigits: 1
-  });
-
-  const valore = elemento("strong", `${dato.etichetta} · ${percentuale}%`);
-  valore.style.cssText =
-    "display:block;font-size:16px;color:" +
-    (dato.etichetta === "Più alta" ? "#4ade80" : "#ff526e");
-
-  const incontro = elemento("span", dato.partita);
-  incontro.style.cssText = "display:block;margin-top:3px;font-size:12px;";
-
-  riga.append(valore, incontro);
-  riempimento.appendChild(riga);
+  statistiche.appendChild(card);
 }
 
-const notaRiempimento = elemento(
-  "p",
-  "Riempimento dello stadio · Esempi dimostrativi"
-);
-notaRiempimento.style.cssText = "margin:12px 0 0;font-size:11px;";
-riempimento.appendChild(notaRiempimento);
-      statistiche.appendChild(riempimento);
+const riempimento = elemento("div", null, "demo-card");
+riempimento.appendChild(elemento("span", "% spettatori"));
+
+const messaggioRiempimento = elemento("p", "Dati non disponibili");
+messaggioRiempimento.style.cssText =
+  "margin:12px 0 0;font-size:13px;color:#94a3b8;";
+
+riempimento.appendChild(messaggioRiempimento);
+statistiche.appendChild(riempimento);
 
 const gareOverUnder = gare.filter(gara =>
   gara.status === "final" &&
