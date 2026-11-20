@@ -5924,6 +5924,20 @@ fasciaStagione.append(numeri, record, colonne);
 
   card.appendChild(testoPercentuale);
 }
+    if (etichetta === "Ammonizioni") {
+  const mediaAmmonizioni = (
+    esempi.ammonizioni / esempi.partiteSpettatori
+  ).toLocaleString("it-IT", {
+    maximumFractionDigits: 2
+  });
+
+  const media = elemento(
+    "p",
+    `${mediaAmmonizioni} ammonizioni di media per partita`
+  );
+  media.style.cssText = "margin:4px 0 0;font-size:12px;color:#bfcde2;";
+  card.appendChild(media);
+}
     if (etichetta === "Spettatori totali") {
   const media = elemento(
     "p",
