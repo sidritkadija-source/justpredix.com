@@ -2752,6 +2752,8 @@ barraPeriodiQuote.setAttribute("aria-label", "Periodo delle quote");
 barraPeriodiQuote.style.cssText =
   "margin-top:8px;padding:8px 0;border-bottom:1px solid #30445e;";
 
+let sogliaGolQuote = "2,5";
+
 function mostraTabellaQuote() {
   contenutoQuote.replaceChildren();
   barraPeriodiQuote.hidden = mercatoQuoteAttivo === "PT/FT";
@@ -2763,11 +2765,53 @@ function mostraTabellaQuote() {
     pulsante.style.color = attivo ? "#fff" : "#94a3b8";
   }
 
-  if (mercatoQuoteAttivo !== "1X2") {
+  const overUnder = mercatoQuoteAttivo === "Over/Under";
+
+  if (mercatoQuoteAttivo !== "1X2" && !overUnder) {
     contenutoQuote.textContent =
       mercatoQuoteAttivo + " · Quote non ancora disponibili";
     return;
   }
+
+  if (overUnder) {
+    const barraSoglie = document.createElement("div");
+    barraSoglie.setAttribute("role", "group");
+    barraSoglie.setAttribute("aria-label", "Soglia dei gol");
+    barraSoglie.style.cssText =
+      "display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;";
+
+    for (const soglia of ["0,5", "1,5", "2,5", "3,5", "4,5", "5,5", "6,5"]) {
+      const pulsante = document.createElement("button");
+      const attivo = soglia === sogliaGolQuote;
+      pulsante.type = "button";
+      pulsante.textContent = soglia;
+      pulsante.setAttribute("aria-pressed", String(attivo));
+      pulsante.style.cssText =
+        "padding:7px 12px;border:0;border-radius:5px;" +
+        "font-family:inherit;font-size:12px;font-weight:700;" +
+        "cursor:pointer;color:" + (attivo ? "#fff" : "#bfcde2") + ";" +
+        "background:" + (attivo ? "#D3133B" : "#203750") + ";";
+
+      pulsante.addEventListener("click", () => {
+        sogliaGolQuote = soglia;
+        mostraTabellaQuote();
+
+        const gruppo = contenutoQuote.querySelector(
+          '[aria-label="Soglia dei gol"]'
+        );
+        [...gruppo.children]
+          .find(bottone => bottone.textContent === soglia)?.focus();
+      });
+
+      barraSoglie.appendChild(pulsante);
+    }
+
+    contenutoQuote.appendChild(barraSoglie);
+  }
+
+  const colonne = overUnder
+    ? ["BOOKMAKER", "OVER " + sogliaGolQuote, "UNDER " + sogliaGolQuote]
+    : ["BOOKMAKER", "1", "X", "2"];
 
   const scorrimento = document.createElement("div");
   scorrimento.style.overflowX = "auto";
@@ -2775,7 +2819,9 @@ function mostraTabellaQuote() {
   const tabella = document.createElement("table");
   tabella.setAttribute(
     "aria-label",
-    "Confronto quote 1X2 · " + periodoQuoteAttivo
+    "Confronto quote " + mercatoQuoteAttivo +
+    (overUnder ? " " + sogliaGolQuote : "") +
+    " · " + periodoQuoteAttivo
   );
   tabella.style.cssText =
     "width:100%;min-width:360px;border-collapse:collapse;" +
@@ -2783,14 +2829,20 @@ function mostraTabellaQuote() {
 
   const testata = tabella.createTHead().insertRow();
 
-  ["BOOKMAKER", "1", "X", "2"].forEach((testo, indice) => {
+  colonne.forEach((testo, indice) => {
     const cella = document.createElement("th");
     cella.scope = "col";
     cella.textContent = testo;
+
+    const larghezza = indice === 0
+      ? "46%"
+      : overUnder ? "27%" : "18%";
+
     cella.style.cssText =
       "padding:10px 8px;background:#203750;color:#bfcde2;" +
-      "font-size:11px;text-align:" +
-      (indice === 0 ? "left;width:46%;" : "center;width:18%;");
+      "font-size:11px;width:" + larghezza + ";text-align:" +
+      (indice === 0 ? "left;" : "center;");
+
     testata.appendChild(cella);
   });
 
@@ -2807,7 +2859,7 @@ function mostraTabellaQuote() {
       "font-size:13px;border-bottom:1px solid #30445e;";
     riga.appendChild(bookmaker);
 
-    for (let indice = 0; indice < 3; indice++) {
+    for (let indice = 1; indice < colonne.length; indice++) {
       const cella = riga.insertCell();
       cella.style.cssText =
         "padding:14px 8px;text-align:center;" +
