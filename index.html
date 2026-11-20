@@ -2767,8 +2767,14 @@ function mostraTabellaQuote() {
 
   const overUnder = mercatoQuoteAttivo === "Over/Under";
   const golNoGol = mercatoQuoteAttivo === "Gol/No Gol";
+  const doppiaChance = mercatoQuoteAttivo === "Doppia chance";
 
-  if (mercatoQuoteAttivo !== "1X2" && !overUnder && !golNoGol) {
+  if (
+  mercatoQuoteAttivo !== "1X2" &&
+  !overUnder &&
+  !golNoGol &&
+  !doppiaChance
+) {
     contenutoQuote.textContent =
       mercatoQuoteAttivo + " · Quote non ancora disponibili";
     return;
@@ -2814,7 +2820,9 @@ const colonne = overUnder
   ? ["BOOKMAKER", "OVER " + sogliaGolQuote, "UNDER " + sogliaGolQuote]
   : golNoGol
     ? ["BOOKMAKER", "GOL", "NO GOL"]
-    : ["BOOKMAKER", "1", "X", "2"];
+    : doppiaChance
+      ? ["BOOKMAKER", "1X", "12", "X2"]
+      : ["BOOKMAKER", "1", "X", "2"];
 
   const scorrimento = document.createElement("div");
   scorrimento.style.overflowX = "auto";
