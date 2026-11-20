@@ -5909,7 +5909,49 @@ const notaRiempimento = elemento(
 notaRiempimento.style.cssText = "margin:12px 0 0;font-size:11px;";
 riempimento.appendChild(notaRiempimento);
 
-statistiche.appendChild(riempimento);
+const gareOverUnder = gare.filter(gara =>
+  gara.status === "final" &&
+  /^\d+$/.test(String(gara.home_score)) &&
+  /^\d+$/.test(String(gara.away_score))
+);
+
+const totaleOver = gareOverUnder.filter(gara =>
+  Number(gara.home_score) + Number(gara.away_score) >= 3
+).length;
+
+const totaleUnder = gareOverUnder.length - totaleOver;
+
+const riquadroOverUnder = elemento("div", null, "demo-card");
+riquadroOverUnder.appendChild(elemento("span", "Over/Under 2,5"));
+
+for (const [etichetta, totale] of [
+  ["Over 2,5", totaleOver],
+  ["Under 2,5", totaleUnder]
+]) {
+  const riga = elemento("div");
+  riga.style.cssText =
+    "display:flex;justify-content:space-between;align-items:center;" +
+    "gap:8px;margin-top:12px;font-size:13px;";
+
+  const percentuale = gareOverUnder.length
+    ? (totale / gareOverUnder.length).toLocaleString("it-IT", {
+        style: "percent",
+        maximumFractionDigits: 1
+      })
+    : "—";
+
+  riga.append(
+    elemento("span", etichetta),
+    elemento(
+      "strong",
+      gareOverUnder.length ? `${totale} · ${percentuale}` : "—"
+    )
+  );
+
+  riquadroOverUnder.appendChild(riga);
+}
+
+statistiche.appendChild(riquadroOverUnder);
   const formazione = elemento("section", null, "demo-card");
   formazione.style.cssText =
   "width:100%;max-width:680px;box-sizing:border-box;margin:0 auto 18px;padding:12px;";
