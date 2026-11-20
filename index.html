@@ -5368,9 +5368,8 @@ selezionaSchedaNations(
 
   pulsante?.click();
 })();
-  (async () => {
-  const parametri = new URLSearchParams(location.search);
-  if (parametri.get("demoRiepilogo") !== "1") return;
+ async function apriRiepilogoSerieA() {
+  if (document.getElementById("demo-riepilogo-stagione")) return;
 
   const layout = document.querySelector(".home-layout");
   if (!layout) return;
@@ -6222,7 +6221,11 @@ pagina.append(fasciaGiornata, fasciaStagione);
     stato.textContent =
       "Impossibile caricare il riepilogo. Aggiorna la pagina per riprovare.";
   }
-})();
+}
+
+if (new URLSearchParams(location.search).get("demoRiepilogo") === "1") {
+  apriRiepilogoSerieA();
+}
 </script>
 </body>
 </html>
