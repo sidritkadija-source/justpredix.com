@@ -5658,8 +5658,7 @@ pagina.insertBefore(progressoStagione, sottotitolo);
 
     for (const [etichetta, valore] of [
       ["Partite disputate", concluse.length],
-      ["Gol segnati", golTotali],
-      ["Media gol per partita", mediaGol],
+    ["Gol segnati", golTotali],
       ["Squadre con risultati", classifica.length]
     ]) {
       const card = elemento("div", null, "demo-card");
@@ -5667,6 +5666,11 @@ pagina.insertBefore(progressoStagione, sottotitolo);
         elemento("span", etichetta),
         elemento("strong", valore, "demo-numero")
       );
+      if (etichetta === "Gol segnati") {
+  const media = elemento("p", `${mediaGol} gol di media per partita`);
+  media.style.cssText = "margin:4px 0 0;font-size:12px;color:#bfcde2;";
+  card.appendChild(media);
+}
       numeri.appendChild(card);
     }
 
