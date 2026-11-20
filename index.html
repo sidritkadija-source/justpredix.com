@@ -5790,11 +5790,93 @@ for (const gara of gareGiornataDemo) {
       risultati.appendChild(riga);
     }
 
-    const marcatori = elemento("section", null, "demo-card");
-    marcatori.append(
-      elemento("h2", "I protagonisti"),
-      elemento("p", "Qui inseriremo la classifica marcatori della stagione.")
+   const marcatori = elemento("section", null, "demo-card");
+marcatori.appendChild(elemento("h2", "Top 10 marcatori"));
+
+const statoMarcatori = elemento("p", "Caricamento marcatori...");
+marcatori.appendChild(statoMarcatori);
+
+async function caricaMarcatoriRiepilogo() {
+  try {
+    const risposta = await fetch(
+      API_URL + "/fd-topscorers?league=135&season=2026"
     );
+
+    if (!risposta.ok) throw new Error("Errore caricamento marcatori");
+
+    const dati = await risposta.json();
+    if (!Array.isArray(dati.scorers)) {
+      throw new Error("Risposta marcatori non valida");
+    }
+
+    const primiDieci = dati.scorers.slice(0, 10);
+
+    if (!primiDieci.length) {
+      statoMarcatori.textContent = "Nessun marcatore disponibile.";
+      return;
+    }
+
+    const scorrimentoMarcatori = elemento("div");
+    scorrimentoMarcatori.style.overflowX = "auto";
+
+    const tabellaMarcatori = elemento("table");
+    tabellaMarcatori.style.cssText =
+      "width:100%;border-collapse:collapse;font-size:13px;";
+
+    const testata = tabellaMarcatori.createTHead().insertRow();
+
+    ["#", "GIOCATORE / SQUADRA", "GOL"].forEach((titolo, indice) => {
+      const cella = elemento("th", titolo);
+      cella.scope = "col";
+      cella.style.cssText =
+        "padding:9px 6px;border-bottom:1px solid #30445e;" +
+        "color:#bfcde2;font-size:11px;" +
+        (indice === 2 ? "text-align:right;" : "text-align:left;");
+      testata.appendChild(cella);
+    });
+
+    const corpo = tabellaMarcatori.createTBody();
+
+    primiDieci.forEach((voce, indice) => {
+      const riga = corpo.insertRow();
+      const posizione = riga.insertCell();
+      const giocatore = riga.insertCell();
+      const gol = riga.insertCell();
+
+      posizione.textContent = indice + 1;
+      posizione.style.color = "#94a3b8";
+
+      const nome = elemento("strong", voce.player?.name ?? "—");
+      nome.style.display = "block";
+
+      const squadra = elemento(
+        "span",
+        voce.team?.shortName ?? voce.team?.name ?? "—"
+      );
+      squadra.style.cssText =
+        "display:block;margin-top:3px;font-size:11px;color:#94a3b8;";
+
+      giocatore.append(nome, squadra);
+
+      gol.textContent = voce.goals ?? "—";
+      gol.style.cssText =
+        "text-align:right;font-weight:700;color:#fff;font-size:16px;";
+
+      for (const cella of riga.cells) {
+        cella.style.padding = "9px 6px";
+        cella.style.borderBottom = "1px solid #30445e";
+      }
+    });
+
+    scorrimentoMarcatori.appendChild(tabellaMarcatori);
+    statoMarcatori.replaceWith(scorrimentoMarcatori);
+  } catch {
+    statoMarcatori.textContent =
+      "Marcatori momentaneamente non disponibili.";
+  }
+}
+
+caricaMarcatoriRiepilogo();
 
     const fasciaGiornata = elemento("section");
 fasciaGiornata.setAttribute("aria-label", "Riepilogo della giornata");
