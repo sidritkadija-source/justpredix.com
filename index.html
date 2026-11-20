@@ -6158,6 +6158,57 @@ stileDisposizione.textContent = `
     }
   }
 `;
+    stileDisposizione.textContent += `
+  #demo-riepilogo-stagione .demo-statistiche-unite {
+    gap: 12px;
+    align-items: stretch;
+  }
+
+  #demo-riepilogo-stagione .demo-statistiche-unite > .demo-card {
+    padding: 14px;
+    border-radius: 8px;
+  }
+
+  #demo-riepilogo-stagione .demo-statistiche-unite > .demo-card > span:first-child {
+    display: block;
+    min-height: 34px;
+    font-size: 13px;
+    line-height: 17px;
+    color: #bfcde2;
+    font-weight: 600;
+  }
+
+  #demo-riepilogo-stagione .demo-statistiche-unite .demo-numero {
+    margin-top: 4px;
+    font-size: 28px;
+    line-height: 34px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  #demo-riepilogo-stagione .demo-statistiche-unite p {
+    line-height: 1.4;
+  }
+
+  #demo-riepilogo-stagione .demo-record .demo-card {
+    padding: 14px;
+    border-radius: 8px;
+  }
+
+  #demo-riepilogo-stagione .demo-record h2 {
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: #bfcde2;
+  }
+
+  #demo-riepilogo-stagione .demo-record strong {
+    font-size: 18px;
+  }
+
+  #demo-riepilogo-stagione .demo-record p {
+    margin: 6px 0 0;
+    font-size: 12px;
+  }
+`;
 pagina.appendChild(stileDisposizione);
 
 for (const fascia of [fasciaGiornata, fasciaStagione]) {
