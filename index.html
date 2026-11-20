@@ -6059,7 +6059,7 @@ statistiche.appendChild(riquadroOverUnder);
         ? "Formazione migliore della giornata"
         : "Formazione migliore della stagione"
     ),
-    elemento("p", "4-3-3 · Giocatori dimostrativi")
+    elemento("p", "Dati non disponibili")
   );
 
   const mezzoCampo = elemento("div");
@@ -6078,41 +6078,17 @@ statistiche.appendChild(riquadroOverUnder);
     "border:2px solid #9ed3b8;border-bottom:0;z-index:-1;";
   mezzoCampo.appendChild(areaRigore);
 
-  let numeroDemo = 11;
+ mezzoCampo.setAttribute(
+  "aria-label",
+  "Formazione migliore non ancora disponibile"
+);
 
-  for (const [ruolo, quanti] of [
-    ["Attaccante", 3],
-    ["Centrocampista", 3],
-    ["Difensore", 4],
-    ["Portiere", 1]
-  ]) {
-    const reparto = elemento("div");
-    reparto.style.cssText =
-      "display:flex;align-items:center;justify-content:space-around;gap:4px;";
+const avvisoFormazione = elemento("p", "Dati non disponibili");
+avvisoFormazione.style.cssText =
+  "position:relative;align-self:center;justify-self:center;" +
+  "margin:0;padding:10px;text-align:center;color:white;font-size:14px;";
 
-    for (let indice = 1; indice <= quanti; indice++) {
-      const giocatore = elemento("div");
-      giocatore.style.cssText =
-        "display:grid;justify-items:center;gap:5px;min-width:0;flex:1;";
-
-      const maglia = elemento("span", numeroDemo--);
-      maglia.style.cssText =
-        "display:grid;place-items:center;width:32px;height:32px;" +
-        "border:1px solid white;border-radius:50%;" +
-        "background:#1d4ed8;color:white;font-weight:700;";
-
-      const nome = elemento("span", `${ruolo} ${indice}`);
-      nome.style.cssText =
-        "font-size:11px;color:white;text-align:center;overflow-wrap:anywhere;";
-
-      giocatore.append(maglia, nome);
-      reparto.appendChild(giocatore);
-    }
-
-    mezzoCampo.appendChild(reparto);
-  }
-
-  formazione.appendChild(mezzoCampo);
+mezzoCampo.appendChild(avvisoFormazione);
   fascia.append(statistiche, formazione);
 }
 
