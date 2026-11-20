@@ -2766,6 +2766,7 @@ function mostraTabellaQuote() {
   }
 
   const overUnder = mercatoQuoteAttivo === "Over/Under";
+  const golNoGol = mercatoQuoteAttivo === "Gol/No Gol";
 
   if (mercatoQuoteAttivo !== "1X2" && !overUnder) {
     contenutoQuote.textContent =
@@ -2809,8 +2810,10 @@ function mostraTabellaQuote() {
     contenutoQuote.appendChild(barraSoglie);
   }
 
-  const colonne = overUnder
-    ? ["BOOKMAKER", "OVER " + sogliaGolQuote, "UNDER " + sogliaGolQuote]
+const colonne = overUnder
+  ? ["BOOKMAKER", "OVER " + sogliaGolQuote, "UNDER " + sogliaGolQuote]
+  : golNoGol
+    ? ["BOOKMAKER", "GOL", "NO GOL"]
     : ["BOOKMAKER", "1", "X", "2"];
 
   const scorrimento = document.createElement("div");
@@ -2834,9 +2837,9 @@ function mostraTabellaQuote() {
     cella.scope = "col";
     cella.textContent = testo;
 
-    const larghezza = indice === 0
-      ? "46%"
-      : overUnder ? "27%" : "18%";
+const larghezza = indice === 0
+  ? "46%"
+  : (54 / (colonne.length - 1)) + "%";
 
     cella.style.cssText =
       "padding:10px 8px;background:#203750;color:#bfcde2;" +
