@@ -3463,13 +3463,33 @@ async function caricaClassificaPartita() {
         cella.style.cssText =
           "padding:9px 6px;border-bottom:1px solid #30445e;text-align:center;";
 
-        if (colonna === 1) {
-          cella.style.textAlign = "left";
-          cella.appendChild(creaSquadraConLogo(squadra.squadra));
-          if (evidenziata) cella.style.fontWeight = "700";
-        } else {
-          cella.textContent = valore;
-        }
+       if (colonna === 0) {
+  const numero = document.createElement("span");
+  numero.textContent = valore;
+  numero.style.cssText =
+    "display:inline-block;min-width:26px;padding:4px 0;" +
+    "border-radius:6px;font-weight:700;";
+
+  let colore = "";
+
+  if (indice < 4) colore = "#0b4f8a";
+  else if (indice === 4) colore = "#7c1d1d";
+  else if (indice === 5) colore = "#b7791f";
+  else if (indice >= 17 && indice <= 19) colore = "#dc0000";
+
+  if (colore) {
+    numero.style.background = colore;
+    numero.style.color = "#fff";
+  }
+
+  cella.appendChild(numero);
+} else if (colonna === 1) {
+  cella.style.textAlign = "left";
+  cella.appendChild(creaSquadraConLogo(squadra.squadra));
+  if (evidenziata) cella.style.fontWeight = "700";
+} else {
+  cella.textContent = valore;
+}
 
         if (colonna === 8) cella.style.fontWeight = "800";
       });
@@ -3491,6 +3511,42 @@ async function caricaClassificaPartita() {
     });
 
     pannelloClassifica.replaceChildren(tabella);
+    const legendaPartita = document.createElement("div");
+legendaPartita.style.cssText =
+  "display:grid;gap:8px;margin-top:18px;font-size:12px;";
+
+for (const [colore, testo] of [
+  ["#0b4f8a", "Qualificazione · Champions League"],
+  ["#7c1d1d", "Qualificazione · Europa League"],
+  ["#b7791f", "Qualificazione · Conference League"],
+  ["#dc0000", "Retrocessione · Serie B"]
+]) {
+  const voce = document.createElement("div");
+  voce.style.cssText =
+    "display:flex;align-items:center;gap:9px;";
+
+  const simbolo = document.createElement("span");
+  simbolo.setAttribute("aria-hidden", "true");
+  simbolo.style.cssText =
+    "width:15px;height:15px;border-radius:4px;flex-shrink:0;" +
+    "background:" + colore + ";";
+
+  const descrizione = document.createElement("span");
+  descrizione.textContent = testo;
+
+  voce.append(simbolo, descrizione);
+  legendaPartita.appendChild(voce);
+}
+
+const notaLegenda = document.createElement("p");
+notaLegenda.textContent =
+  "Le posizioni europee indicate sono provvisorie e possono variare " +
+  "in base agli esiti delle coppe e ai posti assegnati.";
+notaLegenda.style.cssText =
+  "margin:8px 0 0;color:#94a3b8;font-size:11px;line-height:1.5;";
+
+legendaPartita.appendChild(notaLegenda);
+pannelloClassifica.appendChild(legendaPartita);
     classificaCaricata = true;
   } catch {
     pannelloClassifica.textContent =
