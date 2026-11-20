@@ -4737,9 +4737,10 @@ zonaSerieA.appendChild(riga);
     zonaSerieA.textContent =
       "Impossibile caricare le partite della Serie A.";
   });
- document.querySelector(
-  '#league-detail [data-tab="risultati"]'
-)?.click();
+ document.getElementById("back-to-matches").addEventListener("click", () => {
+  document.getElementById("league-detail").style.display = "none";
+  document.getElementById("partite").style.display = "";
+});
   });
 }
   (() => {
