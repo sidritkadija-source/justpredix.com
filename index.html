@@ -5825,8 +5825,7 @@ fasciaStagione.append(numeri, record, colonne);
     ["Ammonizioni", esempi.ammonizioni, true],
     ["Espulsioni", esempi.espulsioni, true],
     ["Rigori segnati", esempi.rigori, true],
-    ["Spettatori totali", esempi.spettatori, true],
-    ["Media spettatori per partita", mediaSpettatori, true]
+   ["Spettatori totali", esempi.spettatori, true]
   ];
 
   for (const [etichetta, valore, dimostrativo] of dati) {
@@ -5851,6 +5850,14 @@ fasciaStagione.append(numeri, record, colonne);
     "margin:4px 0 0;font-size:14px;font-weight:600;color:#93c5fd;";
 
   card.appendChild(testoPercentuale);
+}
+    if (etichetta === "Spettatori totali") {
+  const media = elemento(
+    "p",
+    `${formatoNumero.format(mediaSpettatori)} spettatori di media per partita`
+  );
+  media.style.cssText = "margin:4px 0 0;font-size:12px;color:#bfcde2;";
+  card.appendChild(media);
 }
     if (dimostrativo) {
       const nota = elemento("p", "Esempio dimostrativo");
