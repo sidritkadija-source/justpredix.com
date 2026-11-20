@@ -2564,6 +2564,20 @@ function calcolaClassificaSerieA(partite, tipo = "totale", limite = Infinity) {
     b.PT - a.PT || b.DR - a.DR || b.GF - a.GF ||
     a.squadra.localeCompare(b.squadra)
   );
+  const partitaSerieADaRipristinare = (() => {
+  const navigazione = performance.getEntriesByType("navigation")[0];
+  if (navigazione?.type !== "reload") return null;
+
+  try {
+    const salvata = JSON.parse(
+      sessionStorage.getItem("justpredix_partita_aperta") || "null"
+    );
+
+    return salvata?.indirizzo === location.href ? salvata : null;
+  } catch {
+    return null;
+  }
+})();
 }function collegaSchedaPartitaSerieA(riga, partita) {
   const casa = partita.home_team?.name;
   const ospite = partita.away_team?.name;
@@ -5434,21 +5448,8 @@ selezionaSchedaNations(
 }
 }
   (() => {
-  const navigazione = performance.getEntriesByType("navigation")[0];
-  if (navigazione?.type !== "reload") return;
-
-  let salvata;
-
-  try {
-    salvata = JSON.parse(
-      sessionStorage.getItem("justpredix_partita_aperta") || "null"
-    );
-  } catch {
-    return;
-  }
-
-  if (!salvata || salvata.indirizzo !== location.href) return;
-
+ const salvata = partitaSerieADaRipristinare;
+if (!salvata) return;
   const partita = salvata.partita;
   if (!partita?.home_team?.name || !partita?.away_team?.name) return;
 
