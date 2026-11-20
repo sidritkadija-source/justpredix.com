@@ -5868,6 +5868,48 @@ fasciaStagione.append(numeri, record, colonne);
     statistiche.appendChild(card);
   }
 
+      const riempimento = elemento("div", null, "demo-card");
+riempimento.appendChild(elemento("span", "% spettatori"));
+
+const esempiRiempimento = ambito === "giornata"
+  ? [
+      { etichetta: "Più alta", partita: "Squadra A – Squadra B", percentuale: 98.4 },
+      { etichetta: "Più bassa", partita: "Squadra C – Squadra D", percentuale: 56.2 }
+    ]
+  : [
+      { etichetta: "Più alta", partita: "Squadra E – Squadra F", percentuale: 99.7 },
+      { etichetta: "Più bassa", partita: "Squadra G – Squadra H", percentuale: 42.8 }
+    ];
+
+for (const dato of esempiRiempimento) {
+  const riga = elemento("div");
+  riga.style.cssText = "margin-top:12px;";
+
+  const percentuale = dato.percentuale.toLocaleString("it-IT", {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1
+  });
+
+  const valore = elemento("strong", `${dato.etichetta} · ${percentuale}%`);
+  valore.style.cssText =
+    "display:block;font-size:16px;color:" +
+    (dato.etichetta === "Più alta" ? "#4ade80" : "#ff526e");
+
+  const incontro = elemento("span", dato.partita);
+  incontro.style.cssText = "display:block;margin-top:3px;font-size:12px;";
+
+  riga.append(valore, incontro);
+  riempimento.appendChild(riga);
+}
+
+const notaRiempimento = elemento(
+  "p",
+  "Riempimento dello stadio · Esempi dimostrativi"
+);
+notaRiempimento.style.cssText = "margin:12px 0 0;font-size:11px;";
+riempimento.appendChild(notaRiempimento);
+
+statistiche.appendChild(riempimento);
   const formazione = elemento("section", null, "demo-card");
   formazione.style.cssText =
   "width:100%;max-width:680px;box-sizing:border-box;margin:0 auto 18px;padding:12px;";
