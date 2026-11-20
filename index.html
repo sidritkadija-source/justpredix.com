@@ -2724,6 +2724,74 @@ function selezionaScheda(selezionata) {
 
 selezionaScheda(barraSchede.firstElementChild);
 scheda.append(indietro, intestazione, testata, barraSchede);
+    const pannelloQuote = document.createElement("section");
+pannelloQuote.hidden = true;
+pannelloQuote.setAttribute("aria-label", "Confronto quote");
+pannelloQuote.style.cssText =
+  "padding-top:16px;min-width:0;";
+
+const barraMercati = document.createElement("div");
+barraMercati.setAttribute("role", "group");
+barraMercati.setAttribute("aria-label", "Mercati delle quote");
+barraMercati.tabIndex = 0;
+barraMercati.style.cssText =
+  "display:flex;flex-wrap:nowrap;gap:8px;max-width:100%;" +
+  "overflow-x:auto;padding:0 0 10px;";
+
+const contenutoQuote = document.createElement("div");
+contenutoQuote.style.cssText =
+  "padding:18px 0;color:#94a3b8;font-size:13px;";
+contenutoQuote.setAttribute("role", "status");
+
+function selezionaMercatoQuote(selezionato) {
+  for (const pulsante of barraMercati.children) {
+    const attivo = pulsante === selezionato;
+    pulsante.setAttribute("aria-pressed", String(attivo));
+    pulsante.style.background = attivo ? "#D3133B" : "#203750";
+    pulsante.style.color = attivo ? "#fff" : "#bfcde2";
+  }
+
+  contenutoQuote.textContent =
+    selezionato.textContent + " · Quote non ancora disponibili";
+}
+
+for (const mercato of [
+  "1X2",
+  "Over/Under",
+  "Gol/No Gol",
+  "Doppia chance",
+  "Handicap",
+  "Risultato esatto",
+  "PT/FT",
+  "Corner",
+  "Cartellini"
+]) {
+  const pulsanteMercato = document.createElement("button");
+  pulsanteMercato.type = "button";
+  pulsanteMercato.textContent = mercato;
+  pulsanteMercato.style.cssText =
+    "flex:0 0 auto;white-space:nowrap;padding:8px 12px;" +
+    "border:0;border-radius:6px;font-family:inherit;" +
+    "font-size:12px;font-weight:700;cursor:pointer;";
+
+  pulsanteMercato.addEventListener("click", () => {
+    selezionaMercatoQuote(pulsanteMercato);
+  });
+
+  barraMercati.appendChild(pulsanteMercato);
+}
+
+selezionaMercatoQuote(barraMercati.firstElementChild);
+
+pannelloQuote.append(barraMercati, contenutoQuote);
+scheda.appendChild(pannelloQuote);
+
+for (const pulsanteScheda of barraSchede.children) {
+  pulsanteScheda.addEventListener("click", () => {
+    pannelloQuote.hidden =
+      pulsanteScheda.textContent.trim() !== "Comp. Quote";
+  });
+}
    const pannelloFormazioni = document.createElement("section");
 pannelloFormazioni.setAttribute("aria-label", "Formazioni");
 pannelloFormazioni.hidden = true;
