@@ -5840,7 +5840,18 @@ fasciaStagione.append(numeri, record, colonne);
       )
     );
 
-    if (dimostrativo) {
+    if (!dimostrativo && typeof valore === "number" && gare.length > 0) {
+  const percentuale = (valore / gare.length).toLocaleString("it-IT", {
+    style: "percent",
+    maximumFractionDigits: 1
+  });
+
+  const testoPercentuale = elemento("p", percentuale);
+  testoPercentuale.style.cssText =
+    "margin:4px 0 0;font-size:14px;font-weight:600;color:#93c5fd;";
+
+  card.appendChild(testoPercentuale);
+}
       const nota = elemento("p", "Esempio dimostrativo");
       nota.style.cssText = "margin:8px 0 0;font-size:11px;";
       card.appendChild(nota);
