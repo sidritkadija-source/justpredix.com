@@ -2743,13 +2743,126 @@ contenutoQuote.style.cssText =
   "padding:18px 0;color:#94a3b8;font-size:13px;";
 contenutoQuote.setAttribute("role", "status");
 
+let mercatoQuoteAttivo = "1X2";
+let periodoQuoteAttivo = "Finale";
+
+const barraPeriodiQuote = document.createElement("div");
+barraPeriodiQuote.setAttribute("role", "group");
+barraPeriodiQuote.setAttribute("aria-label", "Periodo delle quote");
+barraPeriodiQuote.style.cssText =
+  "margin-top:8px;padding:8px 0;border-bottom:1px solid #30445e;";
+
+function mostraTabellaQuote() {
+  contenutoQuote.replaceChildren();
+  barraPeriodiQuote.hidden = mercatoQuoteAttivo === "PT/FT";
+
+  for (const pulsante of barraPeriodiQuote.children) {
+    const attivo = pulsante.textContent === periodoQuoteAttivo;
+    pulsante.setAttribute("aria-pressed", String(attivo));
+    pulsante.style.background = attivo ? "#203750" : "transparent";
+    pulsante.style.color = attivo ? "#fff" : "#94a3b8";
+  }
+
+  if (mercatoQuoteAttivo !== "1X2") {
+    contenutoQuote.textContent =
+      mercatoQuoteAttivo + " · Quote non ancora disponibili";
+    return;
+  }
+
+  const scorrimento = document.createElement("div");
+  scorrimento.style.overflowX = "auto";
+
+  const tabella = document.createElement("table");
+  tabella.setAttribute(
+    "aria-label",
+    "Confronto quote 1X2 · " + periodoQuoteAttivo
+  );
+  tabella.style.cssText =
+    "width:100%;min-width:360px;border-collapse:collapse;" +
+    "table-layout:fixed;font-size:13px;";
+
+  const testata = tabella.createTHead().insertRow();
+
+  ["BOOKMAKER", "1", "X", "2"].forEach((testo, indice) => {
+    const cella = document.createElement("th");
+    cella.scope = "col";
+    cella.textContent = testo;
+    cella.style.cssText =
+      "padding:10px 8px;background:#203750;color:#bfcde2;" +
+      "font-size:11px;text-align:" +
+      (indice === 0 ? "left;width:46%;" : "center;width:18%;");
+    testata.appendChild(cella);
+  });
+
+  const corpo = tabella.createTBody();
+
+  for (const nome of ["Bookmaker A", "Bookmaker B", "Bookmaker C"]) {
+    const riga = corpo.insertRow();
+
+    const bookmaker = document.createElement("th");
+    bookmaker.scope = "row";
+    bookmaker.textContent = nome;
+    bookmaker.style.cssText =
+      "padding:18px 8px;text-align:left;color:#edf4ff;" +
+      "font-size:13px;border-bottom:1px solid #30445e;";
+    riga.appendChild(bookmaker);
+
+    for (let indice = 0; indice < 3; indice++) {
+      const cella = riga.insertCell();
+      cella.style.cssText =
+        "padding:14px 8px;text-align:center;" +
+        "border-bottom:1px solid #30445e;";
+
+      const quota = document.createElement("span");
+      quota.textContent = "—";
+      quota.style.cssText =
+        "display:block;padding:9px 4px;border:1px solid #30445e;" +
+        "border-radius:8px;color:#bfcde2;font-weight:700;";
+
+      cella.appendChild(quota);
+    }
+  }
+
+  scorrimento.appendChild(tabella);
+
+  const nota = document.createElement("p");
+  nota.textContent =
+    "Struttura dimostrativa · Bookmaker e quote da collegare.";
+  nota.style.cssText =
+    "margin:12px 0 0;font-size:11px;color:#94a3b8;";
+
+  contenutoQuote.append(scorrimento, nota);
+}
+
+for (const periodo of ["Finale", "1 tempo", "2 tempo"]) {
+  const pulsante = document.createElement("button");
+  pulsante.type = "button";
+  pulsante.textContent = periodo;
+  pulsante.style.cssText =
+    "padding:9px 14px;margin-right:6px;border:0;border-radius:7px;" +
+    "font-family:inherit;font-size:12px;font-weight:700;" +
+    "text-transform:uppercase;cursor:pointer;";
+
+  pulsante.addEventListener("click", () => {
+    periodoQuoteAttivo = periodo;
+    mostraTabellaQuote();
+  });
+
+  barraPeriodiQuote.appendChild(pulsante);
+}
+
 function selezionaMercatoQuote(selezionato) {
+  mercatoQuoteAttivo = selezionato.textContent;
+
   for (const pulsante of barraMercati.children) {
     const attivo = pulsante === selezionato;
     pulsante.setAttribute("aria-pressed", String(attivo));
     pulsante.style.background = attivo ? "#D3133B" : "#203750";
     pulsante.style.color = attivo ? "#fff" : "#bfcde2";
   }
+
+  mostraTabellaQuote();
+}
 
   contenutoQuote.textContent =
     selezionato.textContent + " · Quote non ancora disponibili";
@@ -2783,7 +2896,11 @@ for (const mercato of [
 
 selezionaMercatoQuote(barraMercati.firstElementChild);
 
-pannelloQuote.append(barraMercati, contenutoQuote);
+pannelloQuote.append(
+  barraMercati,
+  barraPeriodiQuote,
+  contenutoQuote
+);
 scheda.appendChild(pannelloQuote);
 
 for (const pulsanteScheda of barraSchede.children) {
