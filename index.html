@@ -4460,10 +4460,11 @@ lista.appendChild(riga);
 };
 
 
-// Torna a RIEPILOGO
-document.querySelector('[data-tab="riepilogo"]').onclick = () => {
-  schedaRisultati.style.display = "none";
-  corpoRiepilogo.style.display = "block";
+// Apri il nuovo Riepilogo della Serie A
+document.querySelector(
+  '#league-detail [data-tab="riepilogo"]'
+).onclick = () => {
+  apriRiepilogoSerieA();
 };
 // Primo test delle partite della Serie A
 const zonaSerieA = document.getElementById("serie-a-fixtures");
@@ -5529,7 +5530,7 @@ nomeSerieA.style.cssText =
 titolo.append(logoSerieA, nomeSerieA);
   const sottotitolo = elemento(
     "p",
-    "2026/27 · Anteprima del nuovo Riepilogo"
+    "Riepilogo della giornata e della stagione"
   );
   const stato = elemento("p", "Caricamento dei dati della stagione…");
   stato.setAttribute("role", "status");
