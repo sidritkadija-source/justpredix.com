@@ -2768,7 +2768,7 @@ function mostraTabellaQuote() {
   const overUnder = mercatoQuoteAttivo === "Over/Under";
   const golNoGol = mercatoQuoteAttivo === "Gol/No Gol";
 
-  if (mercatoQuoteAttivo !== "1X2" && !overUnder) {
+  if (mercatoQuoteAttivo !== "1X2" && !overUnder && !golNoGol) {
     contenutoQuote.textContent =
       mercatoQuoteAttivo + " · Quote non ancora disponibili";
     return;
