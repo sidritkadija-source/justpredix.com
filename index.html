@@ -2753,6 +2753,8 @@ barraPeriodiQuote.style.cssText =
   "margin-top:8px;padding:8px 0;border-bottom:1px solid #30445e;";
 
 let sogliaGolQuote = "2,5";
+    let tipoHandicapQuote = "Europeo";
+let valoreHandicapQuote = "-1";
 
 function mostraTabellaQuote() {
   contenutoQuote.replaceChildren();
@@ -2768,12 +2770,14 @@ function mostraTabellaQuote() {
   const overUnder = mercatoQuoteAttivo === "Over/Under";
   const golNoGol = mercatoQuoteAttivo === "Gol/No Gol";
   const doppiaChance = mercatoQuoteAttivo === "Doppia chance";
+  const handicapQuote = mercatoQuoteAttivo === "Handicap";
 
-  if (
+ if (
   mercatoQuoteAttivo !== "1X2" &&
   !overUnder &&
   !golNoGol &&
-  !doppiaChance
+  !doppiaChance &&
+  !handicapQuote
 ) {
     contenutoQuote.textContent =
       mercatoQuoteAttivo + " · Quote non ancora disponibili";
@@ -2822,8 +2826,95 @@ const colonne = overUnder
     ? ["BOOKMAKER", "GOL", "NO GOL"]
     : doppiaChance
       ? ["BOOKMAKER", "1X", "12", "X2"]
-      : ["BOOKMAKER", "1", "X", "2"];
+      : handicapQuote && tipoHandicapQuote === "Asiatico"
+        ? ["BOOKMAKER", "1", "2"]
+        : ["BOOKMAKER", "1", "X", "2"];
+if (handicapQuote) {
+  const comandiHandicap = document.createElement("div");
+  comandiHandicap.style.cssText =
+    "display:flex;align-items:center;flex-wrap:wrap;" +
+    "gap:8px;margin-bottom:16px;";
 
+  const gruppoTipo = document.createElement("div");
+  gruppoTipo.setAttribute("role", "group");
+  gruppoTipo.setAttribute("aria-label", "Tipo di handicap");
+  gruppoTipo.style.cssText = "display:flex;gap:8px;";
+
+  for (const tipo of ["Europeo", "Asiatico"]) {
+    const pulsante = document.createElement("button");
+    const attivo = tipo === tipoHandicapQuote;
+    pulsante.type = "button";
+    pulsante.textContent = tipo;
+    pulsante.setAttribute("aria-pressed", String(attivo));
+    pulsante.style.cssText =
+      "padding:8px 12px;border:0;border-radius:6px;" +
+      "font-family:inherit;font-size:12px;font-weight:700;" +
+      "cursor:pointer;color:#fff;background:" +
+      (attivo ? "#D3133B" : "#203750") + ";";
+
+    pulsante.addEventListener("click", () => {
+      tipoHandicapQuote = tipo;
+      valoreHandicapQuote = tipo === "Europeo" ? "-1" : "-0,5";
+      mostraTabellaQuote();
+
+      const gruppo = contenutoQuote.querySelector(
+        '[aria-label="Tipo di handicap"]'
+      );
+      [...gruppo.children]
+        .find(bottone => bottone.textContent === tipo)?.focus();
+    });
+
+    gruppoTipo.appendChild(pulsante);
+  }
+
+  const etichetta = document.createElement("label");
+  etichetta.style.cssText =
+    "display:flex;align-items:center;gap:8px;" +
+    "font-size:12px;color:#bfcde2;";
+
+  const testoEtichetta = document.createElement("span");
+  testoEtichetta.textContent = "Handicap casa";
+
+  const selettore = document.createElement("select");
+  selettore.style.cssText =
+    "padding:7px 10px;background:#203750;color:#fff;" +
+    "border:1px solid #30445e;border-radius:5px;font:inherit;";
+
+  const valori = tipoHandicapQuote === "Europeo"
+    ? ["-3", "-2", "-1", "0", "+1", "+2", "+3"]
+    : [
+        "-3", "-2,5", "-2", "-1,5", "-1", "-0,5",
+        "0", "+0,5", "+1", "+1,5", "+2", "+2,5", "+3"
+      ];
+
+  for (const valore of valori) {
+    const opzione = document.createElement("option");
+    opzione.value = valore;
+    opzione.textContent = valore;
+    opzione.selected = valore === valoreHandicapQuote;
+    selettore.appendChild(opzione);
+  }
+
+  selettore.addEventListener("change", () => {
+    valoreHandicapQuote = selettore.value;
+    mostraTabellaQuote();
+
+    contenutoQuote.querySelector("select")?.focus();
+  });
+
+  etichetta.append(testoEtichetta, selettore);
+  comandiHandicap.append(gruppoTipo, etichetta);
+  contenutoQuote.appendChild(comandiHandicap);
+
+  const descrizione = document.createElement("p");
+  descrizione.textContent =
+    tipoHandicapQuote + " · " + periodoQuoteAttivo +
+    " · Handicap " + casa + ": " + valoreHandicapQuote;
+  descrizione.style.cssText =
+    "margin:0 0 12px;color:#bfcde2;font-size:12px;";
+
+  contenutoQuote.appendChild(descrizione);
+}
   const scorrimento = document.createElement("div");
   scorrimento.style.overflowX = "auto";
 
