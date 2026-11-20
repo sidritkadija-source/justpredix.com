@@ -2563,8 +2563,10 @@ function calcolaClassificaSerieA(partite, tipo = "totale", limite = Infinity) {
   }).sort((a, b) =>
     b.PT - a.PT || b.DR - a.DR || b.GF - a.GF ||
     a.squadra.localeCompare(b.squadra)
-  );
-  const partitaSerieADaRipristinare = (() => {
+   );
+}
+
+const partitaSerieADaRipristinare = (() => {
   const navigazione = performance.getEntriesByType("navigation")[0];
   if (navigazione?.type !== "reload") return null;
 
@@ -2578,7 +2580,7 @@ function calcolaClassificaSerieA(partite, tipo = "totale", limite = Infinity) {
     return null;
   }
 })();
-}function collegaSchedaPartitaSerieA(riga, partita) {
+function collegaSchedaPartitaSerieA(riga, partita) {
   const casa = partita.home_team?.name;
   const ospite = partita.away_team?.name;
   const paginaSerieA = riga.closest("#league-detail")
