@@ -983,15 +983,14 @@ html, body {
     <p>Italia · Stagione 2026/2027</p>
   </div>
 
-  <div class="league-page-tabs">
-  <button type="button" data-tab="riepilogo">RIEPILOGO</button>
+ <div class="league-page-tabs">
   <button type="button" data-tab="risultati">RISULTATI</button>
   <button type="button" data-tab="calendario">CALENDARIO</button>
   <button type="button" data-tab="classifiche">CLASSIFICHE</button>
+  <button type="button" data-tab="riepilogo">RIEPILOGO</button>
   <button type="button" data-tab="quote">COMP. QUOTE</button>
   <button type="button" data-tab="archivio">ARCHIVIO</button>
 </div>
-
   <div id="league-page-content"></div>
 
 </section>
@@ -4738,10 +4737,9 @@ zonaSerieA.appendChild(riga);
     zonaSerieA.textContent =
       "Impossibile caricare le partite della Serie A.";
   });
-    document.getElementById("back-to-matches").addEventListener("click", () => {
-      document.getElementById("league-detail").style.display = "none";
-      document.getElementById("partite").style.display = "";
-    });
+ document.querySelector(
+  '#league-detail [data-tab="risultati"]'
+)?.click();
   });
 }
   (() => {
@@ -4767,7 +4765,7 @@ zonaSerieA.appendChild(riga);
     const elemento = evento.target;
 
     if (elemento.closest('.league-item[data-league="135"]')) {
-      salvaPercorso("serie-a/riepilogo");
+      salvaPercorso("serie-a/risultati");
       return;
     }
 
