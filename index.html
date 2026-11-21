@@ -6908,7 +6908,7 @@ pagina.insertBefore(progressoStagione, stato);
   "margin:0 0 18px;padding:12px 16px;";
    const giornateDemo = organizzaGiornateSerieA(stagione);
 
-const ultimaGiornataGiocata = Object.entries(giornateDemo)
+const giornateGiocate = Object.entries(giornateDemo)
   .map(([numero, gare]) => [
     numero,
     gare.filter(gara =>
@@ -6920,8 +6920,10 @@ const ultimaGiornataGiocata = Object.entries(giornateDemo)
   .filter(([, gare]) => gare.length > 0)
   .sort((a, b) => Number(b[0]) - Number(a[0]))[0];
 
-const numeroGiornataDemo = ultimaGiornataGiocata?.[0];
-const gareGiornataDemo = ultimaGiornataGiocata?.[1] || [];
+const [numeroGiornataDemo, gareGiornataDemo] = giornateGiocate[0] || [null, []];
+
+    function mostraRisultatiGiornata(gareGiornataDemo) {
+  risultati.replaceChildren();
 
 risultati.appendChild(elemento("h2", "Risultati della giornata"));
 
@@ -6938,7 +6940,8 @@ for (const gara of gareGiornataDemo) {
       );
       risultati.appendChild(riga);
     }
-
+}
+mostraRisultatiGiornata(gareGiornataDemo);
    const marcatori = elemento("section", null, "demo-card");
 marcatori.appendChild(elemento("h2", "Top 10 marcatori"));
 
@@ -7040,7 +7043,7 @@ fasciaGiornata.appendChild(
       : "Riepilogo della giornata"
   )
 );
-
+function creaNumeriGiornata(gareGiornataDemo) {
 const numeriGiornata = elemento("div", null, "demo-numeri");
 
 if (gareGiornataDemo.length) {
@@ -7078,7 +7081,9 @@ if (gareGiornataDemo.length) {
   }
 }
 
-fasciaGiornata.append(numeriGiornata, risultati);
+  return numeriGiornata;
+}
+fasciaGiornata.append(creaNumeriGiornata(gareGiornataDemo), risultati);
 
 const fasciaStagione = elemento("section");
 fasciaStagione.setAttribute("aria-label", "Riepilogo della stagione");
@@ -7364,6 +7369,50 @@ for (const formazione of [formazioneGiornata, formazioneStagione]) {
 const dettagliGiornata = elemento("div", null, "demo-dettagli-giornata");
 dettagliGiornata.append(risultati, formazioneGiornata);
 fasciaGiornata.appendChild(dettagliGiornata);
+    const titoloGiornata = fasciaGiornata.querySelector("h2");
+const statisticheGiornata = fasciaGiornata.querySelector(".demo-statistiche-unite");
+
+const sceltaGiornata = elemento("label", "Giornata ");
+sceltaGiornata.style.cssText =
+  "display:flex;align-items:center;gap:8px;font-weight:600;";
+
+const tendinaGiornata = elemento("select");
+tendinaGiornata.style.cssText =
+  "padding:8px 12px;border:1px solid #30445e;border-radius:6px;" +
+  "background:#111c2e;color:#e5edf7;";
+
+const risultatiPerGiornata = new Map(giornateGiocate);
+
+for (const [numero] of giornateGiocate) {
+  const opzione = elemento("option", `${numero}ª giornata`);
+  opzione.value = numero;
+  tendinaGiornata.appendChild(opzione);
+}
+
+if (giornateGiocate.length) {
+  sceltaGiornata.appendChild(tendinaGiornata);
+  titoloGiornata.after(sceltaGiornata);
+}
+
+tendinaGiornata.addEventListener("change", () => {
+  const numero = tendinaGiornata.value;
+  const gare = risultatiPerGiornata.get(numero);
+
+  titoloGiornata.textContent = `Riepilogo della giornata · ${numero}ª`;
+  mostraRisultatiGiornata(gare);
+
+  const anteprima = elemento("div");
+  aggiungiStatisticheRiepilogo(anteprima, gare, "giornata");
+
+  const numeri = creaNumeriGiornata(gare);
+  const statistiche = anteprima.firstElementChild;
+  statisticheGiornata.replaceChildren(...numeri.children, ...statistiche.children);
+
+  for (const card of statisticheGiornata.children) {
+    card.style.width = "100%";
+    card.style.boxSizing = "border-box";
+  }
+});
 
 const vincenteSerieA = elemento("section", null, "demo-card");
 vincenteSerieA.appendChild(elemento("h2", "Vincente Serie A"));
