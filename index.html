@@ -7402,24 +7402,26 @@ rigaStagione.append(cardClassifica, laterale, vincenteSerieA);
 
 function allineaAltezzaClassifica() {
   const righe = Array.from(tabella.tBodies[0].rows);
-  for (const riga of righe) riga.style.height = "";
+  const celle = righe.flatMap(riga => Array.from(riga.cells));
+
+  for (const cella of celle) cella.style.paddingBlock = "";
 
   if (!vistaDesktop.matches || righe.length === 0) return;
 
-  const spazioDaAggiungere =
+  const differenza =
     vincenteSerieA.getBoundingClientRect().bottom -
     cardClassifica.getBoundingClientRect().bottom;
 
-  if (spazioDaAggiungere <= 0) return;
+  const spazioAttuale = parseFloat(getComputedStyle(celle[0]).paddingTop);
+  const spazioPerLato = Math.max(
+    0,
+    spazioAttuale + differenza / (righe.length * 2)
+  );
 
-  const altezze = righe.map(riga => riga.getBoundingClientRect().height);
-  const extraPerRiga = spazioDaAggiungere / righe.length;
-
-  righe.forEach((riga, indice) => {
-    riga.style.height = `${altezze[indice] + extraPerRiga}px`;
-  });
+  for (const cella of celle) {
+    cella.style.paddingBlock = `${spazioPerLato}px`;
+  }
 }
-
 const osservatoreAltezza = new ResizeObserver(allineaAltezzaClassifica);
 osservatoreAltezza.observe(vincenteSerieA);
 vistaDesktop.addEventListener("change", allineaAltezzaClassifica);
