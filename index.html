@@ -6880,7 +6880,7 @@ pagina.insertBefore(progressoStagione, stato);
       for (const [colonna, valore] of [
         indice + 1, squadra.squadra, squadra.PG,
         squadra.V, squadra.N, squadra.P,
-        `${squadra.GF}:${squadra.GS}`, squadra.DR, squadra.PT
+        squadra.DR, squadra.PT
       ].entries()) {
         const cella = riga.insertCell();
 
@@ -6891,7 +6891,7 @@ pagina.insertBefore(progressoStagione, stato);
           cella.textContent = valore;
         }
 
-        if (colonna === 8) {
+        if (colonna === 7) {
           cella.style.fontWeight = "800";
           cella.style.color = "#93c5fd";
         }
@@ -7434,7 +7434,7 @@ indietro.addEventListener("click", () => {
 stileDisposizione.textContent += `
   #demo-riepilogo-stagione .demo-riga-stagione {
     display: grid;
-    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 0.8fr);
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.2fr) minmax(0, 0.8fr);
     gap: 12px;
     margin-top: 14px;
     align-items: start;
