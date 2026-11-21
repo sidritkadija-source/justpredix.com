@@ -7401,19 +7401,23 @@ rigaStagione.append(cardClassifica, laterale, vincenteSerieA);
     const vistaDesktop = window.matchMedia("(min-width: 801px)");
 
 function allineaAltezzaClassifica() {
-  if (!vistaDesktop.matches) {
-    tabella.style.height = "";
-    return;
-  }
+  const righe = Array.from(tabella.tBodies[0].rows);
+  for (const riga of righe) riga.style.height = "";
 
-  const fondoVincente = vincenteSerieA.getBoundingClientRect().bottom;
-  const inizioTabella = tabella.getBoundingClientRect().top;
-  const spazioSottoTabella =
-    parseFloat(getComputedStyle(cardClassifica).paddingBottom) +
-    parseFloat(getComputedStyle(cardClassifica).borderBottomWidth);
+  if (!vistaDesktop.matches || righe.length === 0) return;
 
-  tabella.style.height =
-    `${Math.max(0, fondoVincente - inizioTabella - spazioSottoTabella)}px`;
+  const spazioDaAggiungere =
+    vincenteSerieA.getBoundingClientRect().bottom -
+    cardClassifica.getBoundingClientRect().bottom;
+
+  if (spazioDaAggiungere <= 0) return;
+
+  const altezze = righe.map(riga => riga.getBoundingClientRect().height);
+  const extraPerRiga = spazioDaAggiungere / righe.length;
+
+  righe.forEach((riga, indice) => {
+    riga.style.height = `${altezze[indice] + extraPerRiga}px`;
+  });
 }
 
 const osservatoreAltezza = new ResizeObserver(allineaAltezzaClassifica);
