@@ -2835,11 +2835,6 @@ function aggiornaPeriodoStatistiche() {
 
   messaggioStatistiche.replaceChildren();
 
-  const nota = document.createElement("p");
-  nota.textContent = "Statistiche non ancora disponibili";
-  nota.style.cssText =
-    "margin:0 0 16px;text-align:center;color:#94a3b8;font-size:12px;";
-
   const squadreStatistiche = document.createElement("div");
   squadreStatistiche.style.cssText =
     "display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);" +
@@ -2855,7 +2850,7 @@ function aggiornaPeriodoStatistiche() {
     "text-align:right;overflow-wrap:anywhere;";
 
   squadreStatistiche.append(nomeCasa, nomeOspite);
-  messaggioStatistiche.append(nota, squadreStatistiche);
+  messaggioStatistiche.appendChild(squadreStatistiche);
 
   for (const [gruppo, voci] of gruppiStatistiche) {
     const tabella = document.createElement("table");
