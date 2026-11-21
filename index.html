@@ -2778,12 +2778,52 @@ try {
   }
 } catch {}
 
-const messaggioStatistiche = document.createElement("p");
-messaggioStatistiche.textContent = "Statistiche non disponibili";
-messaggioStatistiche.style.cssText =
-  "margin:0;padding:16px 0;text-align:center;" +
-  "color:#94a3b8;font-size:13px;";
-messaggioStatistiche.setAttribute("role", "status");
+const messaggioStatistiche = document.createElement("div");
+
+const gruppiStatistiche = [
+  ["Principali", [
+    "Possesso palla",
+    "Gol attesi (xG)",
+    "Tiri totali",
+    "Tiri in porta",
+    "Grandi occasioni",
+    "Calci d'angolo"
+  ]],
+  ["Tiri", [
+    "Tiri fuori",
+    "Tiri respinti",
+    "Pali e traverse",
+    "Tiri dentro l'area",
+    "Tiri fuori area"
+  ]],
+  ["Attacco", [
+    "Grandi occasioni sbagliate",
+    "Fuorigioco"
+  ]],
+  ["Passaggi", [
+    "Passaggi totali",
+    "Passaggi riusciti",
+    "Precisione dei passaggi",
+    "Cross riusciti",
+    "Lanci lunghi riusciti"
+  ]],
+  ["Difesa e duelli", [
+    "Contrasti",
+    "Intercetti",
+    "Respinte difensive",
+    "Duelli vinti",
+    "Duelli aerei vinti"
+  ]],
+  ["Disciplina", [
+    "Falli commessi",
+    "Cartellini gialli",
+    "Cartellini rossi"
+  ]],
+  ["Portieri", [
+    "Parate",
+    "Gol evitati"
+  ]]
+];
 
 function aggiornaPeriodoStatistiche() {
   for (const pulsante of barraPeriodiStatistiche.children) {
@@ -2793,11 +2833,83 @@ function aggiornaPeriodoStatistiche() {
     pulsante.style.color = attivo ? "#fff" : "#bfcde2";
   }
 
-  messaggioStatistiche.setAttribute(
-    "aria-label",
-    periodoStatistiche + ": statistiche non disponibili"
-  );
+  messaggioStatistiche.replaceChildren();
+
+  const nota = document.createElement("p");
+  nota.textContent = "Statistiche non ancora disponibili";
+  nota.style.cssText =
+    "margin:0 0 16px;text-align:center;color:#94a3b8;font-size:12px;";
+
+  const squadreStatistiche = document.createElement("div");
+  squadreStatistiche.style.cssText =
+    "display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);" +
+    "gap:16px;margin-bottom:16px;font-size:13px;font-weight:700;";
+
+  const nomeCasa = document.createElement("span");
+  nomeCasa.textContent = casa;
+  nomeCasa.style.overflowWrap = "anywhere";
+
+  const nomeOspite = document.createElement("span");
+  nomeOspite.textContent = ospite;
+  nomeOspite.style.cssText =
+    "text-align:right;overflow-wrap:anywhere;";
+
+  squadreStatistiche.append(nomeCasa, nomeOspite);
+  messaggioStatistiche.append(nota, squadreStatistiche);
+
+  for (const [gruppo, voci] of gruppiStatistiche) {
+    const tabella = document.createElement("table");
+    tabella.setAttribute(
+      "aria-label",
+      gruppo + " · " + periodoStatistiche
+    );
+    tabella.style.cssText =
+      "width:100%;table-layout:fixed;border-collapse:collapse;" +
+      "margin-bottom:20px;font-size:13px;color:#edf4ff;";
+
+    const titolo = document.createElement("caption");
+    titolo.textContent = gruppo;
+    titolo.style.cssText =
+      "padding:10px 12px;background:#203750;border-radius:6px;" +
+      "text-align:left;font-size:13px;font-weight:700;";
+    tabella.appendChild(titolo);
+
+    const corpo = tabella.createTBody();
+
+    for (const voce of voci) {
+      const riga = corpo.insertRow();
+
+      const valoreCasa = riga.insertCell();
+      valoreCasa.textContent = "—";
+      valoreCasa.setAttribute("aria-label", casa + ": dato non disponibile");
+      valoreCasa.style.cssText =
+        "width:20%;padding:12px 6px;text-align:left;" +
+        "border-bottom:1px solid #30445e;color:#94a3b8;";
+
+      const nomeStatistica = document.createElement("th");
+      nomeStatistica.scope = "row";
+      nomeStatistica.textContent = voce;
+      nomeStatistica.style.cssText =
+        "width:60%;padding:12px 6px;text-align:center;" +
+        "font-weight:400;border-bottom:1px solid #30445e;" +
+        "overflow-wrap:anywhere;";
+      riga.appendChild(nomeStatistica);
+
+      const valoreOspite = riga.insertCell();
+      valoreOspite.textContent = "—";
+      valoreOspite.setAttribute(
+        "aria-label",
+        ospite + ": dato non disponibile"
+      );
+      valoreOspite.style.cssText =
+        "width:20%;padding:12px 6px;text-align:right;" +
+        "border-bottom:1px solid #30445e;color:#94a3b8;";
+    }
+
+    messaggioStatistiche.appendChild(tabella);
+  }
 }
+
 
 for (const periodo of ["Totale", "1° tempo", "2° tempo"]) {
   const pulsante = document.createElement("button");
