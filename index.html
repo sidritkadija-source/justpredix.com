@@ -7389,13 +7389,21 @@ for (const [numero] of giornateGiocate) {
   opzione.value = numero;
   tendinaGiornata.appendChild(opzione);
 }
-
+function allineaTendinaGiornata() {
+  const vittorieCasa = statisticheGiornata.children[2];
+  sceltaGiornata.style.left = `${vittorieCasa.offsetLeft}px`;
+}
 if (giornateGiocate.length) {
   sceltaGiornata.appendChild(tendinaGiornata);
-  sceltaGiornata.style.gridColumn = "1 / -1";
-statisticheGiornata.insertBefore(sceltaGiornata, statisticheGiornata.children[2]);
+ statisticheGiornata.style.position = "relative";
+statisticheGiornata.style.marginTop = "56px";
+sceltaGiornata.style.position = "absolute";
+sceltaGiornata.style.bottom = "calc(100% + 8px)";
+statisticheGiornata.appendChild(sceltaGiornata);
 }
-
+const osservatoreTendina = new ResizeObserver(allineaTendinaGiornata);
+osservatoreTendina.observe(statisticheGiornata);
+indietro.addEventListener("click", () => osservatoreTendina.disconnect(), { once: true });
 tendinaGiornata.addEventListener("change", () => {
   const numero = tendinaGiornata.value;
   const gare = risultatiPerGiornata.get(numero);
@@ -7410,11 +7418,11 @@ tendinaGiornata.addEventListener("change", () => {
   const statistiche = anteprima.firstElementChild;
   statisticheGiornata.replaceChildren(
   ...numeri.children,
-  sceltaGiornata,
   ...statistiche.children
+   sceltaGiornata, 
 );
-
-  for (const card of statisticheGiornata.children) {
+allineaTendinaGiornata();
+  for (const card of statisticheGiornata.querySelectorAll(".demo-card")) {
     card.style.width = "100%";
     card.style.boxSizing = "border-box";
   }
