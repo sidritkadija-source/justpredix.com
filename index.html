@@ -6598,15 +6598,98 @@ nomeSerieA.style.cssText =
   "margin:0;font-size:clamp(22px,3vw,32px);font-weight:800;";
 
 titolo.append(logoSerieA, nomeSerieA);
-  const sottotitolo = elemento(
-    "p",
-    "Riepilogo della giornata e della stagione"
-  );
+   const notizie = elemento("section");
+  notizie.setAttribute("aria-label", "Notizie Serie A");
+  notizie.style.cssText =
+    "display:flex;align-items:center;gap:6px;padding:6px 8px;" +
+    "background:#111c2e;border:1px solid #30445e;border-radius:8px;font-size:13px;";
+
+  const etichetta = elemento("strong", "Notizie Serie A");
+  etichetta.style.flexShrink = "0";
+
+  const titoliNotizie = [
+    "Demo · Anticipi e posticipi",
+    "Demo · Aggiornamenti sulle formazioni",
+    "Demo · Risultati del weekend"
+  ];
+  let indiceNotizia = 0;
+  let inizioTocco = null;
+  let inPausa = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const testo = elemento("span", titoliNotizie[0]);
+  testo.style.cssText =
+    "flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;" +
+    "white-space:nowrap;touch-action:pan-y pinch-zoom;";
+
+  const precedente = elemento("button", "‹");
+  const pausa = elemento("button");
+  const successiva = elemento("button", "›");
+
+  for (const pulsante of [precedente, pausa, successiva]) {
+    pulsante.type = "button";
+    pulsante.style.cssText =
+      "flex-shrink:0;min-width:28px;min-height:32px;cursor:pointer;" +
+      "background:#223653;color:#fff;border:1px solid #405674;border-radius:4px;";
+  }
+
+  precedente.setAttribute("aria-label", "Notizia precedente");
+  successiva.setAttribute("aria-label", "Notizia successiva");
+
+  function aggiornaPausa() {
+    pausa.textContent = inPausa ? "▶" : "Ⅱ";
+    pausa.setAttribute("aria-label", inPausa ? "Avvia rotazione" : "Metti in pausa");
+    testo.setAttribute("aria-live", inPausa ? "polite" : "off");
+  }
+
+  function mostraNotizia(direzione) {
+    indiceNotizia = (indiceNotizia + direzione + titoliNotizie.length) % titoliNotizie.length;
+    testo.textContent = titoliNotizie[indiceNotizia];
+  }
+
+  function cambiaNotizia(direzione) {
+    inPausa = true;
+    aggiornaPausa();
+    mostraNotizia(direzione);
+  }
+
+  precedente.addEventListener("click", () => cambiaNotizia(-1));
+  successiva.addEventListener("click", () => cambiaNotizia(1));
+  pausa.addEventListener("click", () => {
+    inPausa = !inPausa;
+    aggiornaPausa();
+  });
+  aggiornaPausa();
+
+  testo.addEventListener("touchstart", evento => {
+    inizioTocco = evento.touches.length === 1 ? evento.touches[0] : null;
+  }, { passive: true });
+  testo.addEventListener("touchend", evento => {
+    if (!inizioTocco) return;
+    const fineTocco = evento.changedTouches[0];
+    const dx = fineTocco.clientX - inizioTocco.clientX;
+    const dy = fineTocco.clientY - inizioTocco.clientY;
+    inizioTocco = null;
+    if (Math.abs(dx) >= 40 && Math.abs(dx) > Math.abs(dy)) {
+      cambiaNotizia(dx < 0 ? 1 : -1);
+    }
+  });
+  testo.addEventListener("touchcancel", () => { inizioTocco = null; });
+
+  notizie.append(etichetta, testo, precedente, pausa, successiva);
+
   const stato = elemento("p", "Caricamento dei dati della stagione…");
   stato.setAttribute("role", "status");
+  pagina.append(indietro, titolo, notizie, stato);
 
-  pagina.append(indietro, titolo, sottotitolo, stato);
+  const rotazioneNotizie = window.setInterval(() => {
+    if (!pagina.isConnected) {
+      window.clearInterval(rotazioneNotizie);
+      return;
+    }
+    if (!inPausa && !document.hidden && !inizioTocco) mostraNotizia(1);
+  }, 5000);
 
+  indietro.addEventListener("click", () => window.clearInterval(rotazioneNotizie));
   try {
     const stagione = await recuperaStagioneCompletaSerieA();
 const dateStagione = stagione
@@ -7288,6 +7371,7 @@ fasciaGiornata.appendChild(dettagliGiornata);
 
 laterale.appendChild(formazioneStagione);
 pagina.append(fasciaGiornata, fasciaStagione);
+    pagina.append(indietro, titolo, sottotitolo, stato);
   } catch {
     stato.textContent =
       "Impossibile caricare il riepilogo. Aggiorna la pagina per riprovare.";
