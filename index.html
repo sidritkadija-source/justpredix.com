@@ -7381,7 +7381,18 @@ for (const squadra of squadreSerieA) {
   elencoSquadre.appendChild(riga);
 }
 
-vincenteSerieA.appendChild(elencoSquadre);
+const intestazioneVincente = elemento("div");
+intestazioneVincente.style.cssText =
+  "display:flex;justify-content:space-between;gap:8px;" +
+  "padding:0 0 8px;border-bottom:1px solid #30445e;" +
+  "font-size:12px;font-weight:700;color:#bfcde2;";
+
+intestazioneVincente.append(
+  elemento("span", "Squadra"),
+  elemento("span", "Quote")
+);
+
+vincenteSerieA.append(intestazioneVincente, elencoSquadre);
 
 const rigaStagione = elemento("div", null, "demo-riga-stagione");
 laterale.appendChild(formazioneStagione);
