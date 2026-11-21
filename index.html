@@ -792,11 +792,19 @@ html, body {
   margin: 0;
 }
 
-.league-page-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 20px;
+#league-detail .league-page-tabs {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  max-width: 100%;
+  gap: 6px;
+  padding-bottom: 6px;
+}
+
+#league-detail .league-page-tabs button {
+  flex: 0 0 auto;
+  white-space: nowrap;
+  padding: 10px;
+  font-size: 11px;
 }
 
 .league-page-tabs button {
