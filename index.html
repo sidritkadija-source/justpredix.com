@@ -6918,7 +6918,7 @@ const giornateGiocate = Object.entries(giornateDemo)
     )
   ])
   .filter(([, gare]) => gare.length > 0)
-  .sort((a, b) => Number(b[0]) - Number(a[0]))[0];
+  .sort((a, b) => Number(b[0]) - Number(a[0]));
 
 const [numeroGiornataDemo, gareGiornataDemo] = giornateGiocate[0] || [null, []];
 
