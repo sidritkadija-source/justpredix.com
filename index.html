@@ -2800,6 +2800,8 @@ barraPeriodiQuote.style.cssText =
 let sogliaGolQuote = "2,5";
     let tipoHandicapQuote = "Europeo";
 let valoreHandicapQuote = "-1";
+    let golCasaEsatto = "1";
+let golOspiteEsatto = "0";
 
 function mostraTabellaQuote() {
   contenutoQuote.replaceChildren();
@@ -2816,13 +2818,15 @@ function mostraTabellaQuote() {
   const golNoGol = mercatoQuoteAttivo === "Gol/No Gol";
   const doppiaChance = mercatoQuoteAttivo === "Doppia chance";
   const handicapQuote = mercatoQuoteAttivo === "Handicap";
+  const risultatoEsatto = mercatoQuoteAttivo === "Risultato esatto";
 
  if (
   mercatoQuoteAttivo !== "1X2" &&
   !overUnder &&
   !golNoGol &&
-  !doppiaChance &&
-  !handicapQuote
+    !doppiaChance &&
+  !handicapQuote &&
+  !risultatoEsatto
 ) {
     contenutoQuote.textContent =
       mercatoQuoteAttivo + " · Quote non ancora disponibili";
@@ -2866,6 +2870,9 @@ function mostraTabellaQuote() {
   }
 
 const colonne = overUnder
+  const colonne = risultatoEsatto
+  ? ["BOOKMAKER", "QUOTA"]
+  : overUnder
   ? ["BOOKMAKER", "OVER " + sogliaGolQuote, "UNDER " + sogliaGolQuote]
   : golNoGol
     ? ["BOOKMAKER", "GOL", "NO GOL"]
@@ -2959,6 +2966,67 @@ if (handicapQuote) {
     "margin:0 0 12px;color:#bfcde2;font-size:12px;";
 
   contenutoQuote.appendChild(descrizione);
+}
+  if (risultatoEsatto) {
+  const sceltaRisultato = document.createElement("div");
+  sceltaRisultato.style.cssText =
+    "display:flex;align-items:center;flex-wrap:wrap;" +
+    "gap:14px;margin-bottom:16px;";
+
+  for (const lato of ["casa", "ospite"]) {
+    const etichetta = document.createElement("label");
+    etichetta.style.cssText =
+      "display:flex;align-items:center;gap:8px;" +
+      "font-size:12px;color:#bfcde2;";
+
+    const nome = document.createElement("span");
+    nome.textContent = lato === "casa" ? casa : ospite;
+
+    const selettore = document.createElement("select");
+    selettore.dataset.latoRisultato = lato;
+    selettore.style.cssText =
+      "padding:8px 12px;background:#203750;color:#fff;" +
+      "border:1px solid #30445e;border-radius:5px;" +
+      "font:inherit;font-weight:700;";
+
+    const valoreAttuale = lato === "casa"
+      ? golCasaEsatto
+      : golOspiteEsatto;
+
+    for (let gol = 0; gol <= 6; gol++) {
+      const opzione = document.createElement("option");
+      opzione.value = String(gol);
+      opzione.textContent = String(gol);
+      opzione.selected = String(gol) === valoreAttuale;
+      selettore.appendChild(opzione);
+    }
+
+    selettore.addEventListener("change", () => {
+      if (lato === "casa") {
+        golCasaEsatto = selettore.value;
+      } else {
+        golOspiteEsatto = selettore.value;
+      }
+
+      mostraTabellaQuote();
+
+      contenutoQuote.querySelector(
+        '[data-lato-risultato="' + lato + '"]'
+      )?.focus();
+    });
+
+    etichetta.append(nome, selettore);
+    sceltaRisultato.appendChild(etichetta);
+  }
+
+  const riepilogoEsatto = document.createElement("p");
+  riepilogoEsatto.textContent =
+    periodoQuoteAttivo + " · " + casa + " " +
+    golCasaEsatto + " – " + golOspiteEsatto + " " + ospite;
+  riepilogoEsatto.style.cssText =
+    "margin:0 0 14px;font-size:13px;font-weight:700;color:#edf4ff;";
+
+  contenutoQuote.append(sceltaRisultato, riepilogoEsatto);
 }
   const scorrimento = document.createElement("div");
   scorrimento.style.overflowX = "auto";
