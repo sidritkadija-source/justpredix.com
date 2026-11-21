@@ -6865,7 +6865,7 @@ pagina.insertBefore(progressoStagione, stato);
     tabella.setAttribute("aria-label", "Classifica Serie A");
     const intestazione = tabella.createTHead().insertRow();
 
-    for (const testo of ["#", "Squadra", "PG", "V", "N", "P", "GF:GS", "DR", "PT"]) {
+    for (const testo of ["#", "Squadra", "PG", "V", "N", "P", "DR", "PT"]) {
       const cella = elemento("th", testo);
       cella.scope = "col";
       if (testo === "Squadra") cella.style.textAlign = "left";
