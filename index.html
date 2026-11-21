@@ -1101,7 +1101,11 @@ async function caricaClassifica(leagueId) {
   if (salvata) {
     const cache = JSON.parse(salvata);
 
-    if (Date.now() - cache.time < CACHE_TIME) {
+    if (
+  Array.isArray(cache.data) &&
+  cache.data.length > 0 &&
+  Date.now() - cache.time < CACHE_TIME
+) {
       return cache.data;
     }
   }
@@ -1114,6 +1118,14 @@ async function caricaClassifica(leagueId) {
   }
 
   const dati = await risposta.json();
+  if (
+  !Array.isArray(dati.response) ||
+  (dati.errors && Object.keys(dati.errors).length > 0)
+) {
+  throw new Error(
+    "Errore del fornitore partite: " + JSON.stringify(dati.errors || {})
+  );
+}
   
 const partiteTop5 = (dati.response || []).filter(
   partita => [39, 140, 135, 78, 61].includes(
