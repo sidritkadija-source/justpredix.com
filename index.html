@@ -3031,12 +3031,7 @@ if (handicapQuote) {
   contenutoQuote.append(sceltaRisultato, riepilogoEsatto);
 }
   if (primoFinale) {
-  const descrizionePTFT = document.createElement("p");
-  descrizionePTFT.textContent =
-    "Primo simbolo: primo tempo · Secondo simbolo: risultato finale";
-  descrizionePTFT.style.cssText =
-    "margin:0 0 12px;color:#bfcde2;font-size:12px;";
-
+  
   const barraCombinazioni = document.createElement("div");
   barraCombinazioni.setAttribute("role", "group");
   barraCombinazioni.setAttribute("aria-label", "Combinazioni PT/FT");
@@ -3080,11 +3075,10 @@ if (handicapQuote) {
   selezionePTFT.style.cssText =
     "margin:0 0 14px;color:#edf4ff;font-size:13px;font-weight:700;";
 
-  contenutoQuote.append(
-    descrizionePTFT,
-    barraCombinazioni,
-    selezionePTFT
-  );
+ contenutoQuote.append(
+  barraCombinazioni,
+  selezionePTFT
+);
 }
   const scorrimento = document.createElement("div");
   scorrimento.style.overflowX = "auto";
