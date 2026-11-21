@@ -2709,7 +2709,19 @@ barraSchede.setAttribute("aria-label", "Sezioni della partita");
 barraSchede.style.cssText =
   "display:flex;flex-wrap:wrap;gap:0 18px;border-top:1px solid #30445e;";
 
-for (const nome of ["Partita", "Comp. Quote", "Formazioni", "Testa-a-testa", "Classifiche"]) {
+const sezioniPartita = [
+  "Partita",
+  "Comp. Quote",
+  "Formazioni",
+  "Testa-a-testa",
+  "Classifiche"
+];
+
+if (["in_progress", "final"].includes(partita.status)) {
+  sezioniPartita.splice(1, 0, "Statistiche");
+}
+
+for (const nome of sezioniPartita) {
   const pulsante = document.createElement("button");
   pulsante.type = "button";
   pulsante.textContent = nome;
@@ -2732,7 +2744,26 @@ function selezionaScheda(selezionata) {
 }
 
 selezionaScheda(barraSchede.firstElementChild);
-scheda.append(indietro, intestazione, testata, barraSchede);
+const pannelloStatistiche = document.createElement("section");
+pannelloStatistiche.hidden = true;
+pannelloStatistiche.setAttribute("aria-label", "Statistiche della partita");
+pannelloStatistiche.style.cssText =
+  "padding:20px 0;";
+
+const messaggioStatistiche = document.createElement("p");
+messaggioStatistiche.textContent = "Statistiche non disponibili";
+messaggioStatistiche.style.cssText =
+  "margin:0;text-align:center;color:#94a3b8;font-size:13px;";
+
+pannelloStatistiche.appendChild(messaggioStatistiche);
+scheda.appendChild(pannelloStatistiche);
+
+for (const pulsante of barraSchede.children) {
+  pulsante.addEventListener("click", () => {
+    pannelloStatistiche.hidden =
+      pulsante.textContent.trim() !== "Statistiche";
+  });
+}
     const pannelloQuote = document.createElement("section");
 pannelloQuote.hidden = true;
 pannelloQuote.setAttribute("aria-label", "Confronto quote");
