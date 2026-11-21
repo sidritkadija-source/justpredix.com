@@ -7365,7 +7365,55 @@ const dettagliGiornata = elemento("div", null, "demo-dettagli-giornata");
 dettagliGiornata.append(risultati, formazioneGiornata);
 fasciaGiornata.appendChild(dettagliGiornata);
 
-laterale.appendChild(formazioneStagione);
+const vincenteSerieA = elemento("section", null, "demo-card");
+vincenteSerieA.appendChild(elemento("h2", "Vincente Serie A"));
+
+const squadreSerieA = [...new Set(
+  stagione.flatMap(gara => [gara.home_team?.name, gara.away_team?.name])
+    .filter(Boolean)
+)].sort((a, b) => a.localeCompare(b, "it"));
+
+const elencoSquadre = elemento("ul", null, "demo-vincente-squadre");
+
+for (const squadra of squadreSerieA) {
+  elencoSquadre.appendChild(elemento("li", squadra));
+}
+
+vincenteSerieA.appendChild(elencoSquadre);
+
+const rigaStagione = elemento("div", null, "demo-riga-stagione");
+rigaStagione.append(marcatori, formazioneStagione, vincenteSerieA);
+colonne.replaceWith(cardClassifica, rigaStagione);
+
+stileDisposizione.textContent += `
+  #demo-riepilogo-stagione .demo-riga-stagione {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr) minmax(0, 0.85fr);
+    gap: 12px;
+    margin-top: 14px;
+    align-items: start;
+  }
+
+  #demo-riepilogo-stagione .demo-vincente-squadre {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-height: 320px;
+    overflow-y: auto;
+  }
+
+  #demo-riepilogo-stagione .demo-vincente-squadre li {
+    padding: 8px 0;
+    border-bottom: 1px solid #30445e;
+    font-size: 13px;
+  }
+
+  @media (max-width: 800px) {
+    #demo-riepilogo-stagione .demo-riga-stagione {
+      grid-template-columns: 1fr;
+    }
+  }
+`;
 pagina.append(fasciaGiornata, fasciaStagione);
     stato.remove();
   } catch {
