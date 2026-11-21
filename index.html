@@ -3761,7 +3761,7 @@ if (provaFormazioni) {
   }
 }
 
-    for (const titoloSezione of ["Allenatori", "Assenti"]) {
+    for (const titoloSezione of ["Indisponibili", "Allenatori"]) {
   const sezione = document.createElement("section");
   sezione.style.cssText =
     "max-width:720px;margin:0 auto 18px;";
@@ -3783,18 +3783,14 @@ if (provaFormazioni) {
     colonna.style.cssText =
       "min-width:0;" + (indice === 1 ? "text-align:right;" : "");
 
-    const squadra = document.createElement("h4");
-    squadra.textContent = nomeSquadra;
-    squadra.style.cssText =
-      "margin:0 0 9px;font-size:12px;color:#edf4ff;" +
-      "overflow-wrap:anywhere;";
 
     const messaggio = document.createElement("p");
     messaggio.textContent = "Dati non disponibili";
     messaggio.style.cssText =
       "margin:0;color:#94a3b8;font-size:12px;";
 
-    colonna.append(squadra, messaggio);
+    colonna.setAttribute("aria-label", nomeSquadra);
+colonna.appendChild(messaggio);
     colonne.appendChild(colonna);
   }
 
