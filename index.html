@@ -1593,107 +1593,136 @@ document.querySelector(".filter-btn.active")?.click();
 }
 }
  // Mostra le partite Serie A nel calendario della homepage
-async function mostraSerieANelCalendario(data) {
+async function mostraCampionatiNelCalendario(data) {
   const box = document.getElementById("matches");
   if (!box) return;
 
-  box.textContent = "Caricamento Serie A...";
+  box.textContent = "Caricamento delle partite…";
+
+  const campionati = [
+    { codice: "seriea", id: 135, nome: "Serie A" },
+    { codice: "epl", id: 39, nome: "Premier League" },
+    { codice: "laliga", id: 140, nome: "La Liga" },
+    { codice: "bundesliga", id: 78, nome: "Bundesliga" },
+    { codice: "ligue1", id: 61, nome: "Ligue 1" }
+  ];
 
   try {
-    const chiave = "justpredix_seriea_ninja_" + data;
-    let partite = null;
+    const esiti = await Promise.allSettled(
+      campionati.map(async campionato => {
+        const chiave =
+          "justpredix_home_ninja_" + campionato.codice + "_" + data;
 
-    const salvato = localStorage.getItem(chiave);
+        let partite = null;
 
-    if (salvato) {
-      const cache = JSON.parse(salvato);
+        try {
+          const cache = JSON.parse(localStorage.getItem(chiave) || "null");
 
-      if (
-        Array.isArray(cache.data) &&
-        Date.now() - cache.time < 30 * 60 * 1000
-      ) {
-        partite = cache.data;
-      }
-    }
+          if (
+            cache &&
+            Array.isArray(cache.data) &&
+            Date.now() - cache.time < 30 * 60 * 1000
+          ) {
+            partite = cache.data;
+          }
+        } catch {}
 
-    if (partite === null) {
-      const risposta = await fetch(
-        `${API_URL}/ninja-matches?league=seriea&date=${data}`
-      );
+        if (partite === null) {
+          const risposta = await fetch(
+            API_URL + "/ninja-matches?league=" +
+            campionato.codice + "&date=" + data
+          );
 
-      if (!risposta.ok) {
-        throw new Error("Errore API Ninjas");
-      }
+          if (!risposta.ok) throw new Error(campionato.nome);
 
-      partite = await risposta.json();
+          partite = await risposta.json();
+          if (!Array.isArray(partite)) throw new Error(campionato.nome);
 
-      if (!Array.isArray(partite)) {
-        throw new Error("Dati non validi");
-      }
+          try {
+            localStorage.setItem(chiave, JSON.stringify({
+              time: Date.now(),
+              data: partite
+            }));
+          } catch {}
+        }
 
-      localStorage.setItem(chiave, JSON.stringify({
-        time: Date.now(),
-        data: partite
-      }));
-    }
+        return partite.map(partita => {
+          const stato = partita.status === "final"
+            ? "FT"
+            : partita.status === "in_progress" ? "LIVE" : "NS";
 
-    box.replaceChildren();
+          const punteggio = valore =>
+            /^\d+$/.test(String(valore)) ? Number(valore) : null;
 
-    const titolo = document.createElement("h3");
-    titolo.textContent = "ITALIA: Serie A";
-    box.appendChild(titolo);
+          const squadra = datiSquadra => {
+            const nome = datiSquadra?.name || "Squadra";
+            const logo = creaSquadraConLogo(nome).querySelector("img");
 
-    if (partite.length === 0) {
-      const avviso = document.createElement("p");
-      avviso.textContent = "Nessuna partita di Serie A in questa data.";
-      box.appendChild(avviso);
-    }
+            return {
+              name: nome,
+              logo: logo?.src || ""
+            };
+          };
 
-    partite.forEach(partita => {
-      const riga = document.createElement("div");
-      riga.className = "match-row";
-      riga.style.gridTemplateColumns = "60px minmax(0, 1fr) 65px";
-
-      const orario = document.createElement("div");
-      orario.className = "match-time";
-      orario.textContent = new Date(partita.start_time)
-        .toLocaleTimeString("it-IT", {
-          hour: "2-digit",
-          minute: "2-digit",
-          timeZone: "Europe/Tirane"
+          return {
+            fixture: {
+              id: partita.game_id,
+              date: partita.start_time,
+              status: { short: stato, elapsed: null }
+            },
+            league: {
+              id: campionato.id,
+              name: campionato.nome
+            },
+            teams: {
+              home: squadra(partita.home_team),
+              away: squadra(partita.away_team)
+            },
+            goals: {
+              home: punteggio(partita.home_score),
+              away: punteggio(partita.away_score)
+            }
+          };
         });
-      // Evidenzia le partite LIVE nel RIEPILOGO
-if (partita.status === "in_progress") {
-  orario.textContent = "🔴 LIVE";
-  orario.style.color = "#ff5252";
-}
-   
-      const squadre = document.createElement("div");
-      squadre.className = "match-teams";
+      })
+    );
 
-      const casa = document.createElement("span");
-      casa.textContent = partita.home_team?.name || "Squadra casa";
+    if (document.getElementById("match-date")?.value !== data) return;
 
-      const ospite = document.createElement("span");
-      ospite.textContent = partita.away_team?.name || "Squadra ospite";
+    const partite = esiti.flatMap(esito =>
+      esito.status === "fulfilled" ? esito.value : []
+    );
 
-      squadre.append(casa, ospite);
+    const mancanti = esiti.flatMap((esito, indice) =>
+      esito.status === "rejected" ? [campionati[indice].nome] : []
+    );
 
-      const risultato = document.createElement("div");
-      risultato.className = "match-score";
-    risultato.textContent =
-  /^\d+$/.test(String(partita.home_score)) &&
-  /^\d+$/.test(String(partita.away_score))
-    ? `${partita.home_score} - ${partita.away_score}`
-    : "–";
+    if (mancanti.length === campionati.length) {
+      throw new Error("Nessun campionato disponibile");
+    }
 
-      riga.append(orario, squadre, risultato);
-      box.appendChild(riga);
-    });
+    await mostraPartite(partite);
 
-  } catch (errore) {
-    console.error("Errore calendario Serie A:", errore);
-    box.textContent = "Impossibile caricare la Serie A.";
+    if (document.getElementById("match-date")?.value !== data) return;
+
+    if (!partite.length) {
+      box.textContent = "Nessuna partita disponibile per questa data.";
+    }
+
+    if (mancanti.length) {
+      const avviso = document.createElement("p");
+      avviso.textContent =
+        "Caricamento non riuscito per: " + mancanti.join(", ") +
+        ". Seleziona nuovamente la data per riprovare.";
+      avviso.style.cssText =
+        "padding:12px;color:#fbbf24;font-size:12px;";
+      box.prepend(avviso);
+    }
+  } catch {
+    if (document.getElementById("match-date")?.value !== data) return;
+
+    box.textContent =
+      "Impossibile caricare le partite. Riprova tra poco.";
   }
 }
 async function caricaPartite(dataSelezionata) {
@@ -1705,6 +1734,14 @@ try {
 } catch {}
   const cacheKey = "justpredix_partite_" + oggi;
   const contenitore = document.getElementById("matches");
+  const oggiReale = new Date().toLocaleDateString("en-CA", {
+  timeZone: "Europe/Tirane"
+});
+
+if (oggi > oggiReale) {
+  await mostraCampionatiNelCalendario(oggi);
+  return;
+}
   
   try {
 const salvati = localStorage.getItem(cacheKey);
