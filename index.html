@@ -2802,6 +2802,7 @@ let sogliaGolQuote = "2,5";
 let valoreHandicapQuote = "-1";
     let golCasaEsatto = "1";
 let golOspiteEsatto = "0";
+    let combinazionePTFT = "1/1";
 
 function mostraTabellaQuote() {
   contenutoQuote.replaceChildren();
@@ -2819,14 +2820,16 @@ function mostraTabellaQuote() {
   const doppiaChance = mercatoQuoteAttivo === "Doppia chance";
   const handicapQuote = mercatoQuoteAttivo === "Handicap";
   const risultatoEsatto = mercatoQuoteAttivo === "Risultato esatto";
+  const primoFinale = mercatoQuoteAttivo === "PT/FT";
 
  if (
   mercatoQuoteAttivo !== "1X2" &&
   !overUnder &&
   !golNoGol &&
     !doppiaChance &&
-  !handicapQuote &&
-  !risultatoEsatto
+    !handicapQuote &&
+  !risultatoEsatto &&
+  !primoFinale
 ) {
     contenutoQuote.textContent =
       mercatoQuoteAttivo + " · Quote non ancora disponibili";
@@ -2869,7 +2872,7 @@ function mostraTabellaQuote() {
     contenutoQuote.appendChild(barraSoglie);
   }
 
-const colonne = risultatoEsatto
+const colonne = (risultatoEsatto || primoFinale)
   ? ["BOOKMAKER", "QUOTA"]
   : overUnder
   ? ["BOOKMAKER", "OVER " + sogliaGolQuote, "UNDER " + sogliaGolQuote]
@@ -3026,6 +3029,62 @@ if (handicapQuote) {
     "margin:0 0 14px;font-size:13px;font-weight:700;color:#edf4ff;";
 
   contenutoQuote.append(sceltaRisultato, riepilogoEsatto);
+}
+  if (primoFinale) {
+  const descrizionePTFT = document.createElement("p");
+  descrizionePTFT.textContent =
+    "Primo simbolo: primo tempo · Secondo simbolo: risultato finale";
+  descrizionePTFT.style.cssText =
+    "margin:0 0 12px;color:#bfcde2;font-size:12px;";
+
+  const barraCombinazioni = document.createElement("div");
+  barraCombinazioni.setAttribute("role", "group");
+  barraCombinazioni.setAttribute("aria-label", "Combinazioni PT/FT");
+  barraCombinazioni.style.cssText =
+    "display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;";
+
+  for (const combinazione of [
+    "1/1", "1/X", "1/2",
+    "X/1", "X/X", "X/2",
+    "2/1", "2/X", "2/2"
+  ]) {
+    const pulsante = document.createElement("button");
+    const attivo = combinazione === combinazionePTFT;
+
+    pulsante.type = "button";
+    pulsante.textContent = combinazione;
+    pulsante.setAttribute("aria-pressed", String(attivo));
+    pulsante.style.cssText =
+      "padding:8px 13px;border:0;border-radius:6px;" +
+      "font-family:inherit;font-size:12px;font-weight:700;" +
+      "cursor:pointer;color:#fff;background:" +
+      (attivo ? "#D3133B" : "#203750") + ";";
+
+    pulsante.addEventListener("click", () => {
+      combinazionePTFT = combinazione;
+      mostraTabellaQuote();
+
+      const gruppo = contenutoQuote.querySelector(
+        '[aria-label="Combinazioni PT/FT"]'
+      );
+
+      [...gruppo.children]
+        .find(bottone => bottone.textContent === combinazione)?.focus();
+    });
+
+    barraCombinazioni.appendChild(pulsante);
+  }
+
+  const selezionePTFT = document.createElement("p");
+  selezionePTFT.textContent = "PT/FT selezionato: " + combinazionePTFT;
+  selezionePTFT.style.cssText =
+    "margin:0 0 14px;color:#edf4ff;font-size:13px;font-weight:700;";
+
+  contenutoQuote.append(
+    descrizionePTFT,
+    barraCombinazioni,
+    selezionePTFT
+  );
 }
   const scorrimento = document.createElement("div");
   scorrimento.style.overflowX = "auto";
