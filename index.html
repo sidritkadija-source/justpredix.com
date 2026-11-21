@@ -1118,15 +1118,7 @@ async function caricaClassifica(leagueId) {
   }
 
   const dati = await risposta.json();
-  if (
-  !Array.isArray(dati.response) ||
-  (dati.errors && Object.keys(dati.errors).length > 0)
-) {
-  throw new Error(
-    "Errore del fornitore partite: " + JSON.stringify(dati.errors || {})
-  );
-}
-  
+   
 const partiteTop5 = (dati.response || []).filter(
   partita => [39, 140, 135, 78, 61].includes(
     Number(partita.league?.id)
@@ -1729,12 +1721,16 @@ if (oggi > oggiReale) {
   return;
 }
   try {
-    const salvati = localStorage.getItem(cacheKey);
+const salvati = localStorage.getItem(cacheKey);
 
-    if (salvati) {
-      const cache = JSON.parse(salvati);
+if (salvati) {
+  const cache = JSON.parse(salvati);
 
-      if (Date.now() - cache.time < CACHE_TIME) {
+  if (
+    Array.isArray(cache.data) &&
+    cache.data.length > 0 &&
+    Date.now() - cache.time < CACHE_TIME
+  ) {
         
 mostraPartite(
   (Array.isArray(cache.data) ? cache.data : [])
@@ -2467,15 +2463,23 @@ async function mostraMarcatoriSerieA(contenitore) {
 
   try {
     const risposta = await fetch(
-      API_URL + "/fd-topscorers?league=135&season=2026"
-    );
+  `${API_URL}/fixtures?date=${oggi}`
+);
 
-    if (!risposta.ok) {
-      throw new Error("Errore marcatori: " + risposta.status);
-    }
+if (!risposta.ok) {
+  throw new Error("Errore nella richiesta API: " + risposta.status);
+}
 
-    const dati = await risposta.json();
+const dati = await risposta.json();
 
+if (
+  !Array.isArray(dati.response) ||
+  (dati.errors && Object.keys(dati.errors).length > 0)
+) {
+  throw new Error(
+    "Errore del fornitore partite: " + JSON.stringify(dati.errors || {})
+  );
+}
     if (!Array.isArray(dati.scorers)) {
       throw new Error("Risposta marcatori non valida");
     }
