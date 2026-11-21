@@ -2755,12 +2755,80 @@ pannelloStatistiche.setAttribute("aria-label", "Statistiche della partita");
 pannelloStatistiche.style.cssText =
   "padding:20px 0;";
 
+const barraPeriodiStatistiche = document.createElement("div");
+barraPeriodiStatistiche.setAttribute("role", "group");
+barraPeriodiStatistiche.setAttribute("aria-label", "Periodo delle statistiche");
+barraPeriodiStatistiche.style.cssText =
+  "display:flex;gap:8px;margin-bottom:20px;";
+
+const chiavePeriodoStatistiche = "justpredix_statistiche_" +
+  JSON.stringify([
+    partita.game_id || partita.fixture?.id || "",
+    casa,
+    ospite,
+    partita.start_time || partita.fixture?.date || ""
+  ]);
+
+let periodoStatistiche = "Totale";
+
+try {
+  const salvato = sessionStorage.getItem(chiavePeriodoStatistiche);
+  if (["Totale", "1° tempo", "2° tempo"].includes(salvato)) {
+    periodoStatistiche = salvato;
+  }
+} catch {}
+
 const messaggioStatistiche = document.createElement("p");
 messaggioStatistiche.textContent = "Statistiche non disponibili";
 messaggioStatistiche.style.cssText =
-  "margin:0;text-align:center;color:#94a3b8;font-size:13px;";
+  "margin:0;padding:16px 0;text-align:center;" +
+  "color:#94a3b8;font-size:13px;";
+messaggioStatistiche.setAttribute("role", "status");
 
-pannelloStatistiche.appendChild(messaggioStatistiche);
+function aggiornaPeriodoStatistiche() {
+  for (const pulsante of barraPeriodiStatistiche.children) {
+    const attivo = pulsante.textContent === periodoStatistiche;
+    pulsante.setAttribute("aria-pressed", String(attivo));
+    pulsante.style.background = attivo ? "#D3133B" : "#203750";
+    pulsante.style.color = attivo ? "#fff" : "#bfcde2";
+  }
+
+  messaggioStatistiche.setAttribute(
+    "aria-label",
+    periodoStatistiche + ": statistiche non disponibili"
+  );
+}
+
+for (const periodo of ["Totale", "1° tempo", "2° tempo"]) {
+  const pulsante = document.createElement("button");
+  pulsante.type = "button";
+  pulsante.textContent = periodo;
+  pulsante.style.cssText =
+    "padding:8px 12px;border:0;border-radius:6px;" +
+    "font-family:inherit;font-size:12px;font-weight:700;" +
+    "white-space:nowrap;cursor:pointer;";
+
+  pulsante.addEventListener("click", () => {
+    periodoStatistiche = periodo;
+    aggiornaPeriodoStatistiche();
+
+    try {
+      sessionStorage.setItem(
+        chiavePeriodoStatistiche,
+        periodoStatistiche
+      );
+    } catch {}
+  });
+
+  barraPeriodiStatistiche.appendChild(pulsante);
+}
+
+aggiornaPeriodoStatistiche();
+
+pannelloStatistiche.append(
+  barraPeriodiStatistiche,
+  messaggioStatistiche
+);
 scheda.appendChild(pannelloStatistiche);
 
 for (const pulsante of barraSchede.children) {
