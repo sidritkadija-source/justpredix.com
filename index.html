@@ -7070,21 +7070,24 @@ function creaNumeriGiornata(gareGiornataDemo, numeroGiornata) {
       prioritaPartita(gara) < prioritaPartita(migliore) ? gara : migliore
     );
 
-    const evidenza = elemento("div", null, "demo-card");
+        const evidenza = elemento("div", null, "demo-card");
     const incontro = elemento("div");
-    incontro.style.cssText = "display:grid;gap:6px;";
-    incontro.append(
-      creaSquadraConLogo(partita.home_team.name),
-      creaSquadraConLogo(partita.away_team.name)
-    );
-    evidenza.append(elemento("span", "In evidenza"), incontro);
+    incontro.style.cssText = "display:flex;align-items:center;gap:12px;";
 
-    if (gareGiornataDemo.includes(partita)) {
-      evidenza.appendChild(
-        elemento("strong", `${partita.home_score} – ${partita.away_score}`)
-      );
+    for (const nome of [partita.home_team.name, partita.away_team.name]) {
+      const logo = creaSquadraConLogo(nome).querySelector("img");
+
+      if (logo) {
+        logo.alt = nome;
+        logo.title = nome;
+        incontro.appendChild(logo);
+      } else {
+        incontro.appendChild(elemento("span", nome));
+      }
     }
 
+    evidenza.append(elemento("span", "In evidenza"), incontro);
+    numeriGiornata.appendChild(evidenza);
     numeriGiornata.appendChild(evidenza);
   }
 
