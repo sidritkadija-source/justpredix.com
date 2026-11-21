@@ -7125,7 +7125,7 @@ if (gareGiornataDemo.length) {
 
   return numeriGiornata;
 }
-fasciaGiornata.append(creaNumeriGiornata(gareGiornataDemo), risultati);
+fasciaGiornata.append(creaNumeriGiornata(gareGiornataDemo, numeroGiornataDemo), risultati);
 
 const fasciaStagione = elemento("section");
 fasciaStagione.setAttribute("aria-label", "Riepilogo della stagione");
@@ -7481,7 +7481,7 @@ intestazioneGiornata.style.cssText =
   "display:flex;align-items:center;flex-wrap:wrap;gap:8px 12px;";
 
 function allineaTendinaGiornata() {
-  const vittorieCasa = statisticheGiornata.children[2];
+  const vittorieCasa = statisticheGiornata.children[3];
   if (!vittorieCasa || !sceltaGiornata.isConnected) return;
 
   const inizioRiga = intestazioneGiornata.getBoundingClientRect().left;
@@ -7515,7 +7515,7 @@ tendinaGiornata.addEventListener("change", () => {
   const anteprima = elemento("div");
   aggiungiStatisticheRiepilogo(anteprima, gare, "giornata");
 
-  const numeri = creaNumeriGiornata(gare);
+  const numeri = creaNumeriGiornata(gare, numero);
   const statistiche = anteprima.firstElementChild;
 statisticheGiornata.replaceChildren(
   ...numeri.children,
