@@ -1117,9 +1117,18 @@ async function caricaClassifica(leagueId) {
     throw new Error("Errore classifica: " + risposta.status);
   }
 
-  const dati = await risposta.json();
-   
-const partiteTop5 = (dati.response || []).filter(
+const dati = await risposta.json();
+
+if (
+  !Array.isArray(dati.response) ||
+  (dati.errors && Object.keys(dati.errors).length > 0)
+) {
+  throw new Error(
+    "Errore del fornitore partite: " + JSON.stringify(dati.errors || {})
+  );
+}
+
+const partiteTop5 = (
   partita => [39, 140, 135, 78, 61].includes(
     Number(partita.league?.id)
   )
