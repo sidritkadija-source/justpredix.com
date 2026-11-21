@@ -984,6 +984,7 @@ html, body {
   </div>
 
  <div class="league-page-tabs">
+   <button type="button" data-tab="oggi">OGGI</button>
   <button type="button" data-tab="risultati">RISULTATI</button>
   <button type="button" data-tab="calendario">CALENDARIO</button>
   <button type="button" data-tab="classifiche">CLASSIFICHE</button>
@@ -4908,7 +4909,135 @@ lista.appendChild(riga);
   }
 };
 
+const schedaOggi = document.createElement("section");
+schedaOggi.hidden = true;
+schedaOggi.setAttribute("aria-label", "Partite di oggi della Serie A");
+corpoRiepilogo.after(schedaOggi);
 
+let richiestaOggi = 0;
+
+document.querySelector(
+  '#league-detail [data-tab="oggi"]'
+).onclick = async () => {
+  const richiesta = ++richiestaOggi;
+
+  corpoRiepilogo.style.display = "none";
+  schedaRisultati.style.display = "none";
+  schedaCalendario.style.display = "none";
+  schedaClassificheSerieA.style.display = "none";
+  schedaArchivioSerieA.style.display = "none";
+  schedaOggi.hidden = false;
+  schedaOggi.textContent = "Caricamento delle partite di oggi…";
+
+  const formatoData = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/Rome",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  });
+
+  const oggi = formatoData.format(new Date());
+
+  try {
+    const risposta = await fetch(
+      API_URL + "/ninja-matches?league=seriea&date=" + oggi
+    );
+
+    if (!risposta.ok) throw new Error("Errore partite di oggi");
+
+    const dati = await risposta.json();
+    if (!Array.isArray(dati)) throw new Error("Risposta non valida");
+    if (richiesta !== richiestaOggi || !schedaOggi.isConnected) return;
+
+    const partiteOggi = dati
+      .filter(partita => {
+        const data = new Date(partita.start_time);
+        return Number.isFinite(data.getTime()) &&
+          formatoData.format(data) === oggi;
+      })
+      .sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
+
+    schedaOggi.replaceChildren();
+
+    const titoloOggi = document.createElement("h3");
+    titoloOggi.textContent = new Intl.DateTimeFormat("it-IT", {
+      timeZone: "Europe/Rome",
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric"
+    }).format(new Date()).toUpperCase();
+    titoloOggi.style.cssText = "margin:20px 0;font-size:16px;";
+    schedaOggi.appendChild(titoloOggi);
+
+    if (!partiteOggi.length) {
+      const messaggio = document.createElement("p");
+      messaggio.textContent =
+        "Nessuna partita di Serie A in programma oggi.";
+      schedaOggi.appendChild(messaggio);
+      return;
+    }
+
+    for (const partita of partiteOggi) {
+      const riga = document.createElement("div");
+      riga.className = "match-row";
+      riga.style.gridTemplateColumns = "75px minmax(0,1fr) 65px";
+
+      const orario = document.createElement("div");
+      orario.className = "match-time";
+
+      orario.textContent = partita.status === "in_progress"
+        ? "🔴 LIVE"
+        : partita.status === "final"
+          ? "FIN"
+          : new Intl.DateTimeFormat("it-IT", {
+              timeZone: "Europe/Rome",
+              hour: "2-digit",
+              minute: "2-digit"
+            }).format(new Date(partita.start_time));
+
+      const squadre = document.createElement("div");
+      squadre.className = "match-teams";
+      squadre.append(
+        creaSquadraConLogo(partita.home_team?.name || "Squadra casa"),
+        creaSquadraConLogo(partita.away_team?.name || "Squadra ospite")
+      );
+
+      const risultato = document.createElement("div");
+      risultato.className = "match-score";
+
+      const punteggioDisponibile =
+        /^\d+$/.test(String(partita.home_score)) &&
+        /^\d+$/.test(String(partita.away_score));
+
+      risultato.textContent = punteggioDisponibile
+        ? `${partita.home_score} - ${partita.away_score}`
+        : "–";
+
+      if (!punteggioDisponibile &&
+          ["in_progress", "final"].includes(partita.status)) {
+        risultato.title = "Punteggio non disponibile dal fornitore";
+      }
+
+      riga.append(orario, squadre, risultato);
+      collegaSchedaPartitaSerieA(riga, partita);
+      schedaOggi.appendChild(riga);
+    }
+  } catch {
+    if (richiesta !== richiestaOggi || !schedaOggi.isConnected) return;
+
+    schedaOggi.textContent =
+      "Impossibile caricare le partite di oggi. Premi OGGI per riprovare.";
+  }
+};
+
+for (const pulsante of barraSchedeSerieA.querySelectorAll("button[data-tab]")) {
+  if (pulsante.dataset.tab !== "oggi") {
+    pulsante.addEventListener("click", () => {
+      schedaOggi.hidden = true;
+    });
+  }
+}
 // Apri il nuovo Riepilogo della Serie A
 document.querySelector(
   '#league-detail [data-tab="riepilogo"]'
@@ -5193,14 +5322,14 @@ document.getElementById("back-to-matches").addEventListener("click", () => {
 });
 
 document.querySelector(
-  '#league-detail [data-tab="risultati"]'
+  '#league-detail [data-tab="oggi"]'
 )?.click();
   });
 }
   (() => {
-  const schede = [
-    "riepilogo", "risultati", "calendario", "classifiche", "archivio"
-  ];
+ const schede = [
+  "oggi", "riepilogo", "risultati", "calendario", "classifiche", "archivio"
+];
 
   let ripristino = false;
 
@@ -5220,7 +5349,7 @@ document.querySelector(
     const elemento = evento.target;
 
     if (elemento.closest('.league-item[data-league="135"]')) {
-      salvaPercorso("serie-a/risultati");
+      salvaPercorso("serie-a/oggi");
       return;
     }
 
