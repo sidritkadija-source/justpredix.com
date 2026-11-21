@@ -3210,7 +3210,61 @@ for (const mercato of [
   barraMercati.appendChild(pulsanteMercato);
 }
 
-selezionaMercatoQuote(barraMercati.firstElementChild);
+const chiaveStatoQuote = "justpredix_quote_" + JSON.stringify([
+  partita.game_id || partita.fixture?.id || "",
+  casa,
+  ospite,
+  partita.start_time || partita.fixture?.date || ""
+]);
+
+let mercatoDaRipristinare = "1X2";
+
+try {
+  const salvato = JSON.parse(
+    sessionStorage.getItem(chiaveStatoQuote) || "null"
+  );
+
+  if (salvato) {
+    mercatoDaRipristinare = salvato.mercato || "1X2";
+    periodoQuoteAttivo = salvato.periodo || "Finale";
+    sogliaGolQuote = salvato.soglia || "2,5";
+    tipoHandicapQuote = salvato.tipoHandicap || "Europeo";
+    valoreHandicapQuote = salvato.valoreHandicap || "-1";
+    golCasaEsatto = salvato.golCasa ?? "1";
+    golOspiteEsatto = salvato.golOspite ?? "0";
+    combinazionePTFT = salvato.ptft || "1/1";
+  }
+} catch {
+  // Usa le selezioni iniziali se il salvataggio non è leggibile.
+}
+
+const pulsanteMercatoSalvato = [...barraMercati.children].find(
+  pulsante => pulsante.textContent === mercatoDaRipristinare
+);
+
+selezionaMercatoQuote(
+  pulsanteMercatoSalvato || barraMercati.firstElementChild
+);
+
+function salvaStatoQuote() {
+  try {
+    sessionStorage.setItem(chiaveStatoQuote, JSON.stringify({
+      mercato: mercatoQuoteAttivo,
+      periodo: periodoQuoteAttivo,
+      soglia: sogliaGolQuote,
+      tipoHandicap: tipoHandicapQuote,
+      valoreHandicap: valoreHandicapQuote,
+      golCasa: golCasaEsatto,
+      golOspite: golOspiteEsatto,
+      ptft: combinazionePTFT
+    }));
+  } catch {
+    // La navigazione continua anche senza memoria disponibile.
+  }
+}
+
+pannelloQuote.addEventListener("click", salvaStatoQuote);
+pannelloQuote.addEventListener("change", salvaStatoQuote);
 
 pannelloQuote.append(
   barraMercati,
