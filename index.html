@@ -7382,13 +7382,14 @@ for (const squadra of squadreSerieA) {
 vincenteSerieA.appendChild(elencoSquadre);
 
 const rigaStagione = elemento("div", null, "demo-riga-stagione");
-rigaStagione.append(marcatori, formazioneStagione, vincenteSerieA);
-colonne.replaceWith(cardClassifica, rigaStagione);
+laterale.appendChild(formazioneStagione);
+colonne.replaceWith(rigaStagione);
+rigaStagione.append(cardClassifica, laterale, vincenteSerieA);
 
 stileDisposizione.textContent += `
   #demo-riepilogo-stagione .demo-riga-stagione {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr) minmax(0, 0.85fr);
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 0.8fr);
     gap: 12px;
     margin-top: 14px;
     align-items: start;
