@@ -6865,10 +6865,10 @@ pagina.insertBefore(progressoStagione, stato);
     tabella.setAttribute("aria-label", "Classifica Serie A");
     const intestazione = tabella.createTHead().insertRow();
 
-    for (const testo of ["#", "Squadra", "PG", "V", "N", "P", "DR", "PT"]) {
+    for (const testo of ["#", "SQUADRA", "PG", "V", "N", "P", "DR", "PT"]) {
       const cella = elemento("th", testo);
       cella.scope = "col";
-      if (testo === "Squadra") cella.style.textAlign = "left";
+      if (testo === "SQUADRA") cella.style.textAlign = "left";
       intestazione.appendChild(cella);
     }
 
@@ -7388,8 +7388,8 @@ intestazioneVincente.style.cssText =
   "font-size:12px;font-weight:700;color:#bfcde2;";
 
 intestazioneVincente.append(
-  elemento("span", "Squadra"),
-  elemento("span", "Quote")
+  elemento("span", "SQUADRA"),
+  elemento("span", "QUOTE")
 );
 
 vincenteSerieA.append(intestazioneVincente, elencoSquadre);
