@@ -1559,7 +1559,8 @@ ${mostraQuote && quote1x2 ? `
   { id: 61, nome: '<img src="https://flagcdn.com/fr.svg" width="24" height="18" alt=""> FRANCIA: Ligue 1' }
 ];
 
-const partiteCampionato = partiteValutate
+contenitore.innerHTML = gruppiCampionati.map(({ id, nome }) => {
+  const partiteCampionato = partiteValutate
   .filter(({ partita }) => partita.league.id === id)
   .sort((a, b) =>
     new Date(a.partita.fixture.date).getTime() -
