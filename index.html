@@ -7372,11 +7372,12 @@ fasciaGiornata.appendChild(dettagliGiornata);
     const titoloGiornata = fasciaGiornata.querySelector("h2");
 const statisticheGiornata = fasciaGiornata.querySelector(".demo-statistiche-unite");
 
-const sceltaGiornata = elemento("label", "Giornata ");
+const sceltaGiornata = elemento("label");
 sceltaGiornata.style.cssText =
   "display:flex;align-items:center;gap:8px;font-weight:600;";
 
 const tendinaGiornata = elemento("select");
+    tendinaGiornata.setAttribute("aria-label", "Seleziona la giornata");
 tendinaGiornata.style.cssText =
   "padding:8px 12px;border:1px solid #30445e;border-radius:6px;" +
   "background:#111c2e;color:#e5edf7;";
@@ -7391,7 +7392,8 @@ for (const [numero] of giornateGiocate) {
 
 if (giornateGiocate.length) {
   sceltaGiornata.appendChild(tendinaGiornata);
-  titoloGiornata.after(sceltaGiornata);
+  sceltaGiornata.style.gridColumn = "1 / -1";
+statisticheGiornata.insertBefore(sceltaGiornata, statisticheGiornata.children[2]);
 }
 
 tendinaGiornata.addEventListener("change", () => {
@@ -7406,7 +7408,11 @@ tendinaGiornata.addEventListener("change", () => {
 
   const numeri = creaNumeriGiornata(gare);
   const statistiche = anteprima.firstElementChild;
-  statisticheGiornata.replaceChildren(...numeri.children, ...statistiche.children);
+  statisticheGiornata.replaceChildren(
+  ...numeri.children,
+  sceltaGiornata,
+  ...statistiche.children
+);
 
   for (const card of statisticheGiornata.children) {
     card.style.width = "100%";
