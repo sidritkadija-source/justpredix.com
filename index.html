@@ -7258,6 +7258,51 @@ aggiungiStatisticheRiepilogo(
   concluse,
   "stagione"
 );
+    const golPerGiornata = Object.entries(giornateDemo)
+  .filter(([, gare]) =>
+    gare.length === 10 &&
+    gare.every(gara =>
+      gara.status === "final" &&
+      /^\d+$/.test(String(gara.home_score)) &&
+      /^\d+$/.test(String(gara.away_score))
+    )
+  )
+  .map(([numero, gare]) => ({
+    numero,
+    gol: gare.reduce(
+      (totale, gara) =>
+        totale + Number(gara.home_score) + Number(gara.away_score),
+      0
+    )
+  }));
+
+const riquadroGolGiornate = elemento("div", null, "demo-card");
+riquadroGolGiornate.appendChild(elemento("span", "Giornata +/− gol"));
+
+if (golPerGiornata.length) {
+  const totaliGol = golPerGiornata.map(giornata => giornata.gol);
+
+  for (const [etichetta, totale] of [
+    ["Più gol", Math.max(...totaliGol)],
+    ["Meno gol", Math.min(...totaliGol)]
+  ]) {
+    const giornate = golPerGiornata
+      .filter(giornata => giornata.gol === totale)
+      .map(giornata => giornata.numero)
+      .join("/");
+
+    riquadroGolGiornate.appendChild(
+      elemento("p", `${etichetta} · ${giornate} — ${totale} gol`)
+    );
+  }
+} else {
+  riquadroGolGiornate.appendChild(
+    elemento("p", "Nessuna giornata conclusa")
+  );
+}
+
+fasciaStagione.querySelector(".demo-numeri:last-of-type")
+  ?.appendChild(riquadroGolGiornate);
     const stileDisposizione = elemento("style");
 stileDisposizione.textContent = `
   #demo-riepilogo-stagione .demo-statistiche-unite {
