@@ -7398,6 +7398,32 @@ const rigaStagione = elemento("div", null, "demo-riga-stagione");
 laterale.appendChild(formazioneStagione);
 colonne.replaceWith(rigaStagione);
 rigaStagione.append(cardClassifica, laterale, vincenteSerieA);
+    const vistaDesktop = window.matchMedia("(min-width: 801px)");
+
+function allineaAltezzaClassifica() {
+  if (!vistaDesktop.matches) {
+    tabella.style.height = "";
+    return;
+  }
+
+  const fondoVincente = vincenteSerieA.getBoundingClientRect().bottom;
+  const inizioTabella = tabella.getBoundingClientRect().top;
+  const spazioSottoTabella =
+    parseFloat(getComputedStyle(cardClassifica).paddingBottom) +
+    parseFloat(getComputedStyle(cardClassifica).borderBottomWidth);
+
+  tabella.style.height =
+    `${Math.max(0, fondoVincente - inizioTabella - spazioSottoTabella)}px`;
+}
+
+const osservatoreAltezza = new ResizeObserver(allineaAltezzaClassifica);
+osservatoreAltezza.observe(vincenteSerieA);
+vistaDesktop.addEventListener("change", allineaAltezzaClassifica);
+
+indietro.addEventListener("click", () => {
+  osservatoreAltezza.disconnect();
+  vistaDesktop.removeEventListener("change", allineaAltezzaClassifica);
+}, { once: true });
 
 stileDisposizione.textContent += `
   #demo-riepilogo-stagione .demo-riga-stagione {
