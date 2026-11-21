@@ -7376,6 +7376,10 @@ const squadreSerieA = [...new Set(
 const elencoSquadre = elemento("ul", null, "demo-vincente-squadre");
 
 for (const squadra of squadreSerieA) {
+  const riga = elemento("li");
+  riga.appendChild(creaSquadraConLogo(squadra));
+  elencoSquadre.appendChild(riga);
+}
   elencoSquadre.appendChild(elemento("li", squadra));
 }
 
