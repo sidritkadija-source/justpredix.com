@@ -7416,10 +7416,10 @@ tendinaGiornata.addEventListener("change", () => {
 
   const numeri = creaNumeriGiornata(gare);
   const statistiche = anteprima.firstElementChild;
-  statisticheGiornata.replaceChildren(
+statisticheGiornata.replaceChildren(
   ...numeri.children,
-  ...statistiche.children
-   sceltaGiornata, 
+  ...statistiche.children,
+  sceltaGiornata
 );
 allineaTendinaGiornata();
   for (const card of statisticheGiornata.querySelectorAll(".demo-card")) {
