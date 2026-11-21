@@ -1706,15 +1706,6 @@ try {
   const cacheKey = "justpredix_partite_" + oggi;
   const contenitore = document.getElementById("matches");
   
-// Per le date future usa API Ninjas per la Serie A
-const oggiReale = new Date().toLocaleDateString("en-CA", {
-  timeZone: "Europe/Tirane"
-});
-
-if (oggi > oggiReale) {
-  await mostraSerieANelCalendario(oggi);
-  return;
-}
   try {
 const salvati = localStorage.getItem(cacheKey);
 
