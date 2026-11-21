@@ -2798,6 +2798,8 @@ barraPeriodiQuote.style.cssText =
   "margin-top:8px;padding:8px 0;border-bottom:1px solid #30445e;";
 
 let sogliaGolQuote = "2,5";
+    let sogliaCornerQuote = "9,5";
+let sogliaCartelliniQuote = "4,5";
     let tipoHandicapQuote = "Europeo";
 let valoreHandicapQuote = "-1";
     let golCasaEsatto = "1";
@@ -2816,73 +2818,106 @@ function mostraTabellaQuote() {
   }
 
   const overUnder = mercatoQuoteAttivo === "Over/Under";
-  const golNoGol = mercatoQuoteAttivo === "Gol/No Gol";
-  const doppiaChance = mercatoQuoteAttivo === "Doppia chance";
-  const handicapQuote = mercatoQuoteAttivo === "Handicap";
-  const risultatoEsatto = mercatoQuoteAttivo === "Risultato esatto";
-  const primoFinale = mercatoQuoteAttivo === "PT/FT";
+const cornerQuote = mercatoQuoteAttivo === "Corner";
+const cartelliniQuote = mercatoQuoteAttivo === "Cartellini";
+const mercatoTotali = overUnder || cornerQuote || cartelliniQuote;
 
- if (
+const golNoGol = mercatoQuoteAttivo === "Gol/No Gol";
+const doppiaChance = mercatoQuoteAttivo === "Doppia chance";
+const handicapQuote = mercatoQuoteAttivo === "Handicap";
+const risultatoEsatto = mercatoQuoteAttivo === "Risultato esatto";
+const primoFinale = mercatoQuoteAttivo === "PT/FT";
+
+if (
   mercatoQuoteAttivo !== "1X2" &&
-  !overUnder &&
+  !mercatoTotali &&
   !golNoGol &&
-    !doppiaChance &&
-    !handicapQuote &&
+  !doppiaChance &&
+  !handicapQuote &&
   !risultatoEsatto &&
   !primoFinale
 ) {
-    contenutoQuote.textContent =
-      mercatoQuoteAttivo + " · Quote non ancora disponibili";
-    return;
-  }
+  contenutoQuote.textContent =
+    mercatoQuoteAttivo + " · Quote non ancora disponibili";
+  return;
+}
 
-  if (overUnder) {
-    const barraSoglie = document.createElement("div");
-    barraSoglie.setAttribute("role", "group");
-    barraSoglie.setAttribute("aria-label", "Soglia dei gol");
-    barraSoglie.style.cssText =
-      "display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;";
+const sogliaTotaleAttiva = cornerQuote
+  ? sogliaCornerQuote
+  : cartelliniQuote
+    ? sogliaCartelliniQuote
+    : sogliaGolQuote;
 
-    for (const soglia of ["0,5", "1,5", "2,5", "3,5", "4,5", "5,5", "6,5"]) {
-      const pulsante = document.createElement("button");
-      const attivo = soglia === sogliaGolQuote;
-      pulsante.type = "button";
-      pulsante.textContent = soglia;
-      pulsante.setAttribute("aria-pressed", String(attivo));
-      pulsante.style.cssText =
-        "padding:7px 12px;border:0;border-radius:5px;" +
-        "font-family:inherit;font-size:12px;font-weight:700;" +
-        "cursor:pointer;color:" + (attivo ? "#fff" : "#bfcde2") + ";" +
-        "background:" + (attivo ? "#D3133B" : "#203750") + ";";
+if (mercatoTotali) {
+  const barraSoglie = document.createElement("div");
+  barraSoglie.setAttribute("role", "group");
+  barraSoglie.setAttribute("aria-label", "Soglia del totale");
+  barraSoglie.style.cssText =
+    "display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;";
 
-      pulsante.addEventListener("click", () => {
+  const soglie = cornerQuote
+    ? [
+        "2,5", "3,5", "4,5", "5,5", "6,5", "7,5", "8,5",
+        "9,5", "10,5", "11,5", "12,5", "13,5", "14,5"
+      ]
+    : cartelliniQuote
+      ? ["0,5", "1,5", "2,5", "3,5", "4,5", "5,5", "6,5", "7,5", "8,5"]
+      : ["0,5", "1,5", "2,5", "3,5", "4,5", "5,5", "6,5"];
+
+  for (const soglia of soglie) {
+    const pulsante = document.createElement("button");
+    const attivo = soglia === sogliaTotaleAttiva;
+
+    pulsante.type = "button";
+    pulsante.textContent = soglia;
+    pulsante.setAttribute("aria-pressed", String(attivo));
+    pulsante.style.cssText =
+      "padding:7px 12px;border:0;border-radius:5px;" +
+      "font-family:inherit;font-size:12px;font-weight:700;" +
+      "cursor:pointer;color:" + (attivo ? "#fff" : "#bfcde2") + ";" +
+      "background:" + (attivo ? "#D3133B" : "#203750") + ";";
+
+    pulsante.addEventListener("click", () => {
+      if (cornerQuote) {
+        sogliaCornerQuote = soglia;
+      } else if (cartelliniQuote) {
+        sogliaCartelliniQuote = soglia;
+      } else {
         sogliaGolQuote = soglia;
-        mostraTabellaQuote();
+      }
 
-        const gruppo = contenutoQuote.querySelector(
-          '[aria-label="Soglia dei gol"]'
-        );
-        [...gruppo.children]
-          .find(bottone => bottone.textContent === soglia)?.focus();
-      });
+      mostraTabellaQuote();
 
-      barraSoglie.appendChild(pulsante);
-    }
+      const gruppo = contenutoQuote.querySelector(
+        '[aria-label="Soglia del totale"]'
+      );
 
-    contenutoQuote.appendChild(barraSoglie);
+      [...gruppo.children]
+        .find(bottone => bottone.textContent === soglia)?.focus();
+    });
+
+    barraSoglie.appendChild(pulsante);
   }
+
+  contenutoQuote.appendChild(barraSoglie);
+}
 
 const colonne = (risultatoEsatto || primoFinale)
   ? ["BOOKMAKER", "QUOTA"]
-  : overUnder
-  ? ["BOOKMAKER", "OVER " + sogliaGolQuote, "UNDER " + sogliaGolQuote]
-  : golNoGol
-    ? ["BOOKMAKER", "GOL", "NO GOL"]
-    : doppiaChance
-      ? ["BOOKMAKER", "1X", "12", "X2"]
-      : handicapQuote && tipoHandicapQuote === "Asiatico"
-        ? ["BOOKMAKER", "1", "2"]
-        : ["BOOKMAKER", "1", "X", "2"];
+  : mercatoTotali
+    ? [
+        "BOOKMAKER",
+        "OVER " + sogliaTotaleAttiva,
+        "UNDER " + sogliaTotaleAttiva
+      ]
+    : golNoGol
+      ? ["BOOKMAKER", "GOL", "NO GOL"]
+      : doppiaChance
+        ? ["BOOKMAKER", "1X", "12", "X2"]
+        : handicapQuote && tipoHandicapQuote === "Asiatico"
+          ? ["BOOKMAKER", "1", "2"]
+          : ["BOOKMAKER", "1", "X", "2"];
+
 if (handicapQuote) {
   const comandiHandicap = document.createElement("div");
   comandiHandicap.style.cssText =
@@ -3072,7 +3107,7 @@ if (handicapQuote) {
   tabella.setAttribute(
     "aria-label",
     "Confronto quote " + mercatoQuoteAttivo +
-    (overUnder ? " " + sogliaGolQuote : "") +
+    (mercatoTotali ? " " + sogliaTotaleAttiva : "") +
     " · " + periodoQuoteAttivo
   );
   tabella.style.cssText =
@@ -3213,6 +3248,8 @@ try {
     mercatoDaRipristinare = salvato.mercato || "1X2";
     periodoQuoteAttivo = salvato.periodo || "Finale";
     sogliaGolQuote = salvato.soglia || "2,5";
+    sogliaCornerQuote = salvato.sogliaCorner || "9,5";
+sogliaCartelliniQuote = salvato.sogliaCartellini || "4,5";
     tipoHandicapQuote = salvato.tipoHandicap || "Europeo";
     valoreHandicapQuote = salvato.valoreHandicap || "-1";
     golCasaEsatto = salvato.golCasa ?? "1";
@@ -3237,6 +3274,8 @@ function salvaStatoQuote() {
       mercato: mercatoQuoteAttivo,
       periodo: periodoQuoteAttivo,
       soglia: sogliaGolQuote,
+      sogliaCorner: sogliaCornerQuote,
+sogliaCartellini: sogliaCartelliniQuote,
       tipoHandicap: tipoHandicapQuote,
       valoreHandicap: valoreHandicapQuote,
       golCasa: golCasaEsatto,
