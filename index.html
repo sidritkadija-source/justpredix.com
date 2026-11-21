@@ -1700,7 +1700,9 @@ async function caricaPartite(dataSelezionata) {
 const oggi = dataSelezionata || new Date().toLocaleDateString("en-CA", {
   timeZone: "Europe/Tirane"
 });
-
+try {
+  sessionStorage.setItem("justpredix_data_home", oggi);
+} catch {}
   const cacheKey = "justpredix_partite_" + oggi;
   const contenitore = document.getElementById("matches");
   
@@ -1834,14 +1836,30 @@ await mostraPartite(
   }
 }
 
-caricaPartite();
-  const campoData = document.getElementById("match-date");
+const campoData = document.getElementById("match-date");
+
+let dataInizialeHome = new Date().toLocaleDateString("en-CA", {
+  timeZone: "Europe/Tirane"
+});
+
+try {
+  const navigazione = performance.getEntriesByType("navigation")[0];
+  const salvata = sessionStorage.getItem("justpredix_data_home");
+
+  if (
+    navigazione?.type === "reload" &&
+    salvata &&
+    /^\d{4}-\d{2}-\d{2}$/.test(salvata)
+  ) {
+    dataInizialeHome = salvata;
+  }
+} catch {}
 
 if (campoData) {
-  campoData.value = new Date().toLocaleDateString("en-CA", {
-    timeZone: "Europe/Tirane"
-  });
+  campoData.value = dataInizialeHome;
 }
+
+caricaPartite(dataInizialeHome);
   if (campoData) {
   campoData.addEventListener("change", () => {
     if (!campoData.value) return;
