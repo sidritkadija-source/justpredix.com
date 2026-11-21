@@ -6908,24 +6908,25 @@ pagina.insertBefore(progressoStagione, stato);
   "margin:0 0 18px;padding:12px 16px;";
    const giornateDemo = organizzaGiornateSerieA(stagione);
 
-const ultimaGiornataConclusa = Object.entries(giornateDemo)
-  .filter(([, gare]) =>
-    gare.length === 10 &&
-    gare.every(gara =>
+const ultimaGiornataGiocata = Object.entries(giornateDemo)
+  .map(([numero, gare]) => [
+    numero,
+    gare.filter(gara =>
       gara.status === "final" &&
       /^\d+$/.test(String(gara.home_score)) &&
       /^\d+$/.test(String(gara.away_score))
     )
-  )
+  ])
+  .filter(([, gare]) => gare.length > 0)
   .sort((a, b) => Number(b[0]) - Number(a[0]))[0];
 
-const numeroGiornataDemo = ultimaGiornataConclusa?.[0];
-const gareGiornataDemo = ultimaGiornataConclusa?.[1] || [];
+const numeroGiornataDemo = ultimaGiornataGiocata?.[0];
+const gareGiornataDemo = ultimaGiornataGiocata?.[1] || [];
 
 risultati.appendChild(elemento("h2", "Risultati della giornata"));
 
 if (!gareGiornataDemo.length) {
-  risultati.appendChild(elemento("p", "Nessuna giornata completa disponibile."));
+  risultati.appendChild(elemento("p", "Nessuna partita conclusa disponibile."));
 }
 
 for (const gara of gareGiornataDemo) {
