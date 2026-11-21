@@ -6802,11 +6802,6 @@ pagina.insertBefore(progressoStagione, sottotitolo);
       timeZone: "Europe/Tirane"
     });
 
-    stato.textContent =
-      "Dati calcolati dai risultati conclusi caricati nel sito. " +
-      "Ultima partita inclusa del " +
-      formatoData.format(new Date(concluse[0].start_time)) + ".";
-
     const numeri = elemento("div", null, "demo-numeri");
 
     for (const [etichetta, valore] of [
@@ -7371,7 +7366,7 @@ fasciaGiornata.appendChild(dettagliGiornata);
 
 laterale.appendChild(formazioneStagione);
 pagina.append(fasciaGiornata, fasciaStagione);
-    pagina.append(indietro, titolo, sottotitolo, stato);
+    stato.remove();
   } catch {
     stato.textContent =
       "Impossibile caricare il riepilogo. Aggiorna la pagina per riprovare.";
