@@ -6765,7 +6765,7 @@ conteggioGiornate.style.cssText =
   "margin:6px 0 0;text-align:center;font-size:12px;";
 
 progressoStagione.append(barraStagione, dateBarra);
-pagina.insertBefore(progressoStagione, sottotitolo);
+pagina.insertBefore(progressoStagione, stato);
     const concluse = stagione.filter(gara =>
       gara.status === "final" &&
       gara.home_team?.name &&
