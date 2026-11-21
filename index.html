@@ -7043,8 +7043,50 @@ fasciaGiornata.appendChild(
       : "Riepilogo della giornata"
   )
 );
-function creaNumeriGiornata(gareGiornataDemo) {
-const numeriGiornata = elemento("div", null, "demo-numeri");
+function creaNumeriGiornata(gareGiornataDemo, numeroGiornata) {
+  const numeriGiornata = elemento("div", null, "demo-numeri");
+
+  const gareDelTurno = (giornateDemo[numeroGiornata] || []).filter(
+    gara => gara.home_team?.name && gara.away_team?.name
+  );
+
+  if (gareDelTurno.length) {
+    const inizioTurno = Math.min(
+      ...gareDelTurno.map(gara => new Date(gara.start_time).getTime())
+    );
+    const classificaPrimaDelTurno = calcolaClassificaSerieA(
+      concluse.filter(gara => new Date(gara.start_time).getTime() < inizioTurno)
+    );
+    const posizioni = new Map(
+      classificaPrimaDelTurno.map((squadra, indice) => [squadra.squadra, indice + 1])
+    );
+
+    function prioritaPartita(gara) {
+      return (posizioni.get(gara.home_team.name) ?? 21) +
+        (posizioni.get(gara.away_team.name) ?? 21);
+    }
+
+    const partita = gareDelTurno.reduce((migliore, gara) =>
+      prioritaPartita(gara) < prioritaPartita(migliore) ? gara : migliore
+    );
+
+    const evidenza = elemento("div", null, "demo-card");
+    const incontro = elemento("div");
+    incontro.style.cssText = "display:grid;gap:6px;";
+    incontro.append(
+      creaSquadraConLogo(partita.home_team.name),
+      creaSquadraConLogo(partita.away_team.name)
+    );
+    evidenza.append(elemento("span", "In evidenza"), incontro);
+
+    if (gareGiornataDemo.includes(partita)) {
+      evidenza.appendChild(
+        elemento("strong", `${partita.home_score} – ${partita.away_score}`)
+      );
+    }
+
+    numeriGiornata.appendChild(evidenza);
+  }
 
 if (gareGiornataDemo.length) {
   const golGiornata = gareGiornataDemo.reduce(
