@@ -4771,12 +4771,15 @@ document.querySelector('[data-tab="risultati"]').onclick = async () => {
     let numero = 1;
 
     for (let n = 1; n <= 38; n++) {
-      if (giornate[n].some(p =>
-        new Date(p.start_time).getTime() <= Date.now()
-      )) {
-        numero = n;
-      }
-    }
+  const gare = giornate[n] || [];
+
+  if (
+    gare.length === 10 &&
+    gare.every(partita => partita.status === "final")
+  ) {
+    numero = n;
+  }
+}
 
     function visualizzaGiornata() {
       lista.replaceChildren();
