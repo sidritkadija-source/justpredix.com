@@ -3021,14 +3021,7 @@ if (handicapQuote) {
     sceltaRisultato.appendChild(etichetta);
   }
 
-  const riepilogoEsatto = document.createElement("p");
-  riepilogoEsatto.textContent =
-    periodoQuoteAttivo + " · " + casa + " " +
-    golCasaEsatto + " – " + golOspiteEsatto + " " + ospite;
-  riepilogoEsatto.style.cssText =
-    "margin:0 0 14px;font-size:13px;font-weight:700;color:#edf4ff;";
-
-  contenutoQuote.append(sceltaRisultato, riepilogoEsatto);
+  contenutoQuote.appendChild(sceltaRisultato);
 }
   if (primoFinale) {
   
@@ -3070,15 +3063,7 @@ if (handicapQuote) {
     barraCombinazioni.appendChild(pulsante);
   }
 
-  const selezionePTFT = document.createElement("p");
-  selezionePTFT.textContent = "PT/FT selezionato: " + combinazionePTFT;
-  selezionePTFT.style.cssText =
-    "margin:0 0 14px;color:#edf4ff;font-size:13px;font-weight:700;";
-
- contenutoQuote.append(
-  barraCombinazioni,
-  selezionePTFT
-);
+ contenutoQuote.appendChild(barraCombinazioni);
 }
   const scorrimento = document.createElement("div");
   scorrimento.style.overflowX = "auto";
